@@ -14,6 +14,7 @@ A support bot for SaaS help centers that ships with proof it works: a test repor
 - `fixtures/zulip/`: the text of Zulip's help center, saved on 2026-10-06, used for the demo. The raw HTML is attached to the `zulip-v1-frozen` release.
 - `scripts/snapshot.py`: how that copy was made. `scripts/verify_snapshot.py` checks what the extraction kept.
 - `scripts/api_check.py`: checks what the bot assumes about the Claude and Voyage APIs, on each model, before anything is built on it. The results from 2026-10-08 are next to it.
+- `src/citemark/jobs/` and `citemark jobs work`: background jobs that survive a restart (a job whose worker is killed finishes exactly once, and a test proves it), and the daily purge of conversations older than 90 days.
 - `src/citemark/db/`: the database (Postgres 16 with pgvector). The database itself refuses to change a frozen test set, and to edit or delete a passage, so an old citation always opens what it cited.
 
 ## Running it locally

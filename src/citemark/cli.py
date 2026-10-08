@@ -14,6 +14,8 @@ from citemark.evals.snapshot import HelpCenterSnapshot
 app = typer.Typer(help="Citemark: a support bot tested against its own help center.", no_args_is_help=True)
 test_app = typer.Typer(help="Test questions: check them, then freeze them.", no_args_is_help=True)
 app.add_typer(test_app, name="test")
+jobs_app = typer.Typer(help="Background jobs, such as the daily purge of old conversations.", no_args_is_help=True)
+app.add_typer(jobs_app, name="jobs")
 
 FileArg = Annotated[Path, typer.Argument(help="The test-set YAML file.", exists=True, dir_okay=False)]
 SnapshotOpt = Annotated[
@@ -124,3 +126,17 @@ def freeze(
         typer.echo(f"Wording check flagged {flagged} in the draft; {edited} of {lock['questions']} changed in review.")
     files = [file.name, testset.lock_path(file).name, *([draft.name] if draft else [])]
     typer.echo(f"Commit {', '.join(files)} together.")
+
+
+@jobs_app.command("work")
+def jobs_work(
+    until_idle: Annotated[bool, typer.Option(help="Stop once no job is waiting, instead of waiting for more.")] = False,
+) -> None:
+    """Run the job worker in this process. If it's stopped mid-job, the job resumes next time."""
+    import asyncio
+
+    from citemark import log
+    from citemark.jobs.worker import run_worker
+
+    log.configure()
+    asyncio.run(run_worker(until_idle=until_idle))
