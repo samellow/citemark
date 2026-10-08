@@ -14,9 +14,16 @@ A support bot for SaaS help centers that ships with proof it works: a test repor
 - `fixtures/zulip/`: the text of Zulip's help center, saved on 2026-10-06, used for the demo. The raw HTML is attached to the `zulip-v1-frozen` release.
 - `scripts/snapshot.py`: how that copy was made. `scripts/verify_snapshot.py` checks what the extraction kept.
 
+## Running it locally
+
+You need [uv](https://docs.astral.sh/uv/) and Docker.
+
 ```
-uv run citemark test check test-sets/zulip-v1.yaml --snapshot fixtures/zulip
+cp .env.example .env              # then add your API keys to .env
+docker compose up -d db           # Postgres 16 with pgvector, on port 54320
+uv run alembic upgrade head
 uv run pytest
+uv run citemark test check test-sets/zulip-v1.yaml --snapshot fixtures/zulip
 ```
 
 ## Licenses

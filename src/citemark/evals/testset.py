@@ -157,9 +157,7 @@ def freeze(
 ) -> dict:
     """Write the lock. `flagged` and `edited` come from comparing the AI draft (checks.review_counts)."""
     if lock_path(path).exists():
-        raise AlreadyFrozen(
-            f"{path.name} is already frozen. Put changes in version {test_set.version + 1} instead."
-        )
+        raise AlreadyFrozen(f"{path.name} is already frozen. Put changes in version {test_set.version + 1} instead.")
     counts = Counter(q.type.value for q in test_set.questions)
     lock = {
         "test_set": test_set.name,

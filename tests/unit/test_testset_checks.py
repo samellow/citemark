@@ -111,8 +111,11 @@ def _set_source(**changes):
         pytest.param(_set_source(section="Delete a message"), "source", id="no-such-section"),
         pytest.param(_set_source(url="https://zulip.com/help/nope"), "source", id="no-such-article"),
         pytest.param(_set_q(0, question="hover over the message to see icons"), "wording", id="copies-the-article"),
-        pytest.param(_set_q(1, not_covered_terms=["light theme", "auto-reply", "vacation"]), "not_covered",
-                     id="decline-term-is-covered"),
+        pytest.param(
+            _set_q(1, not_covered_terms=["light theme", "auto-reply", "vacation"]),
+            "not_covered",
+            id="decline-term-is-covered",
+        ),
         pytest.param(_set_q(1, type="partial"), "fields", id="partial-without-its-fields"),
         pytest.param(_set_q(1, not_covered_terms=["vacation"]), "fields", id="too-few-decline-terms"),
         pytest.param(_set_q(2, question="email me at someone@example.com"), "personal_data", id="email-in-question"),

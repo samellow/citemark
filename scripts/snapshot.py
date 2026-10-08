@@ -113,10 +113,17 @@ def prepare_html(html: str) -> str:
 
 
 def extract(html: str) -> str:
-    return trafilatura.extract(
-        prepare_html(html), output_format="markdown", include_formatting=True,
-        include_tables=True, include_links=False, favor_recall=True,
-    ) or ""
+    return (
+        trafilatura.extract(
+            prepare_html(html),
+            output_format="markdown",
+            include_formatting=True,
+            include_tables=True,
+            include_links=False,
+            favor_recall=True,
+        )
+        or ""
+    )
 
 
 def reextract(out_dir: Path) -> None:
@@ -186,16 +193,18 @@ def main(out_dir: Path) -> None:
             text = extract(html)
             (text_dir / f"{slug}.md").write_text(text, encoding="utf-8")
             title = re.search(r"<title>(.*?)</title>", html, re.S)
-            pages.append({
-                "url": final,
-                "requested": url,
-                "slug": slug,
-                "title": title.group(1).strip() if title else "",
-                "sha256": hashlib.sha256(html.encode("utf-8")).hexdigest(),
-                "html_bytes": len(html.encode("utf-8")),
-                "text_chars": len(text),
-                "fetched_at": dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
-            })
+            pages.append(
+                {
+                    "url": final,
+                    "requested": url,
+                    "slug": slug,
+                    "title": title.group(1).strip() if title else "",
+                    "sha256": hashlib.sha256(html.encode("utf-8")).hexdigest(),
+                    "html_bytes": len(html.encode("utf-8")),
+                    "text_chars": len(text),
+                    "fetched_at": dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
+                }
+            )
             print(f"{len(pages):4d}  {slug}", flush=True)
 
     tar_path = out_dir / "raw.tar.gz"

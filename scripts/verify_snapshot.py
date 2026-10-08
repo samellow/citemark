@@ -106,8 +106,10 @@ def main(snapshot: Path) -> None:
     print(f"pages {manifest['page_count']}")
     for name in ("headings", "tab panels", "callouts"):
         print(f"  {name}: {counts[name]}, missing {counts[name + ' missing']}")
-    print(f"  paragraphs and list items: {counts['paragraphs and list items']}, "
-          f"missing {counts['paragraphs and list items missing']}")
+    print(
+        f"  paragraphs and list items: {counts['paragraphs and list items']}, "
+        f"missing {counts['paragraphs and list items missing']}"
+    )
     print(f"  tab labels missing: {counts['tab labels missing']}")
     print(f"  tab panel text missing (spot check, code blocks included): {counts['tab panel text missing']}")
     print(f"  pages with navigation text: {counts['pages with navigation text']}")

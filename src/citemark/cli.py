@@ -20,9 +20,7 @@ SnapshotOpt = Annotated[
     Path,
     typer.Option(help="Folder holding the help center's manifest.json and text/.", exists=True, file_okay=False),
 ]
-ExpectOpt = Annotated[
-    str | None, typer.Option(help="Required counts per type, for example answerable=32,partial=5.")
-]
+ExpectOpt = Annotated[str | None, typer.Option(help="Required counts per type, for example answerable=32,partial=5.")]
 MaxPerArticleOpt = Annotated[int | None, typer.Option(help="The most questions allowed to use one article.")]
 DraftOpt = Annotated[
     Path | None,
@@ -119,8 +117,9 @@ def freeze(
         )
     except testset.AlreadyFrozen as exc:
         _fail(str(exc))
-    typer.echo(f"Frozen: {test_set.name} v{test_set.version}, {lock['questions']} questions, "
-               f"fingerprint {lock['sha256'][:8]}.")
+    typer.echo(
+        f"Frozen: {test_set.name} v{test_set.version}, {lock['questions']} questions, fingerprint {lock['sha256'][:8]}."
+    )
     if draft:
         typer.echo(f"Wording check flagged {flagged} in the draft; {edited} of {lock['questions']} changed in review.")
     files = [file.name, testset.lock_path(file).name, *([draft.name] if draft else [])]

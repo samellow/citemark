@@ -185,7 +185,7 @@ def _reviewed_fields(q: Question) -> dict:
 
 
 def parse_expect(spec: str | None) -> dict[str, int] | None:
-    """"answerable=32,partial=5" becomes {"answerable": 32, "partial": 5}."""
+    """ "answerable=32,partial=5" becomes {"answerable": 32, "partial": 5}."""
     if not spec:
         return None
     pairs = (item.split("=", 1) for item in spec.split(",") if item.strip())

@@ -7,3 +7,6 @@ dist/
 # The raw HTML of the help-center snapshot is attached to the freeze tag's release, not committed
 fixtures/zulip/raw/
 fixtures/zulip/raw.tar.gz
+
+# Local settings, including API keys
+.env
