@@ -1,0 +1,2587 @@
+{
+  "start": "https://zulip.com/help/",
+  "user_agent": "help-center-snapshot/0.1 (+https://github.com/samellow)",
+  "crawled_at": "2026-10-06T14:52:43+00:00",
+  "page_count": 257,
+  "raw_tarball_sha256": "a9ca99960b115395d22332f54413e3450e0e592714b103d8a13700fecd266cf3",
+  "pages": [
+    {
+      "url": "https://zulip.com/help/add-a-bot-or-integration",
+      "requested": "https://zulip.com/help/add-a-bot-or-integration",
+      "slug": "add-a-bot-or-integration",
+      "title": "Add a bot or integration | Zulip help center",
+      "sha256": "9b3220786321a1059777f0dc9358285d8e341a0e2d206fd8aab3240440da35cc",
+      "html_bytes": 95508,
+      "text_chars": 1098,
+      "fetched_at": "2026-10-06T14:52:31+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/add-a-custom-linkifier",
+      "requested": "https://zulip.com/help/add-a-custom-linkifier",
+      "slug": "add-a-custom-linkifier",
+      "title": "Add a custom linkifier | Zulip help center",
+      "sha256": "819d20e9f6456a0d596c4d275f2cd15c895fb70f6bb604e4c459c2732a454775",
+      "html_bytes": 131301,
+      "text_chars": 9389,
+      "fetched_at": "2026-10-06T14:52:25+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/analytics",
+      "requested": "https://zulip.com/help/analytics",
+      "slug": "analytics",
+      "title": "Usage statistics | Zulip help center",
+      "sha256": "2b2b7bf48a47e426b9727ccece96f0d8be421f2437145a38c01fcc7d86b61898",
+      "html_bytes": 85506,
+      "text_chars": 657,
+      "fetched_at": "2026-10-06T14:52:30+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/animated-gifs",
+      "requested": "https://zulip.com/help/animated-gifs",
+      "slug": "animated-gifs",
+      "title": "Animated GIFs | Zulip help center",
+      "sha256": "4e2c2e731392d5ea1790c7c28c949cb05582a2b085e113bb9f887f32114cdf85",
+      "html_bytes": 102625,
+      "text_chars": 2402,
+      "fetched_at": "2026-10-06T14:51:08+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/archive-a-channel",
+      "requested": "https://zulip.com/help/archive-a-channel",
+      "slug": "archive-a-channel",
+      "title": "Archive a channel | Zulip help center",
+      "sha256": "2193e185dfd7ff8ad846a756c3f8d7731b072e7c033352a39fc485e70a0ca53a",
+      "html_bytes": 113920,
+      "text_chars": 2641,
+      "fetched_at": "2026-10-06T14:52:16+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/bots-overview",
+      "requested": "https://zulip.com/help/bots-overview",
+      "slug": "bots-overview",
+      "title": "Bots overview | Zulip help center",
+      "sha256": "55430b4c32432e78dabf0d0a93f299bf2f18916554cae3b2e66affcafce5f651",
+      "html_bytes": 91401,
+      "text_chars": 3644,
+      "fetched_at": "2026-10-06T14:52:31+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/bulleted-lists",
+      "requested": "https://zulip.com/help/bulleted-lists",
+      "slug": "bulleted-lists",
+      "title": "Bulleted lists | Zulip help center",
+      "sha256": "880ed9ed48773195448f17ff23d0c49c3730b2087754aa970f7992b5d80b2d14",
+      "html_bytes": 90826,
+      "text_chars": 1202,
+      "fetched_at": "2026-10-06T14:51:09+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-a-users-name",
+      "requested": "https://zulip.com/help/change-a-users-name",
+      "slug": "change-a-users-name",
+      "title": "Change a user's name | Zulip help center",
+      "sha256": "50b7ff113943323b239b65e4db3a3d4b8fdb5341fcf591d4e7e5a1f30b3ffbb1",
+      "html_bytes": 96829,
+      "text_chars": 1115,
+      "fetched_at": "2026-10-06T14:52:04+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-organization-url",
+      "requested": "https://zulip.com/help/change-organization-url",
+      "slug": "change-organization-url",
+      "title": "Change organization URL | Zulip help center",
+      "sha256": "bf28c0b5202e8a6ebcfd5f0c05401950b4e15428c46bf33f10705808bddc4743",
+      "html_bytes": 88694,
+      "text_chars": 2156,
+      "fetched_at": "2026-10-06T14:51:55+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-the-channel-description",
+      "requested": "https://zulip.com/help/change-the-channel-description",
+      "slug": "change-the-channel-description",
+      "title": "Change a channel's description | Zulip help center",
+      "sha256": "04355b52d73adbb567c5b9652ee6193fd201d9dd0d643ce1a7693e7e9141530e",
+      "html_bytes": 92294,
+      "text_chars": 1434,
+      "fetched_at": "2026-10-06T14:52:14+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-the-color-of-a-channel",
+      "requested": "https://zulip.com/help/change-the-color-of-a-channel",
+      "slug": "change-the-color-of-a-channel",
+      "title": "Change the color of a channel | Zulip help center",
+      "sha256": "9c08b4c69d6e6f2b65dd512f9bf0e3a173e6c10b131d1057caa06d6bd94f0ebb",
+      "html_bytes": 91673,
+      "text_chars": 1098,
+      "fetched_at": "2026-10-06T14:51:39+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-the-privacy-of-a-channel",
+      "requested": "https://zulip.com/help/change-the-privacy-of-a-channel",
+      "slug": "change-the-privacy-of-a-channel",
+      "title": "Change the privacy of a channel | Zulip help center",
+      "sha256": "63fb3287f70a32d674d57c74c43886121825722cc56c5b8cfab3fd3831710b3c",
+      "html_bytes": 97988,
+      "text_chars": 1767,
+      "fetched_at": "2026-10-06T14:52:15+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-the-time-format",
+      "requested": "https://zulip.com/help/change-the-time-format",
+      "slug": "change-the-time-format",
+      "title": "Change the time format | Zulip help center",
+      "sha256": "0879ff29e3433dc7d780e1b16600a1c18f6b63f3816b483f32cc2ec8c24adbc6",
+      "html_bytes": 86109,
+      "text_chars": 427,
+      "fetched_at": "2026-10-06T14:50:59+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-your-email-address",
+      "requested": "https://zulip.com/help/change-your-email-address",
+      "slug": "change-your-email-address",
+      "title": "Change your email address | Zulip help center",
+      "sha256": "16d38edf96fe742b7e4e025dc28c81914c852a999af8f234116a805e71086a1f",
+      "html_bytes": 87677,
+      "text_chars": 771,
+      "fetched_at": "2026-10-06T14:50:50+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-your-language",
+      "requested": "https://zulip.com/help/change-your-language",
+      "slug": "change-your-language",
+      "title": "Change your language | Zulip help center",
+      "sha256": "0da419d636baf1d9e84517ac0d26f73cd97a0880868fe43beafca0bf2e75aa6e",
+      "html_bytes": 93103,
+      "text_chars": 1638,
+      "fetched_at": "2026-10-06T14:50:58+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-your-name",
+      "requested": "https://zulip.com/help/change-your-name",
+      "slug": "change-your-name",
+      "title": "Change your name | Zulip help center",
+      "sha256": "d23ad431508ffe1060fb91f6a8c6cf884a53c32b195e7faf13d8f0f7798f25f5",
+      "html_bytes": 86887,
+      "text_chars": 709,
+      "fetched_at": "2026-10-06T14:50:50+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-your-password",
+      "requested": "https://zulip.com/help/change-your-password",
+      "slug": "change-your-password",
+      "title": "Change your password | Zulip help center",
+      "sha256": "2becf79a40bb1707113412e1def288fe6b4fe68614c729ca789b5b1f55015ed8",
+      "html_bytes": 89759,
+      "text_chars": 933,
+      "fetched_at": "2026-10-06T14:50:51+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-your-profile-picture",
+      "requested": "https://zulip.com/help/change-your-profile-picture",
+      "slug": "change-your-profile-picture",
+      "title": "Change your profile picture | Zulip help center",
+      "sha256": "28502ddd1e787f7b740f00fbe45010ccc4a470d59013bf137e9d60de0d91244f",
+      "html_bytes": 95217,
+      "text_chars": 1399,
+      "fetched_at": "2026-10-06T14:50:51+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/change-your-timezone",
+      "requested": "https://zulip.com/help/change-your-timezone",
+      "slug": "change-your-timezone",
+      "title": "Change your time zone | Zulip help center",
+      "sha256": "c5cc625e1ef2f39f90914856a0ca74bebf7f0385bda6b0eaa137e8f28b00d3b2",
+      "html_bytes": 98475,
+      "text_chars": 1443,
+      "fetched_at": "2026-10-06T14:50:58+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/channel-feed",
+      "requested": "https://zulip.com/help/channel-feed",
+      "slug": "channel-feed",
+      "title": "Channel feed | Zulip help center",
+      "sha256": "5a0f64e187b9ca5a2f6db7539f9aed9e0bff08c606d5399ebb00646123b46165",
+      "html_bytes": 107644,
+      "text_chars": 1692,
+      "fetched_at": "2026-10-06T14:51:22+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/channel-folders",
+      "requested": "https://zulip.com/help/channel-folders",
+      "slug": "channel-folders",
+      "title": "Channel folders | Zulip help center",
+      "sha256": "566b19de9a67480064ea7c635350a32fac46848844a240ed0c3c0e2f818608e3",
+      "html_bytes": 108029,
+      "text_chars": 2208,
+      "fetched_at": "2026-10-06T14:51:39+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/channel-notifications",
+      "requested": "https://zulip.com/help/channel-notifications",
+      "slug": "channel-notifications",
+      "title": "Channel notifications | Zulip help center",
+      "sha256": "a38b6983e2117846268453f9e7185da3b4b4987710ee0f9446941742f103d466",
+      "html_bytes": 101505,
+      "text_chars": 2356,
+      "fetched_at": "2026-10-06T14:51:45+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/channel-permissions",
+      "requested": "https://zulip.com/help/channel-permissions",
+      "slug": "channel-permissions",
+      "title": "Channel permissions | Zulip help center",
+      "sha256": "5f540c843bf4bb4d534e253a3107e09285839c7c3905e558d0b5f415338f73c7",
+      "html_bytes": 106830,
+      "text_chars": 5545,
+      "fetched_at": "2026-10-06T14:52:06+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/channel-posting-policy",
+      "requested": "https://zulip.com/help/channel-posting-policy",
+      "slug": "channel-posting-policy",
+      "title": "Channel posting policy | Zulip help center",
+      "sha256": "fd4ca0c7b743e6a56e6537a3738b0d69a9d0ea97e7fc10d8da8140d1a7ec1e6e",
+      "html_bytes": 88959,
+      "text_chars": 767,
+      "fetched_at": "2026-10-06T14:52:08+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/cloud-to-self-hosting",
+      "requested": "https://zulip.com/help/cloud-to-self-hosting",
+      "slug": "cloud-to-self-hosting",
+      "title": "Move from Zulip Cloud to self-hosting | Zulip help center",
+      "sha256": "7a0ed530ba953a9438cadbc4f5deab1060976f49b22f5b0f353a29826695dc74",
+      "html_bytes": 83606,
+      "text_chars": 295,
+      "fetched_at": "2026-10-06T14:51:58+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/code-blocks",
+      "requested": "https://zulip.com/help/code-blocks",
+      "slug": "code-blocks",
+      "title": "Code blocks | Zulip help center",
+      "sha256": "7821d0fa74115d42e9cead9c95393dfb6cb2ffd597da48e6e6d0529a8322099d",
+      "html_bytes": 124191,
+      "text_chars": 6820,
+      "fetched_at": "2026-10-06T14:51:11+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/collaborative-to-do-lists",
+      "requested": "https://zulip.com/help/collaborative-to-do-lists",
+      "slug": "collaborative-to-do-lists",
+      "title": "Collaborative to-do lists | Zulip help center",
+      "sha256": "ade1551720042e1508dd9acf86876f79ee70b398032878979c127e01e8949060",
+      "html_bytes": 100263,
+      "text_chars": 2092,
+      "fetched_at": "2026-10-06T14:51:14+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/collapse-a-message",
+      "requested": "https://zulip.com/help/collapse-a-message",
+      "slug": "collapse-a-message",
+      "title": "Collapse a message | Zulip help center",
+      "sha256": "03ed10185ab004b7a013ad62d5c182af17dec2a1d0a625c967176828babb3870",
+      "html_bytes": 83279,
+      "text_chars": 453,
+      "fetched_at": "2026-10-06T14:51:31+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/combined-feed",
+      "requested": "https://zulip.com/help/combined-feed",
+      "slug": "combined-feed",
+      "title": "Combined feed | Zulip help center",
+      "sha256": "4558e17741d402e465981c3d5913f04effaac803be8be10705dc699884dd6993",
+      "html_bytes": 90265,
+      "text_chars": 648,
+      "fetched_at": "2026-10-06T14:51:21+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/communities-directory",
+      "requested": "https://zulip.com/help/communities-directory",
+      "slug": "communities-directory",
+      "title": "Zulip communities directory | Zulip help center",
+      "sha256": "0d0249109b357e34c47bec7ded54e7bff22e401e9efd871d71e1b8e93d78b8c5",
+      "html_bytes": 94221,
+      "text_chars": 2398,
+      "fetched_at": "2026-10-06T14:51:54+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-a-custom-welcome-message",
+      "requested": "https://zulip.com/help/configure-a-custom-welcome-message",
+      "slug": "configure-a-custom-welcome-message",
+      "title": "Configure a custom welcome message | Zulip help center",
+      "sha256": "404b208b8706763fad1317bbfb97874aee44c371ed35db896f55f1270a65ce42",
+      "html_bytes": 96262,
+      "text_chars": 2276,
+      "fetched_at": "2026-10-06T14:52:29+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-authentication-methods",
+      "requested": "https://zulip.com/help/configure-authentication-methods",
+      "slug": "configure-authentication-methods",
+      "title": "Configure authentication methods | Zulip help center",
+      "sha256": "3512d951a7c683663aaca00fd545098e9942eb18cfc60e1804c3373a4bcdef60",
+      "html_bytes": 91289,
+      "text_chars": 1918,
+      "fetched_at": "2026-10-06T14:52:02+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-automated-notices",
+      "requested": "https://zulip.com/help/configure-automated-notices",
+      "slug": "configure-automated-notices",
+      "title": "Configure automated notices | Zulip help center",
+      "sha256": "a967e3661b7b81500d1882d59e4e24d125eac4d15d28f97d146da2027622cf3d",
+      "html_bytes": 116654,
+      "text_chars": 4744,
+      "fetched_at": "2026-10-06T14:52:29+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-call-provider",
+      "requested": "https://zulip.com/help/configure-call-provider",
+      "slug": "configure-call-provider",
+      "title": "Configure call provider | Zulip help center",
+      "sha256": "9740a05a76bcda2622fa767af44e535d9a24ee73afb9dcb0ba490bc8fc78fef2",
+      "html_bytes": 95524,
+      "text_chars": 1482,
+      "fetched_at": "2026-10-06T14:52:24+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-default-new-user-settings",
+      "requested": "https://zulip.com/help/configure-default-new-user-settings",
+      "slug": "configure-default-new-user-settings",
+      "title": "Configure default settings for new users | Zulip help center",
+      "sha256": "7068e8978f706129ccdb27975ddc89cc13b11751c61a547c72a5cb7aa3cbefb9",
+      "html_bytes": 96345,
+      "text_chars": 2220,
+      "fetched_at": "2026-10-06T14:51:59+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-default-profile-pictures",
+      "requested": "https://zulip.com/help/configure-default-profile-pictures",
+      "slug": "configure-default-profile-pictures",
+      "title": "Configure default profile pictures | Zulip help center",
+      "sha256": "ded70a82fef4e9f73b680a0c4c6bdb6aafccb865df16a9286b44eb0cd1418731",
+      "html_bytes": 88233,
+      "text_chars": 925,
+      "fetched_at": "2026-10-06T14:52:00+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-email-visibility",
+      "requested": "https://zulip.com/help/configure-email-visibility",
+      "slug": "configure-email-visibility",
+      "title": "Configure email visibility | Zulip help center",
+      "sha256": "9a36d2fec3de3eb13c2b4da5f3a78e723e2ab938035f104d729ac01fa2ca3c35",
+      "html_bytes": 96744,
+      "text_chars": 1170,
+      "fetched_at": "2026-10-06T14:50:52+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-emoticon-translations",
+      "requested": "https://zulip.com/help/configure-emoticon-translations",
+      "slug": "configure-emoticon-translations",
+      "title": "Configure emoticon translations | Zulip help center",
+      "sha256": "4c2b88cff835f3e5459a327bf20d9febb6fa8a842dca427c544bb0eb781ad50f",
+      "html_bytes": 90481,
+      "text_chars": 650,
+      "fetched_at": "2026-10-06T14:50:59+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-home-view",
+      "requested": "https://zulip.com/help/configure-home-view",
+      "slug": "configure-home-view",
+      "title": "Configure home view | Zulip help center",
+      "sha256": "515ac34da7e5248ec856783ee1569496b0c3b492051107505584fc08ee26c5eb",
+      "html_bytes": 98814,
+      "text_chars": 2339,
+      "fetched_at": "2026-10-06T14:51:00+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-how-links-open",
+      "requested": "https://zulip.com/help/configure-how-links-open",
+      "slug": "configure-how-links-open",
+      "title": "Configure how links open in mobile apps | Zulip help center",
+      "sha256": "0a6a50857043a42e902a2c5e81e8ea4e721e04f242887e3885b735b3ba50ee85",
+      "html_bytes": 87863,
+      "text_chars": 355,
+      "fetched_at": "2026-10-06T14:51:52+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-multi-language-search",
+      "requested": "https://zulip.com/help/configure-multi-language-search",
+      "slug": "configure-multi-language-search",
+      "title": "Configure multi-language search | Zulip help center",
+      "sha256": "15247702e4b9301d2dc6e2a47a2bbb40f09b53ecaef1af863854a686fdad455f",
+      "html_bytes": 80089,
+      "text_chars": 556,
+      "fetched_at": "2026-10-06T14:52:30+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-organization-language",
+      "requested": "https://zulip.com/help/configure-organization-language",
+      "slug": "configure-organization-language",
+      "title": "Organization language for automated messages and invitation emails | Zulip help center",
+      "sha256": "e57fc0eb08d1c5a64fe6d50c8ff757b3875847ca1670506c30b21c54b06cd2d3",
+      "html_bytes": 89476,
+      "text_chars": 1510,
+      "fetched_at": "2026-10-06T14:52:23+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-send-message-keys",
+      "requested": "https://zulip.com/help/configure-send-message-keys",
+      "slug": "configure-send-message-keys",
+      "title": "Configure send message keys | Zulip help center",
+      "sha256": "8c0803093962f6d21e8ba5af5328ad7dacf5858fac3b41e3ee5dd115f318bbf0",
+      "html_bytes": 92455,
+      "text_chars": 897,
+      "fetched_at": "2026-10-06T14:50:57+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-unread-message-counters",
+      "requested": "https://zulip.com/help/configure-unread-message-counters",
+      "slug": "configure-unread-message-counters",
+      "title": "Configure unread message counters | Zulip help center",
+      "sha256": "3f0df015ae23987d947c5477dfac6b43be2f7ece46d21b8c9c133ae435889e72",
+      "html_bytes": 98548,
+      "text_chars": 1723,
+      "fetched_at": "2026-10-06T14:51:25+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-where-you-land",
+      "requested": "https://zulip.com/help/configure-where-you-land",
+      "slug": "configure-where-you-land",
+      "title": "Configure where you land in message feeds | Zulip help center",
+      "sha256": "1318cbd29937dbf9067c1c0e0d53e28552f05cb394c9c92cd632f35ad2a5c941",
+      "html_bytes": 87757,
+      "text_chars": 1111,
+      "fetched_at": "2026-10-06T14:51:25+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-who-can-administer-a-channel",
+      "requested": "https://zulip.com/help/configure-who-can-administer-a-channel",
+      "slug": "configure-who-can-administer-a-channel",
+      "title": "Configure who can administer a channel | Zulip help center",
+      "sha256": "8a82c4622740f8003da4b1d49181850d3744ff40065fc36bd061102309bb997d",
+      "html_bytes": 91812,
+      "text_chars": 1931,
+      "fetched_at": "2026-10-06T14:52:09+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-who-can-create-channels",
+      "requested": "https://zulip.com/help/configure-who-can-create-channels",
+      "slug": "configure-who-can-create-channels",
+      "title": "Restrict channel creation | Zulip help center",
+      "sha256": "b0dba0e7fbbe8a2591efa7a42e1434f0034179e7e04dfe965e5ff01a30711463",
+      "html_bytes": 99776,
+      "text_chars": 1618,
+      "fetched_at": "2026-10-06T14:52:10+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-who-can-invite-to-channels",
+      "requested": "https://zulip.com/help/configure-who-can-invite-to-channels",
+      "slug": "configure-who-can-invite-to-channels",
+      "title": "Configure who can subscribe other users to channels | Zulip help center",
+      "sha256": "82309279bb4ee9405b68fa65a6bee3fc0c047e0fffd669ef61613b511346298a",
+      "html_bytes": 97604,
+      "text_chars": 1906,
+      "fetched_at": "2026-10-06T14:52:11+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-who-can-start-new-topics",
+      "requested": "https://zulip.com/help/configure-who-can-start-new-topics",
+      "slug": "configure-who-can-start-new-topics",
+      "title": "Configure who can start new topics | Zulip help center",
+      "sha256": "e29515a8911b8e7c6eee3433fb12cf720a7c10ac085561dee76744d4bcc43194",
+      "html_bytes": 88751,
+      "text_chars": 983,
+      "fetched_at": "2026-10-06T14:52:09+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-who-can-subscribe",
+      "requested": "https://zulip.com/help/configure-who-can-subscribe",
+      "slug": "configure-who-can-subscribe",
+      "title": "Configure who can subscribe to a channel | Zulip help center",
+      "sha256": "ddc98c4aab80f55fd50313c5837f8b57d1226925cfc88e1c4923c2f594fbd37c",
+      "html_bytes": 92326,
+      "text_chars": 1538,
+      "fetched_at": "2026-10-06T14:52:10+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/configure-who-can-unsubscribe-others",
+      "requested": "https://zulip.com/help/configure-who-can-unsubscribe-others",
+      "slug": "configure-who-can-unsubscribe-others",
+      "title": "Configure who can unsubscribe anyone from a channel | Zulip help center",
+      "sha256": "aae14ec74c873fd2f2b115d905c2475b6d9f2de6d7b0adc9c19c6fbeb8cff176",
+      "html_bytes": 88357,
+      "text_chars": 702,
+      "fetched_at": "2026-10-06T14:52:11+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/connect-through-a-proxy",
+      "requested": "https://zulip.com/help/connect-through-a-proxy",
+      "slug": "connect-through-a-proxy",
+      "title": "Connect through a proxy | Zulip help center",
+      "sha256": "5c35602cddf6e0e5cfe8f48079daed131e62237a2ed138df783576556155b887",
+      "html_bytes": 94557,
+      "text_chars": 2492,
+      "fetched_at": "2026-10-06T14:51:52+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/contact-support",
+      "requested": "https://zulip.com/help/contact-support",
+      "slug": "contact-support",
+      "title": "Contact support | Zulip help center",
+      "sha256": "5c6d0a5b33af9e70279d9674466c7d81a7466cb36ff754b0196e3a44a1805ee1",
+      "html_bytes": 89028,
+      "text_chars": 2671,
+      "fetched_at": "2026-10-06T14:52:42+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/create-a-channel",
+      "requested": "https://zulip.com/help/create-a-channel",
+      "slug": "create-a-channel",
+      "title": "Create a channel | Zulip help center",
+      "sha256": "537b55ac6860d894a9165ac0ec1894cb2b1b844d838355e03ba7bc12b997968a",
+      "html_bytes": 91120,
+      "text_chars": 1113,
+      "fetched_at": "2026-10-06T14:51:38+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/create-a-poll",
+      "requested": "https://zulip.com/help/create-a-poll",
+      "slug": "create-a-poll",
+      "title": "Polls | Zulip help center",
+      "sha256": "d36f6147f2227eef92dd00062f671627e8d4dfb9fdb9372898c2fe86a526c1ea",
+      "html_bytes": 99861,
+      "text_chars": 1763,
+      "fetched_at": "2026-10-06T14:51:13+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/create-an-organization",
+      "requested": "https://zulip.com/help/create-an-organization",
+      "slug": "create-an-organization",
+      "title": "Create an organization | Zulip help center",
+      "sha256": "83f3a1b870b00cb6006bd11a1b2fc669b3054d81eccd41866989080b79a037a4",
+      "html_bytes": 89262,
+      "text_chars": 1341,
+      "fetched_at": "2026-10-06T14:50:40+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/create-channels",
+      "requested": "https://zulip.com/help/create-channels",
+      "slug": "create-channels",
+      "title": "Create channels | Zulip help center",
+      "sha256": "a61542252458471d744df243455dd5353ae2cc743670d5dc7f8234e846b879dc",
+      "html_bytes": 95770,
+      "text_chars": 2742,
+      "fetched_at": "2026-10-06T14:50:47+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/create-user-groups",
+      "requested": "https://zulip.com/help/create-user-groups",
+      "slug": "create-user-groups",
+      "title": "Create user groups | Zulip help center",
+      "sha256": "0247b47c008b7910176a28f27207270420ba37d3cb32237d8024bd0883bdc1bc",
+      "html_bytes": 97559,
+      "text_chars": 2246,
+      "fetched_at": "2026-10-06T14:50:46+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/create-your-organization-profile",
+      "requested": "https://zulip.com/help/create-your-organization-profile",
+      "slug": "create-your-organization-profile",
+      "title": "Create your organization profile | Zulip help center",
+      "sha256": "66ac86532ca812aa8e94add7b17046a1eeebb629e8adda3e38cfa6112282eff7",
+      "html_bytes": 104921,
+      "text_chars": 3600,
+      "fetched_at": "2026-10-06T14:50:46+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/custom-certificates",
+      "requested": "https://zulip.com/help/custom-certificates",
+      "slug": "custom-certificates",
+      "title": "Use a custom certificate | Zulip help center",
+      "sha256": "f90dac949318bff0ab6f06cb16fa769a423529a546befbef0d78742b05ccb46c",
+      "html_bytes": 91307,
+      "text_chars": 2488,
+      "fetched_at": "2026-10-06T14:51:53+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/custom-emoji",
+      "requested": "https://zulip.com/help/custom-emoji",
+      "slug": "custom-emoji",
+      "title": "Custom emoji | Zulip help center",
+      "sha256": "d75eb33204614bd1a769c7499aee95f68a709f5f0d06cafed76bf529bd1afa98",
+      "html_bytes": 104212,
+      "text_chars": 2347,
+      "fetched_at": "2026-10-06T14:52:24+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/custom-profile-fields",
+      "requested": "https://zulip.com/help/custom-profile-fields",
+      "slug": "custom-profile-fields",
+      "title": "Custom profile fields | Zulip help center",
+      "sha256": "ba73065a9d8af81074dc2234cf37f91f29b15c56d86a3921554974aac7bed879",
+      "html_bytes": 139028,
+      "text_chars": 6385,
+      "fetched_at": "2026-10-06T14:52:00+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/customize-organization-settings",
+      "requested": "https://zulip.com/help/customize-organization-settings",
+      "slug": "customize-organization-settings",
+      "title": "Customize organization settings | Zulip help center",
+      "sha256": "84f0de92d2ea0b26ee5220f30c341497381ce2d680cc5c713a3e19147cd56a6b",
+      "html_bytes": 87414,
+      "text_chars": 1221,
+      "fetched_at": "2026-10-06T14:50:47+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/customize-settings-for-new-users",
+      "requested": "https://zulip.com/help/customize-settings-for-new-users",
+      "slug": "customize-settings-for-new-users",
+      "title": "Customize settings for new users | Zulip help center",
+      "sha256": "d1dd26a6fca1442ead1ba4361d0e1eeff185109508d01444713472f28340ee29",
+      "html_bytes": 79637,
+      "text_chars": 369,
+      "fetched_at": "2026-10-06T14:50:48+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/dark-theme",
+      "requested": "https://zulip.com/help/dark-theme",
+      "slug": "dark-theme",
+      "title": "Dark theme | Zulip help center",
+      "sha256": "dfde33a0835a876911e50b0d6fec510a0e8db78cdd5d6284386068b9a7aa9911",
+      "html_bytes": 88634,
+      "text_chars": 798,
+      "fetched_at": "2026-10-06T14:50:56+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/deactivate-a-user-group",
+      "requested": "https://zulip.com/help/deactivate-a-user-group",
+      "slug": "deactivate-a-user-group",
+      "title": "Deactivate a user group | Zulip help center",
+      "sha256": "e349a20c936b7c379383050dc2bf385c8a8d830976ec1aaee4f23d80551f0678",
+      "html_bytes": 114372,
+      "text_chars": 1335,
+      "fetched_at": "2026-10-06T14:52:17+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/deactivate-or-reactivate-a-bot",
+      "requested": "https://zulip.com/help/deactivate-or-reactivate-a-bot",
+      "slug": "deactivate-or-reactivate-a-bot",
+      "title": "Deactivate or reactivate a bot | Zulip help center",
+      "sha256": "9e81ef4d7328e2086890f22f01f56a9b94059ae24a3dd5aa80a41bc9640b67f4",
+      "html_bytes": 113000,
+      "text_chars": 1903,
+      "fetched_at": "2026-10-06T14:52:33+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/deactivate-or-reactivate-a-user",
+      "requested": "https://zulip.com/help/deactivate-or-reactivate-a-user",
+      "slug": "deactivate-or-reactivate-a-user",
+      "title": "Deactivate or reactivate a user | Zulip help center",
+      "sha256": "f8ac199fed1ef1a96997f59f772c04e5f1f8719f9906db8101f4a1c012238a8b",
+      "html_bytes": 112387,
+      "text_chars": 3999,
+      "fetched_at": "2026-10-06T14:52:04+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/deactivate-your-account",
+      "requested": "https://zulip.com/help/deactivate-your-account",
+      "slug": "deactivate-your-account",
+      "title": "Deactivate your account | Zulip help center",
+      "sha256": "c72d9bdbaac941a93066cfe936cf940b24b1efa342fd4fd4f614de799487e63e",
+      "html_bytes": 91423,
+      "text_chars": 1419,
+      "fetched_at": "2026-10-06T14:50:55+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/deactivate-your-organization",
+      "requested": "https://zulip.com/help/deactivate-your-organization",
+      "slug": "deactivate-your-organization",
+      "title": "Deactivate your organization | Zulip help center",
+      "sha256": "b301e0725e3e633d1144e3fa403dbdf3f0a2ae0406da9a5355e29eb8c8f00915",
+      "html_bytes": 89478,
+      "text_chars": 935,
+      "fetched_at": "2026-10-06T14:51:55+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/delete-a-message",
+      "requested": "https://zulip.com/help/delete-a-message",
+      "slug": "delete-a-message",
+      "title": "Delete a message | Zulip help center",
+      "sha256": "c16292c06c44bb964a3eb570ba1612f0b88d7c2257c7a5f291c075a3fddfe60f",
+      "html_bytes": 96625,
+      "text_chars": 3279,
+      "fetched_at": "2026-10-06T14:51:18+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/delete-a-topic",
+      "requested": "https://zulip.com/help/delete-a-topic",
+      "slug": "delete-a-topic",
+      "title": "Delete a topic | Zulip help center",
+      "sha256": "01a5e312c52aa9de2f38675d70b9381e7024cff0ad4602fe0262f003352b4058",
+      "html_bytes": 87793,
+      "text_chars": 1252,
+      "fetched_at": "2026-10-06T14:51:44+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/demo-organizations",
+      "requested": "https://zulip.com/help/demo-organizations",
+      "slug": "demo-organizations",
+      "title": "Demo organizations | Zulip help center",
+      "sha256": "45303596f8985716d0f9b02069a3626b63b3488b70a35f620e2bb2f27323626d",
+      "html_bytes": 103786,
+      "text_chars": 2681,
+      "fetched_at": "2026-10-06T14:50:41+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/deploying-bots",
+      "requested": "https://zulip.com/help/deploying-bots",
+      "slug": "deploying-bots",
+      "title": "Deploying bots in production | Zulip help center",
+      "sha256": "5f5d0726120799aeb55906a00ab9948128971053b2d491ae40f285eace8c40b2",
+      "html_bytes": 110625,
+      "text_chars": 6901,
+      "fetched_at": "2026-10-06T14:52:38+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/desktop-app-install-guide",
+      "requested": "https://zulip.com/help/desktop-app-install-guide",
+      "slug": "desktop-app-install-guide",
+      "title": "Installing the Zulip desktop app | Zulip help center",
+      "sha256": "83cf807e101be63ab11e3331fcf61f40c403dc1b271c2ee0bd28ed1b12045101",
+      "html_bytes": 115277,
+      "text_chars": 4707,
+      "fetched_at": "2026-10-06T14:51:51+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/desktop-notifications",
+      "requested": "https://zulip.com/help/desktop-notifications",
+      "slug": "desktop-notifications",
+      "title": "Desktop notifications | Zulip help center",
+      "sha256": "d1c4b93d7c27be5e3c5ef76160a446e8e2e12f4b70e8a49f0977bdcbca658000",
+      "html_bytes": 125764,
+      "text_chars": 4708,
+      "fetched_at": "2026-10-06T14:51:49+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/digest-emails",
+      "requested": "https://zulip.com/help/digest-emails",
+      "slug": "digest-emails",
+      "title": "Weekly digest emails | Zulip help center",
+      "sha256": "f62d5480c5f96f94c0be2fda4a6afcce40a03521ba1272fc6878ee580b614139",
+      "html_bytes": 86959,
+      "text_chars": 1025,
+      "fetched_at": "2026-10-06T14:52:28+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/direct-messages",
+      "requested": "https://zulip.com/help/direct-messages",
+      "slug": "direct-messages",
+      "title": "Direct messages | Zulip help center",
+      "sha256": "685014d8eb4acc440d961ba6959a99ebe3c75dd117c6ac9661cb89678cd9133d",
+      "html_bytes": 118706,
+      "text_chars": 4863,
+      "fetched_at": "2026-10-06T14:51:35+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/disable-welcome-emails",
+      "requested": "https://zulip.com/help/disable-welcome-emails",
+      "slug": "disable-welcome-emails",
+      "title": "Disable welcome emails | Zulip help center",
+      "sha256": "e85559cbe9ad96c286257664278790d86b649ff6d685f5aa35d743ba568f3125",
+      "html_bytes": 86461,
+      "text_chars": 730,
+      "fetched_at": "2026-10-06T14:52:28+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/dm-mention-alert-notifications",
+      "requested": "https://zulip.com/help/dm-mention-alert-notifications",
+      "slug": "dm-mention-alert-notifications",
+      "title": "DMs, mentions, and alerts | Zulip help center",
+      "sha256": "32de993e623645481ee9e39b0cfee259a3cbbd19e331636e2dcebe87610b22c5",
+      "html_bytes": 110651,
+      "text_chars": 2710,
+      "fetched_at": "2026-10-06T14:51:46+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/do-not-disturb",
+      "requested": "https://zulip.com/help/do-not-disturb",
+      "slug": "do-not-disturb",
+      "title": "Do Not Disturb | Zulip help center",
+      "sha256": "e043575d8c03c3cd9371e1a96f7167f3d52804dd970f2be2ea699703737d6237",
+      "html_bytes": 92428,
+      "text_chars": 1337,
+      "fetched_at": "2026-10-06T14:51:50+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/edit-a-message",
+      "requested": "https://zulip.com/help/edit-a-message",
+      "slug": "edit-a-message",
+      "title": "Edit a message | Zulip help center",
+      "sha256": "cba811a5e07d18b9bb1f08553fdca44aca6dc430be40560e7349c510f4443654",
+      "html_bytes": 90810,
+      "text_chars": 1551,
+      "fetched_at": "2026-10-06T14:51:18+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/edit-your-profile",
+      "requested": "https://zulip.com/help/edit-your-profile",
+      "slug": "edit-your-profile",
+      "title": "Edit your profile | Zulip help center",
+      "sha256": "4cc13ca12260e5f4e832a648397e5aa19ba2552f979ffe7848eb331635f76cf3",
+      "html_bytes": 87812,
+      "text_chars": 511,
+      "fetched_at": "2026-10-06T14:50:49+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/email-notifications",
+      "requested": "https://zulip.com/help/email-notifications",
+      "slug": "email-notifications",
+      "title": "Email notifications | Zulip help center",
+      "sha256": "f8d3d437384748e4af2011c917edd6a748faa309e2e708abc8395abc742155c0",
+      "html_bytes": 128249,
+      "text_chars": 4619,
+      "fetched_at": "2026-10-06T14:51:48+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/emoji-and-emoticons",
+      "requested": "https://zulip.com/help/emoji-and-emoticons",
+      "slug": "emoji-and-emoticons",
+      "title": "Emoji and emoticons | Zulip help center",
+      "sha256": "577685871c8566ddb5c48faa57edcb05fb8da1ba83a96e1df25905a516921e3e",
+      "html_bytes": 109243,
+      "text_chars": 3669,
+      "fetched_at": "2026-10-06T14:51:06+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/emoji-reactions",
+      "requested": "https://zulip.com/help/emoji-reactions",
+      "slug": "emoji-reactions",
+      "title": "Emoji reactions | Zulip help center",
+      "sha256": "174e573b4c131472cfd814d3397be8f0aea09b6a4bc4f0426168e65d91371e51",
+      "html_bytes": 116727,
+      "text_chars": 3008,
+      "fetched_at": "2026-10-06T14:51:26+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/enable-full-width-display",
+      "requested": "https://zulip.com/help/enable-full-width-display",
+      "slug": "enable-full-width-display",
+      "title": "Enable full width display | Zulip help center",
+      "sha256": "1ba4da00634f357cf626b4181cea77257f7a1c06538c44b15dfe55b19a93285f",
+      "html_bytes": 86430,
+      "text_chars": 598,
+      "fetched_at": "2026-10-06T14:51:00+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/enable-mobile-notifications-by-default",
+      "requested": "https://zulip.com/help/enable-mobile-notifications-by-default",
+      "slug": "enable-mobile-notifications-by-default",
+      "title": "Enable mobile notifications by default | Zulip help center",
+      "sha256": "d0a74f412cf387245c716805c201b3ef411dcb3f64c565e0ba898235f48b7d03",
+      "html_bytes": 90759,
+      "text_chars": 1181,
+      "fetched_at": "2026-10-06T14:52:15+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/enable-moderation-requests",
+      "requested": "https://zulip.com/help/enable-moderation-requests",
+      "slug": "enable-moderation-requests",
+      "title": "Enable moderation requests | Zulip help center",
+      "sha256": "0013bd1574fc54e04fdc511f0eae17b308a7f2280816c29839e6cc71d890a41e",
+      "html_bytes": 99986,
+      "text_chars": 1491,
+      "fetched_at": "2026-10-06T14:52:27+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/export-your-organization",
+      "requested": "https://zulip.com/help/export-your-organization",
+      "slug": "export-your-organization",
+      "title": "Export your organization | Zulip help center",
+      "sha256": "d720e6910ea931923e07884ad61254070dc9de36085a0b48b1774dcbe4756298",
+      "html_bytes": 107653,
+      "text_chars": 5519,
+      "fetched_at": "2026-10-06T14:51:58+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/find-administrators",
+      "requested": "https://zulip.com/help/find-administrators",
+      "slug": "find-administrators",
+      "title": "Find administrators | Zulip help center",
+      "sha256": "cf89b6f20c48f7257e20cc81b964d21bd2d48d19632157966bb74d837a4ffc31",
+      "html_bytes": 95530,
+      "text_chars": 742,
+      "fetched_at": "2026-10-06T14:51:36+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/finding-a-conversation-to-read",
+      "requested": "https://zulip.com/help/finding-a-conversation-to-read",
+      "slug": "finding-a-conversation-to-read",
+      "title": "Finding a conversation to read | Zulip help center",
+      "sha256": "c986145cca6f20ff9715bcf75822144bc7a27972900b6c827b9d3710b97c9d31",
+      "html_bytes": 97986,
+      "text_chars": 2602,
+      "fetched_at": "2026-10-06T14:50:43+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/follow-a-topic",
+      "requested": "https://zulip.com/help/follow-a-topic",
+      "slug": "follow-a-topic",
+      "title": "Follow a topic | Zulip help center",
+      "sha256": "b796247c352779fe942dc73e580393e8463aa959a3c59a33a87b0413039b64bc",
+      "html_bytes": 143916,
+      "text_chars": 6198,
+      "fetched_at": "2026-10-06T14:51:46+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/font-size",
+      "requested": "https://zulip.com/help/font-size",
+      "slug": "font-size",
+      "title": "Font size | Zulip help center",
+      "sha256": "8e8415bcd4233bbee952e095210af4da1336ffd4f08ee0b329482c1edb9b94c0",
+      "html_bytes": 89257,
+      "text_chars": 740,
+      "fetched_at": "2026-10-06T14:50:56+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/format-a-quote",
+      "requested": "https://zulip.com/help/format-a-quote",
+      "slug": "format-a-quote",
+      "title": "Format a quote | Zulip help center",
+      "sha256": "9dacc84091d6ca45bfa1b013f49698e17b2ff6209db826c91a5f1f5a8aa5ac73",
+      "html_bytes": 91772,
+      "text_chars": 987,
+      "fetched_at": "2026-10-06T14:51:05+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/format-your-message-using-markdown",
+      "requested": "https://zulip.com/help/format-your-message-using-markdown",
+      "slug": "format-your-message-using-markdown",
+      "title": "Message formatting | Zulip help center",
+      "sha256": "0b147eb5c75f6752eca4b5e05414659853ddc47b77d46d65a4876b7a026fd7e6",
+      "html_bytes": 162718,
+      "text_chars": 11086,
+      "fetched_at": "2026-10-06T14:51:02+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/gdpr-compliance",
+      "requested": "https://zulip.com/help/gdpr-compliance",
+      "slug": "gdpr-compliance",
+      "title": "GDPR compliance | Zulip help center",
+      "sha256": "673941622ac0dace2f3b4289249fa37cb1e64ba5c6679f5deed340526ce72f33",
+      "html_bytes": 91672,
+      "text_chars": 4142,
+      "fetched_at": "2026-10-06T14:52:40+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/general-chat-channels",
+      "requested": "https://zulip.com/help/general-chat-channels",
+      "slug": "general-chat-channels",
+      "title": "\u201cGeneral chat\u201d channels | Zulip help center",
+      "sha256": "578ac8349f8d82ae2c4fb15e81f9932538e8508454f0048d7c9f093e5138dff2",
+      "html_bytes": 92839,
+      "text_chars": 1199,
+      "fetched_at": "2026-10-06T14:52:07+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/general-chat-topic",
+      "requested": "https://zulip.com/help/general-chat-topic",
+      "slug": "general-chat-topic",
+      "title": "\u201cGeneral chat\u201d topic | Zulip help center",
+      "sha256": "ccdc439bb73433a19dcca34e6a20c23e8f9d5e9dc3d0dcf0539d64248adee621",
+      "html_bytes": 97298,
+      "text_chars": 1744,
+      "fetched_at": "2026-10-06T14:51:44+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/generate-integration-url",
+      "requested": "https://zulip.com/help/generate-integration-url",
+      "slug": "generate-integration-url",
+      "title": "Generate URL for an integration | Zulip help center",
+      "sha256": "ba4b3a21d1ca02d45aaf0ba3a417790a8e1d75be5118d329abdf1381bf8816e1",
+      "html_bytes": 96838,
+      "text_chars": 1832,
+      "fetched_at": "2026-10-06T14:52:32+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/getting-started-with-zulip",
+      "requested": "https://zulip.com/help/getting-started-with-zulip",
+      "slug": "getting-started-with-zulip",
+      "title": "Getting started with Zulip | Zulip help center",
+      "sha256": "5c257a0bf357afb76e921191c89348b981df7c799a1e3055ec65843b04060d10",
+      "html_bytes": 151893,
+      "text_chars": 10783,
+      "fetched_at": "2026-10-06T14:50:35+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/global-times",
+      "requested": "https://zulip.com/help/global-times",
+      "slug": "global-times",
+      "title": "Global times | Zulip help center",
+      "sha256": "b796d6eb4c0211eacf6fd245a2577c25a1b3b69951b8866d02775c3d4182dc44",
+      "html_bytes": 89052,
+      "text_chars": 1309,
+      "fetched_at": "2026-10-06T14:51:14+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/guest-users",
+      "requested": "https://zulip.com/help/guest-users",
+      "slug": "guest-users",
+      "title": "Guest users | Zulip help center",
+      "sha256": "c268dfa47d724ebc5d4ad900e223ef7013b3f5a9e4c46617df847b7d243d9418",
+      "html_bytes": 106260,
+      "text_chars": 3710,
+      "fetched_at": "2026-10-06T14:52:18+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/hide-message-content-in-emails",
+      "requested": "https://zulip.com/help/hide-message-content-in-emails",
+      "slug": "hide-message-content-in-emails",
+      "title": "Hide message content in emails | Zulip help center",
+      "sha256": "2c7479f1acd96aa17fef449b1ea612d057630231804e6177c5a37fc83f1bea7a",
+      "html_bytes": 88244,
+      "text_chars": 758,
+      "fetched_at": "2026-10-06T14:52:26+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/image-video-and-website-previews",
+      "requested": "https://zulip.com/help/image-video-and-website-previews",
+      "slug": "image-video-and-website-previews",
+      "title": "Image, video and website previews | Zulip help center",
+      "sha256": "2f506bf0ae9184e83cbc0cb1393c6143a96b8dad4af0360e842f2daaae594f7f",
+      "html_bytes": 119526,
+      "text_chars": 3550,
+      "fetched_at": "2026-10-06T14:52:26+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/import-from-mattermost",
+      "requested": "https://zulip.com/help/import-from-mattermost",
+      "slug": "import-from-mattermost",
+      "title": "Import from Mattermost | Zulip help center",
+      "sha256": "499059dc02ec9cf06babbe6838b9873d60945e1ff12b2cc01ecdad35bce4f878",
+      "html_bytes": 160047,
+      "text_chars": 14684,
+      "fetched_at": "2026-10-06T14:51:56+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/import-from-microsoft-teams",
+      "requested": "https://zulip.com/help/import-from-microsoft-teams",
+      "slug": "import-from-microsoft-teams",
+      "title": "Import from Microsoft Teams | Zulip help center",
+      "sha256": "d739d2a6241cf6f0225c4f99fe32f233020b8a0002cd5d8dd416bb4309c0ae28",
+      "html_bytes": 141999,
+      "text_chars": 13102,
+      "fetched_at": "2026-10-06T14:51:56+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/import-from-rocketchat",
+      "requested": "https://zulip.com/help/import-from-rocketchat",
+      "slug": "import-from-rocketchat",
+      "title": "Import from Rocket.Chat | Zulip help center",
+      "sha256": "1edc73fe15ff1cf65b048086c68fdf81f902140153c98e9476cc0e91c96912f8",
+      "html_bytes": 122509,
+      "text_chars": 9252,
+      "fetched_at": "2026-10-06T14:51:57+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/import-from-slack",
+      "requested": "https://zulip.com/help/import-from-slack",
+      "slug": "import-from-slack",
+      "title": "Import from Slack | Zulip help center",
+      "sha256": "0bf6329631ed6b0d091e04abf77a01fd3c42d3d5c82edb7e30d1e44987370bab",
+      "html_bytes": 128654,
+      "text_chars": 10641,
+      "fetched_at": "2026-10-06T14:51:57+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/import-your-settings",
+      "requested": "https://zulip.com/help/import-your-settings",
+      "slug": "import-your-settings",
+      "title": "Import your settings | Zulip help center",
+      "sha256": "3d0404b87ef26074e4033086c804a7df0691bf5e98cc67312587172451ee60ec",
+      "html_bytes": 85674,
+      "text_chars": 1230,
+      "fetched_at": "2026-10-06T14:50:54+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/inbox",
+      "requested": "https://zulip.com/help/inbox",
+      "slug": "inbox",
+      "title": "Inbox | Zulip help center",
+      "sha256": "931bd636693f2f1c63abfa040aa543bd3a6b2a0ea4ff6720f6e57176fdcd82db",
+      "html_bytes": 107028,
+      "text_chars": 2214,
+      "fetched_at": "2026-10-06T14:51:20+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/indent-a-list-item",
+      "requested": "https://zulip.com/help/indent-a-list-item",
+      "slug": "indent-a-list-item",
+      "title": "Indent a list item | Zulip help center",
+      "sha256": "3c98173fac8c5f1be4cbc72e1e2598eb952134a585d313c5ff4db958bf8a4e51",
+      "html_bytes": 84568,
+      "text_chars": 506,
+      "fetched_at": "2026-10-06T14:51:10+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/",
+      "requested": "https://zulip.com/help/",
+      "slug": "index",
+      "title": "Zulip help center | Zulip help center",
+      "sha256": "5475349a8416261672a2660e4722db2c739588b219a9432365eee7fc8a697dde",
+      "html_bytes": 84552,
+      "text_chars": 1930,
+      "fetched_at": "2026-10-06T14:50:34+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/insert-a-link",
+      "requested": "https://zulip.com/help/insert-a-link",
+      "slug": "insert-a-link",
+      "title": "Insert a link | Zulip help center",
+      "sha256": "7a00ddcd3e43858d89ec00fd09ac90c9c22f9ee6229df4a10cf47953985a9b91",
+      "html_bytes": 101868,
+      "text_chars": 1422,
+      "fetched_at": "2026-10-06T14:51:06+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/integrations-overview",
+      "requested": "https://zulip.com/help/integrations-overview",
+      "slug": "integrations-overview",
+      "title": "Integrations overview | Zulip help center",
+      "sha256": "ca92bed68390f9ec12aee64e97aa803063ee32319ca67d7bf9bddde99af00aaa",
+      "html_bytes": 98249,
+      "text_chars": 3867,
+      "fetched_at": "2026-10-06T14:50:49+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/interactive-bots-api",
+      "requested": "https://zulip.com/help/interactive-bots-api",
+      "slug": "interactive-bots-api",
+      "title": "Interactive bots API | Zulip help center",
+      "sha256": "38fe122ccfa6b297f3935aa9b657780b8a82ec9c274b4aa6a64e49c3e0f9cc3e",
+      "html_bytes": 154126,
+      "text_chars": 8618,
+      "fetched_at": "2026-10-06T14:52:36+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/introduction-to-channels",
+      "requested": "https://zulip.com/help/introduction-to-channels",
+      "slug": "introduction-to-channels",
+      "title": "Introduction to channels | Zulip help center",
+      "sha256": "9128846e069699385e38619958346304961e5506dc479a71c4dd6dcaeb2a9131",
+      "html_bytes": 98033,
+      "text_chars": 1851,
+      "fetched_at": "2026-10-06T14:51:37+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/introduction-to-topics",
+      "requested": "https://zulip.com/help/introduction-to-topics",
+      "slug": "introduction-to-topics",
+      "title": "Introduction to topics | Zulip help center",
+      "sha256": "015fa479dca9bb0b090e4c1a06105b6dede8a0d9d64cca16e71c0d6416f1fb6c",
+      "html_bytes": 110937,
+      "text_chars": 5375,
+      "fetched_at": "2026-10-06T14:50:42+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/introduction-to-users",
+      "requested": "https://zulip.com/help/introduction-to-users",
+      "slug": "introduction-to-users",
+      "title": "Introduction to users | Zulip help center",
+      "sha256": "0aac053a8bcd04d527094e29c1e315443ce93568eff5d1b1a00b329bbc81c690",
+      "html_bytes": 80576,
+      "text_chars": 662,
+      "fetched_at": "2026-10-06T14:51:33+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/invite-new-users",
+      "requested": "https://zulip.com/help/invite-new-users",
+      "slug": "invite-new-users",
+      "title": "Invite new users | Zulip help center",
+      "sha256": "f30b88eae55239197f71511d7b6ac9e7beba9886e8b81b63dba8bc30508dbc19",
+      "html_bytes": 112629,
+      "text_chars": 3547,
+      "fetched_at": "2026-10-06T14:52:01+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/invite-users-to-join",
+      "requested": "https://zulip.com/help/invite-users-to-join",
+      "slug": "invite-users-to-join",
+      "title": "Invite users to join | Zulip help center",
+      "sha256": "ca88e43b5a12177c693c7e457b4e8f9974ad65d65b99c25cbc533c61cd90039b",
+      "html_bytes": 89508,
+      "text_chars": 1830,
+      "fetched_at": "2026-10-06T14:50:48+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/join-a-zulip-organization",
+      "requested": "https://zulip.com/help/join-a-zulip-organization",
+      "slug": "join-a-zulip-organization",
+      "title": "Joining a Zulip organization | Zulip help center",
+      "sha256": "12ed229f23d65e88a2518b5b39ffb8efd96112a48b154d5e9342607ef0578185",
+      "html_bytes": 88497,
+      "text_chars": 1571,
+      "fetched_at": "2026-10-06T14:50:41+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/keyboard-shortcuts",
+      "requested": "https://zulip.com/help/keyboard-shortcuts",
+      "slug": "keyboard-shortcuts",
+      "title": "Keyboard shortcuts | Zulip help center",
+      "sha256": "9ee18088e4b94f7e958af5897668cb1e1e693704dd8161ee46ad908f1f3fc5fc",
+      "html_bytes": 123094,
+      "text_chars": 6685,
+      "fetched_at": "2026-10-06T14:50:45+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/latex",
+      "requested": "https://zulip.com/help/latex",
+      "slug": "latex",
+      "title": "LaTeX | Zulip help center",
+      "sha256": "356cbde6dc8d2e32b477a6a11c3b66f6542e06109f93cab970cddb9f6273bb3d",
+      "html_bytes": 103608,
+      "text_chars": 2361,
+      "fetched_at": "2026-10-06T14:51:12+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/left-sidebar",
+      "requested": "https://zulip.com/help/left-sidebar",
+      "slug": "left-sidebar",
+      "title": "Left sidebar | Zulip help center",
+      "sha256": "1a28c8b05bb59c2b74564251dc184c33dbf5a4a9b8f3d235ef763b0d70506538",
+      "html_bytes": 140914,
+      "text_chars": 5564,
+      "fetched_at": "2026-10-06T14:51:23+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/line-spacing",
+      "requested": "https://zulip.com/help/line-spacing",
+      "slug": "line-spacing",
+      "title": "Line spacing | Zulip help center",
+      "sha256": "9cc681e9d7b2a15f4d0fd572269b1a41dc065d44c4ebd3b0abe4d692731f560d",
+      "html_bytes": 88286,
+      "text_chars": 661,
+      "fetched_at": "2026-10-06T14:50:57+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/link-to-a-message-or-conversation",
+      "requested": "https://zulip.com/help/link-to-a-message-or-conversation",
+      "slug": "link-to-a-message-or-conversation",
+      "title": "Link to a message or conversation | Zulip help center",
+      "sha256": "951d72a941f36f3273b49e5941f2359a045a8161f14d5541e1f3173ea32bc842",
+      "html_bytes": 116638,
+      "text_chars": 6082,
+      "fetched_at": "2026-10-06T14:51:04+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/linking-to-zulip",
+      "requested": "https://zulip.com/help/linking-to-zulip",
+      "slug": "linking-to-zulip",
+      "title": "Linking to your organization | Zulip help center",
+      "sha256": "47157b0bc42c8a793b59b2a1578d4e1ae84a6bf645f332a2168660e18df6c0f9",
+      "html_bytes": 82406,
+      "text_chars": 586,
+      "fetched_at": "2026-10-06T14:51:54+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/linking-to-zulip-website",
+      "requested": "https://zulip.com/help/linking-to-zulip-website",
+      "slug": "linking-to-zulip-website",
+      "title": "Linking to the Zulip website | Zulip help center",
+      "sha256": "ddc5d24b260d46dbc1d7ed24c60b470116c8cfaa6d92d16e61037a100b9b91f6",
+      "html_bytes": 84231,
+      "text_chars": 851,
+      "fetched_at": "2026-10-06T14:52:42+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/list-of-topics",
+      "requested": "https://zulip.com/help/list-of-topics",
+      "slug": "list-of-topics",
+      "title": "List of topics in a channel | Zulip help center",
+      "sha256": "c10bf53d3df817769de5c313c34faf661ca780fcd7786b5834582f59b3844e9b",
+      "html_bytes": 106419,
+      "text_chars": 2235,
+      "fetched_at": "2026-10-06T14:51:22+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/logging-in",
+      "requested": "https://zulip.com/help/logging-in",
+      "slug": "logging-in",
+      "title": "Logging in | Zulip help center",
+      "sha256": "10c1d35569d07a645443c3e779e11ce41d27e7d28e49dbe597e8948a2fd68850",
+      "html_bytes": 105664,
+      "text_chars": 4625,
+      "fetched_at": "2026-10-06T14:50:52+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/logging-out",
+      "requested": "https://zulip.com/help/logging-out",
+      "slug": "logging-out",
+      "title": "Logging out | Zulip help center",
+      "sha256": "0f9da08795994afe459ef367f90a31c28ddd6553f91bad08e166a89153de4b1d",
+      "html_bytes": 99836,
+      "text_chars": 1393,
+      "fetched_at": "2026-10-06T14:50:53+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/manage-a-bot",
+      "requested": "https://zulip.com/help/manage-a-bot",
+      "slug": "manage-a-bot",
+      "title": "Manage a bot | Zulip help center",
+      "sha256": "beeabc657ff71366dbedfb470edf210215d63345aa530f819aca3e8bd096e68f",
+      "html_bytes": 141179,
+      "text_chars": 2764,
+      "fetched_at": "2026-10-06T14:52:32+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/manage-a-user",
+      "requested": "https://zulip.com/help/manage-a-user",
+      "slug": "manage-a-user",
+      "title": "Manage a user | Zulip help center",
+      "sha256": "edffda0b623f0a25d2016392b31ea0ec59eb1bb589e5d330229b05c2aabf820c",
+      "html_bytes": 95137,
+      "text_chars": 787,
+      "fetched_at": "2026-10-06T14:52:03+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/manage-channel-folders",
+      "requested": "https://zulip.com/help/manage-channel-folders",
+      "slug": "manage-channel-folders",
+      "title": "Manage channel folders | Zulip help center",
+      "sha256": "7d53eba84a0c56ce878f6f3395f824930ec103ec0520e5b1326b142ffc15a984",
+      "html_bytes": 143124,
+      "text_chars": 4329,
+      "fetched_at": "2026-10-06T14:52:08+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/manage-inactive-channels",
+      "requested": "https://zulip.com/help/manage-inactive-channels",
+      "slug": "manage-inactive-channels",
+      "title": "Hide or reveal inactive channels | Zulip help center",
+      "sha256": "fa4d793c7335e30d25bd97affcc996d42b4e9626c7054bd56ce158c120377f8f",
+      "html_bytes": 98355,
+      "text_chars": 1332,
+      "fetched_at": "2026-10-06T14:51:40+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/manage-permissions",
+      "requested": "https://zulip.com/help/manage-permissions",
+      "slug": "manage-permissions",
+      "title": "Manage permissions | Zulip help center",
+      "sha256": "807eef87b44e24c1e03c349efd304466d3d910195ef729b2eed6e8b340df9d8a",
+      "html_bytes": 88424,
+      "text_chars": 769,
+      "fetched_at": "2026-10-06T14:52:16+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/manage-user-channel-subscriptions",
+      "requested": "https://zulip.com/help/manage-user-channel-subscriptions",
+      "slug": "manage-user-channel-subscriptions",
+      "title": "Manage a user's channel subscriptions | Zulip help center",
+      "sha256": "9c0dc627d53391019b3f3a6a28f932210448cfd4e97095f93b62e4cebe38bbba",
+      "html_bytes": 110905,
+      "text_chars": 3493,
+      "fetched_at": "2026-10-06T14:52:05+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/manage-user-group-membership",
+      "requested": "https://zulip.com/help/manage-user-group-membership",
+      "slug": "manage-user-group-membership",
+      "title": "Manage a user's group membership | Zulip help center",
+      "sha256": "763ee9a2e567f3a1ca78a85880aeda6867b51a56523cb37eac4a0eaf9cc01031",
+      "html_bytes": 108761,
+      "text_chars": 2288,
+      "fetched_at": "2026-10-06T14:52:05+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/manage-user-groups",
+      "requested": "https://zulip.com/help/manage-user-groups",
+      "slug": "manage-user-groups",
+      "title": "Manage user groups | Zulip help center",
+      "sha256": "dfe29b40c2ffb5f9cb7a9d29c49c248298a10e62b9e9f2e85215f7d6d782779b",
+      "html_bytes": 176890,
+      "text_chars": 7808,
+      "fetched_at": "2026-10-06T14:52:17+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/manage-your-uploaded-files",
+      "requested": "https://zulip.com/help/manage-your-uploaded-files",
+      "slug": "manage-your-uploaded-files",
+      "title": "Manage your uploaded files | Zulip help center",
+      "sha256": "501d0ecb8473dfdf641a3cc55233f0e1555d2b98c46203f9085731578130c7f7",
+      "html_bytes": 107821,
+      "text_chars": 1651,
+      "fetched_at": "2026-10-06T14:51:01+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/marking-messages-as-read",
+      "requested": "https://zulip.com/help/marking-messages-as-read",
+      "slug": "marking-messages-as-read",
+      "title": "Marking messages as read | Zulip help center",
+      "sha256": "2c0d2604180b4b8552232b4a9b96fc00c528eb7f6c245457682f29de9962bff2",
+      "html_bytes": 118037,
+      "text_chars": 4272,
+      "fetched_at": "2026-10-06T14:51:24+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/marking-messages-as-unread",
+      "requested": "https://zulip.com/help/marking-messages-as-unread",
+      "slug": "marking-messages-as-unread",
+      "title": "Marking messages as unread | Zulip help center",
+      "sha256": "a5049649f9da9c8c688a107515bc83306866e48dffa9a65b58652ef7cba39b5a",
+      "html_bytes": 98870,
+      "text_chars": 2042,
+      "fetched_at": "2026-10-06T14:51:24+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/mastering-the-compose-box",
+      "requested": "https://zulip.com/help/mastering-the-compose-box",
+      "slug": "mastering-the-compose-box",
+      "title": "Mastering the compose box | Zulip help center",
+      "sha256": "14f7838aed098eaf92f7fd6f69415f3f4cec076c5d2638902c0d9c440900c24c",
+      "html_bytes": 100705,
+      "text_chars": 1978,
+      "fetched_at": "2026-10-06T14:51:02+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/me-action-messages",
+      "requested": "https://zulip.com/help/me-action-messages",
+      "slug": "me-action-messages",
+      "title": "/me action messages | Zulip help center",
+      "sha256": "cf71347684e8e43e473df289c976b03f0687df1a334360fa769c68bb6760f163",
+      "html_bytes": 81284,
+      "text_chars": 406,
+      "fetched_at": "2026-10-06T14:51:13+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/mention-a-user-or-group",
+      "requested": "https://zulip.com/help/mention-a-user-or-group",
+      "slug": "mention-a-user-or-group",
+      "title": "Mention a user or group | Zulip help center",
+      "sha256": "77c802b3370979bde7bbcd582081b8043fdcdbb14df7332d519a60a3d8294407",
+      "html_bytes": 103312,
+      "text_chars": 3495,
+      "fetched_at": "2026-10-06T14:51:04+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/message-a-channel-by-email",
+      "requested": "https://zulip.com/help/message-a-channel-by-email",
+      "slug": "message-a-channel-by-email",
+      "title": "Message a channel by email | Zulip help center",
+      "sha256": "9a93ff4b125073fc84831a4eddcb6c7bbb2285bc57231974b00a570c9db7f9de",
+      "html_bytes": 94313,
+      "text_chars": 3107,
+      "fetched_at": "2026-10-06T14:51:20+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/message-actions",
+      "requested": "https://zulip.com/help/message-actions",
+      "slug": "message-actions",
+      "title": "Message actions | Zulip help center",
+      "sha256": "7e5a60bafb0d81f461d80635c597c38581fb5e74188a6155df115cafd56ca919",
+      "html_bytes": 87361,
+      "text_chars": 574,
+      "fetched_at": "2026-10-06T14:51:23+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/message-retention-policy",
+      "requested": "https://zulip.com/help/message-retention-policy",
+      "slug": "message-retention-policy",
+      "title": "Message retention policy | Zulip help center",
+      "sha256": "12836de6df47d1899c37dacb380eb4aed4615466b320f7712c9adb0451f108f5",
+      "html_bytes": 98767,
+      "text_chars": 2498,
+      "fetched_at": "2026-10-06T14:52:27+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/messaging-tips",
+      "requested": "https://zulip.com/help/messaging-tips",
+      "slug": "messaging-tips",
+      "title": "Messaging tips & tricks | Zulip help center",
+      "sha256": "8fe1df34bf48c9a83c365a73ca0896dbcb489e7f131ea35ca7a3024ed9c6b4a2",
+      "html_bytes": 80145,
+      "text_chars": 604,
+      "fetched_at": "2026-10-06T14:50:45+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/migrating-from-other-chat-tools",
+      "requested": "https://zulip.com/help/migrating-from-other-chat-tools",
+      "slug": "migrating-from-other-chat-tools",
+      "title": "Migrating from other chat tools | Zulip help center",
+      "sha256": "347d8b0eb1831d0ba387f995b2a1b5e5971f2477c32b0c20903ee2fbd4b1770c",
+      "html_bytes": 81029,
+      "text_chars": 806,
+      "fetched_at": "2026-10-06T14:50:38+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/mobile-app-install-guide",
+      "requested": "https://zulip.com/help/mobile-app-install-guide",
+      "slug": "mobile-app-install-guide",
+      "title": "Installing the Zulip mobile apps | Zulip help center",
+      "sha256": "7b997eb6fd614ad917db39620cfd3f9893cf5365d3568c8ad5f4ce3158316f23",
+      "html_bytes": 90715,
+      "text_chars": 1286,
+      "fetched_at": "2026-10-06T14:51:50+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/mobile-notifications",
+      "requested": "https://zulip.com/help/mobile-notifications",
+      "slug": "mobile-notifications",
+      "title": "Mobile notifications | Zulip help center",
+      "sha256": "2ddf3dbf2780cbe6afa682801267368917be15b31dfca2219072b7d25fa2e9af",
+      "html_bytes": 118868,
+      "text_chars": 4459,
+      "fetched_at": "2026-10-06T14:51:49+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/moderating-open-organizations",
+      "requested": "https://zulip.com/help/moderating-open-organizations",
+      "slug": "moderating-open-organizations",
+      "title": "Community moderation toolkit | Zulip help center",
+      "sha256": "4b2f0d2a3c6a52fc45f1461e1b0608fd5fdc60a8e64e119538cae18bed40186e",
+      "html_bytes": 99035,
+      "text_chars": 4045,
+      "fetched_at": "2026-10-06T14:50:36+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/move-content-to-another-channel",
+      "requested": "https://zulip.com/help/move-content-to-another-channel",
+      "slug": "move-content-to-another-channel",
+      "title": "Move content to another channel | Zulip help center",
+      "sha256": "39247f1962356072755ab1d572244c3ff303a9850c5aeab51bbc06a39b7248b6",
+      "html_bytes": 93120,
+      "text_chars": 3147,
+      "fetched_at": "2026-10-06T14:51:41+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/move-content-to-another-topic",
+      "requested": "https://zulip.com/help/move-content-to-another-topic",
+      "slug": "move-content-to-another-topic",
+      "title": "Move content to another topic | Zulip help center",
+      "sha256": "79de6736b9d99060db3f798a378f4cb8a174c69203608c6ee0577e21f2f21149",
+      "html_bytes": 87117,
+      "text_chars": 990,
+      "fetched_at": "2026-10-06T14:51:43+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/move-to-zulip-cloud",
+      "requested": "https://zulip.com/help/move-to-zulip-cloud",
+      "slug": "move-to-zulip-cloud",
+      "title": "Move from self-hosting to Zulip Cloud | Zulip help center",
+      "sha256": "ea0a3db1a734637fcad39199ecdcbb96abf724801d437134796bbd321334a989",
+      "html_bytes": 100939,
+      "text_chars": 4243,
+      "fetched_at": "2026-10-06T14:52:41+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/moving-from-discord",
+      "requested": "https://zulip.com/help/moving-from-discord",
+      "slug": "moving-from-discord",
+      "title": "Moving from Discord | Zulip help center",
+      "sha256": "46da03e79304a715af003e1f4e149ae1f2c31393a942fe35313bd06d36c0658a",
+      "html_bytes": 102512,
+      "text_chars": 6418,
+      "fetched_at": "2026-10-06T14:50:40+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/moving-from-slack",
+      "requested": "https://zulip.com/help/moving-from-slack",
+      "slug": "moving-from-slack",
+      "title": "Moving from Slack | Zulip help center",
+      "sha256": "993f29cc648b8524f35c36c2eeb7f6322a71daf4a83ecd05f141aaf8639e9601",
+      "html_bytes": 105598,
+      "text_chars": 7628,
+      "fetched_at": "2026-10-06T14:50:39+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/moving-from-teams",
+      "requested": "https://zulip.com/help/moving-from-teams",
+      "slug": "moving-from-teams",
+      "title": "Moving from Microsoft Teams | Zulip help center",
+      "sha256": "cf19b84c141a1800302fc671b5cd5edb96a78e4a991a295aadcbc6e114394adc",
+      "html_bytes": 103694,
+      "text_chars": 6539,
+      "fetched_at": "2026-10-06T14:50:39+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/moving-to-zulip",
+      "requested": "https://zulip.com/help/moving-to-zulip",
+      "slug": "moving-to-zulip",
+      "title": "Moving to Zulip | Zulip help center",
+      "sha256": "39ff2ed91fe1141f36f65581df3d4f58f9e2e5fa0f0922626c24abf5fed94b5d",
+      "html_bytes": 105692,
+      "text_chars": 7375,
+      "fetched_at": "2026-10-06T14:50:38+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/mute-a-channel",
+      "requested": "https://zulip.com/help/mute-a-channel",
+      "slug": "mute-a-channel",
+      "title": "Mute or unmute a channel | Zulip help center",
+      "sha256": "9c9f6c8ceb5694d528d59920a5017261e2279e39c181868e89fc55d7c50555c4",
+      "html_bytes": 102095,
+      "text_chars": 3437,
+      "fetched_at": "2026-10-06T14:51:47+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/mute-a-topic",
+      "requested": "https://zulip.com/help/mute-a-topic",
+      "slug": "mute-a-topic",
+      "title": "Mute or unmute a topic | Zulip help center",
+      "sha256": "e837470a800a929a7b9a2de1dc3a5d3f20fc26288f9b25c88fc94eddfa7ba26d",
+      "html_bytes": 117943,
+      "text_chars": 3413,
+      "fetched_at": "2026-10-06T14:51:47+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/mute-a-user",
+      "requested": "https://zulip.com/help/mute-a-user",
+      "slug": "mute-a-user",
+      "title": "Mute a user | Zulip help center",
+      "sha256": "4ae1791cba99f985c4199e16ef502069876295d70e551eaf4ea848e03a0c4abb",
+      "html_bytes": 97059,
+      "text_chars": 2517,
+      "fetched_at": "2026-10-06T14:51:48+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/non-webhook-integrations",
+      "requested": "https://zulip.com/help/non-webhook-integrations",
+      "slug": "non-webhook-integrations",
+      "title": "Non-webhook integrations | Zulip help center",
+      "sha256": "93e2d839992432dab0cfe338a484caa5b2aefa178535f800da6764485f03dec7",
+      "html_bytes": 82492,
+      "text_chars": 1983,
+      "fetched_at": "2026-10-06T14:52:35+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/numbered-lists",
+      "requested": "https://zulip.com/help/numbered-lists",
+      "slug": "numbered-lists",
+      "title": "Numbered lists | Zulip help center",
+      "sha256": "119068d6474581730afb6b87b8220e3172e0f46203bdbcfcdded10f229cecf4a",
+      "html_bytes": 92012,
+      "text_chars": 1407,
+      "fetched_at": "2026-10-06T14:51:10+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/open-the-compose-box",
+      "requested": "https://zulip.com/help/open-the-compose-box",
+      "slug": "open-the-compose-box",
+      "title": "Open the compose box | Zulip help center",
+      "sha256": "701772989151b7118c479f9cb276d2286c414543773d615d98e5c5eb178afd8b",
+      "html_bytes": 83405,
+      "text_chars": 790,
+      "fetched_at": "2026-10-06T14:51:15+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/organization-type",
+      "requested": "https://zulip.com/help/organization-type",
+      "slug": "organization-type",
+      "title": "Organization type | Zulip help center",
+      "sha256": "2a964f0ea2e1b92b3d0a7f600523d9211ec280058cfa1020c0962fa90d0c819a",
+      "html_bytes": 87737,
+      "text_chars": 598,
+      "fetched_at": "2026-10-06T14:51:53+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/outgoing-webhooks",
+      "requested": "https://zulip.com/help/outgoing-webhooks",
+      "slug": "outgoing-webhooks",
+      "title": "Outgoing webhooks | Zulip help center",
+      "sha256": "4fcc5f1b0f752eddd31069125354468caca263fe9bad368380aef9e6d99ba4a0",
+      "html_bytes": 98031,
+      "text_chars": 2729,
+      "fetched_at": "2026-10-06T14:52:38+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/paragraph-and-section-formatting",
+      "requested": "https://zulip.com/help/paragraph-and-section-formatting",
+      "slug": "paragraph-and-section-formatting",
+      "title": "Paragraph and section formatting | Zulip help center",
+      "sha256": "b15690a40ecf4c5fbe09b0be17ca2c60e8570f97f552fe975808005538dd4cc1",
+      "html_bytes": 82214,
+      "text_chars": 409,
+      "fetched_at": "2026-10-06T14:51:09+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/pin-a-channel",
+      "requested": "https://zulip.com/help/pin-a-channel",
+      "slug": "pin-a-channel",
+      "title": "Pin a channel | Zulip help center",
+      "sha256": "e019878d69cb6010eed8d6f1dc5842e0bb4d2fcb3f2b7e6314b35ba8d6485d44",
+      "html_bytes": 101386,
+      "text_chars": 1815,
+      "fetched_at": "2026-10-06T14:51:38+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/pin-information",
+      "requested": "https://zulip.com/help/pin-information",
+      "slug": "pin-information",
+      "title": "Pin information | Zulip help center",
+      "sha256": "f991d3d3129767df903c73f64b7abab76d3ac51c9fde3f387f3d6d9d2da7a5ce",
+      "html_bytes": 93480,
+      "text_chars": 1460,
+      "fetched_at": "2026-10-06T14:52:14+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/preview-your-message-before-sending",
+      "requested": "https://zulip.com/help/preview-your-message-before-sending",
+      "slug": "preview-your-message-before-sending",
+      "title": "Preview your message before sending | Zulip help center",
+      "sha256": "ed0a828c790f062952daa5506144947b558cc1a1c08bc418910bfbde85a0cd6f",
+      "html_bytes": 88795,
+      "text_chars": 355,
+      "fetched_at": "2026-10-06T14:51:17+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/printing-messages",
+      "requested": "https://zulip.com/help/printing-messages",
+      "slug": "printing-messages",
+      "title": "Printing messages | Zulip help center",
+      "sha256": "7bc35f9ff8af93a39489a3771cce617a0a0403e6a2a265e84ff7574c59a94631",
+      "html_bytes": 84791,
+      "text_chars": 666,
+      "fetched_at": "2026-10-06T14:51:29+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/protect-your-account",
+      "requested": "https://zulip.com/help/protect-your-account",
+      "slug": "protect-your-account",
+      "title": "Protect your account | Zulip help center",
+      "sha256": "beeb293b0a3a04a7a9d3a7572f157bf7ad082ac40aa524389bae7cb385a450da",
+      "html_bytes": 89415,
+      "text_chars": 1283,
+      "fetched_at": "2026-10-06T14:50:55+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/public-access-option",
+      "requested": "https://zulip.com/help/public-access-option",
+      "slug": "public-access-option",
+      "title": "Public access option | Zulip help center",
+      "sha256": "62bd41e2d4e8ce459679885143d30a225a3a36e698c35c9290aab5a9672ffbbc",
+      "html_bytes": 115284,
+      "text_chars": 6632,
+      "fetched_at": "2026-10-06T14:52:07+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/quote-or-forward-a-message",
+      "requested": "https://zulip.com/help/quote-or-forward-a-message",
+      "slug": "quote-or-forward-a-message",
+      "title": "Quote or forward a message | Zulip help center",
+      "sha256": "e09de972cfd7701ad8d2e5ca38731ecd349a4037b655f67bf7aed472d49d4dd9",
+      "html_bytes": 100085,
+      "text_chars": 2236,
+      "fetched_at": "2026-10-06T14:51:05+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/read-receipts",
+      "requested": "https://zulip.com/help/read-receipts",
+      "slug": "read-receipts",
+      "title": "Read receipts | Zulip help center",
+      "sha256": "481d8f568a4aa2b985c6328d84c06b10c4db68d28ff0078d145a66fd56939f47",
+      "html_bytes": 112992,
+      "text_chars": 2476,
+      "fetched_at": "2026-10-06T14:51:32+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/reading-conversations",
+      "requested": "https://zulip.com/help/reading-conversations",
+      "slug": "reading-conversations",
+      "title": "Reading conversations | Zulip help center",
+      "sha256": "a661ea8120ea39ef4e059a720ff6fba540500a186c2eec89c2468123525dc48d",
+      "html_bytes": 101912,
+      "text_chars": 3188,
+      "fetched_at": "2026-10-06T14:50:43+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/reading-strategies",
+      "requested": "https://zulip.com/help/reading-strategies",
+      "slug": "reading-strategies",
+      "title": "Reading strategies | Zulip help center",
+      "sha256": "bcaf1177d5c6a727d5a32d806dfec83f38b0c0333006fc6748f2a06364c41512",
+      "html_bytes": 146529,
+      "text_chars": 7971,
+      "fetched_at": "2026-10-06T14:51:01+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/recent-conversations",
+      "requested": "https://zulip.com/help/recent-conversations",
+      "slug": "recent-conversations",
+      "title": "Recent conversations | Zulip help center",
+      "sha256": "a0ab36acfba2a37f71d2282e703297adcc895ac907fc2551e47771078d694903",
+      "html_bytes": 111239,
+      "text_chars": 3588,
+      "fetched_at": "2026-10-06T14:51:21+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/rename-a-channel",
+      "requested": "https://zulip.com/help/rename-a-channel",
+      "slug": "rename-a-channel",
+      "title": "Rename a channel | Zulip help center",
+      "sha256": "9c7c6b1a360d880c62cdbb660c802e63852ba2677b5f59f017225c36b12a6651",
+      "html_bytes": 91190,
+      "text_chars": 955,
+      "fetched_at": "2026-10-06T14:52:13+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/rename-a-topic",
+      "requested": "https://zulip.com/help/rename-a-topic",
+      "slug": "rename-a-topic",
+      "title": "Rename a topic | Zulip help center",
+      "sha256": "e419db1440bd4feeef3da5f2df966a58a9da96799f160e8125fda14f2f77c57f",
+      "html_bytes": 90593,
+      "text_chars": 1442,
+      "fetched_at": "2026-10-06T14:51:42+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/replying-to-messages",
+      "requested": "https://zulip.com/help/replying-to-messages",
+      "slug": "replying-to-messages",
+      "title": "Replying to messages | Zulip help center",
+      "sha256": "236c6374da870134e704bd46ac824a257d02565aed816e0ad793e8129ee96fe0",
+      "html_bytes": 89535,
+      "text_chars": 1455,
+      "fetched_at": "2026-10-06T14:50:44+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/report-a-message",
+      "requested": "https://zulip.com/help/report-a-message",
+      "slug": "report-a-message",
+      "title": "Report a message | Zulip help center",
+      "sha256": "8042564631b99ba09441606d69a8a7e49208ebe2a52fa3d0dbffc8bc43d82a23",
+      "html_bytes": 87526,
+      "text_chars": 1245,
+      "fetched_at": "2026-10-06T14:51:32+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/request-an-integration",
+      "requested": "https://zulip.com/help/request-an-integration",
+      "slug": "request-an-integration",
+      "title": "Request an integration | Zulip help center",
+      "sha256": "8e26d1b05300791ee9d42f3966b278f82f0e00b3200314076150d6e54678c561",
+      "html_bytes": 79806,
+      "text_chars": 471,
+      "fetched_at": "2026-10-06T14:52:33+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/require-topics",
+      "requested": "https://zulip.com/help/require-topics",
+      "slug": "require-topics",
+      "title": "Configure whether topics are required in channel messages | Zulip help center",
+      "sha256": "6db58d00fc65a806559c17e12c090f432c920fb441dbd5aceab0d74b19466612",
+      "html_bytes": 98702,
+      "text_chars": 1662,
+      "fetched_at": "2026-10-06T14:52:25+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/reset-settings-for-users",
+      "requested": "https://zulip.com/help/reset-settings-for-users",
+      "slug": "reset-settings-for-users",
+      "title": "Reset settings for users | Zulip help center",
+      "sha256": "6ee65dd6db87ae099113a991ac238593388c88ffc521627ecc38c12daf3ef54d",
+      "html_bytes": 90610,
+      "text_chars": 1315,
+      "fetched_at": "2026-10-06T14:52:06+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/resize-the-compose-box",
+      "requested": "https://zulip.com/help/resize-the-compose-box",
+      "slug": "resize-the-compose-box",
+      "title": "Resize the compose box | Zulip help center",
+      "sha256": "31a90fdcb875bdb1eec8ff5415b44369a6e2a68f1d9db1f0b21eb4f101aa935d",
+      "html_bytes": 83836,
+      "text_chars": 448,
+      "fetched_at": "2026-10-06T14:51:16+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/resolve-a-topic",
+      "requested": "https://zulip.com/help/resolve-a-topic",
+      "slug": "resolve-a-topic",
+      "title": "Resolve a topic | Zulip help center",
+      "sha256": "4482a38fb93b99fd89e63d572a5a84fdd3fb8f8308caba66d9511625fd5733aa",
+      "html_bytes": 120916,
+      "text_chars": 5363,
+      "fetched_at": "2026-10-06T14:51:43+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/restrict-account-creation",
+      "requested": "https://zulip.com/help/restrict-account-creation",
+      "slug": "restrict-account-creation",
+      "title": "Restrict account creation | Zulip help center",
+      "sha256": "25e256817c5f5487cd4c3ed0c620832f8a5f8f99d59eefa2301d967eb32ca85f",
+      "html_bytes": 114611,
+      "text_chars": 3255,
+      "fetched_at": "2026-10-06T14:52:01+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/restrict-bot-creation",
+      "requested": "https://zulip.com/help/restrict-bot-creation",
+      "slug": "restrict-bot-creation",
+      "title": "Configure who can add bots | Zulip help center",
+      "sha256": "14f3c64b3c5888b0e7c9b0af1d867141995af4409ee90f8da4b2eb6128f75802",
+      "html_bytes": 95320,
+      "text_chars": 1425,
+      "fetched_at": "2026-10-06T14:52:34+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/restrict-direct-messages",
+      "requested": "https://zulip.com/help/restrict-direct-messages",
+      "slug": "restrict-direct-messages",
+      "title": "Restrict direct messages | Zulip help center",
+      "sha256": "9af120b6d22142edd38248cc9c992d75879f8c60b01411ea6b4d9141bc0da8a5",
+      "html_bytes": 101253,
+      "text_chars": 2270,
+      "fetched_at": "2026-10-06T14:52:19+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/restrict-message-edit-history-access",
+      "requested": "https://zulip.com/help/restrict-message-edit-history-access",
+      "slug": "restrict-message-edit-history-access",
+      "title": "Restrict message edit history access | Zulip help center",
+      "sha256": "95f0ee5a50b2f3cc4f41558bc712bb9b621037bc09c78c9736043973af49e42c",
+      "html_bytes": 89251,
+      "text_chars": 984,
+      "fetched_at": "2026-10-06T14:52:20+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/restrict-message-editing-and-deletion",
+      "requested": "https://zulip.com/help/restrict-message-editing-and-deletion",
+      "slug": "restrict-message-editing-and-deletion",
+      "title": "Restrict message editing and deletion | Zulip help center",
+      "sha256": "404cfdbaae585548a637958d0c26d0be4f6e9964719d0f8c7ea4b602f93a4fe6",
+      "html_bytes": 106362,
+      "text_chars": 2584,
+      "fetched_at": "2026-10-06T14:52:20+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/restrict-moving-messages",
+      "requested": "https://zulip.com/help/restrict-moving-messages",
+      "slug": "restrict-moving-messages",
+      "title": "Restrict moving messages | Zulip help center",
+      "sha256": "d30477e9fd6123fc7a2d1f72c80c77a9bea2d66a8fd71b5e66f6be8c8718e678",
+      "html_bytes": 125776,
+      "text_chars": 3845,
+      "fetched_at": "2026-10-06T14:52:21+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/restrict-name-and-email-changes",
+      "requested": "https://zulip.com/help/restrict-name-and-email-changes",
+      "slug": "restrict-name-and-email-changes",
+      "title": "Restrict name and email changes | Zulip help center",
+      "sha256": "efb78d3581591de817517eac546b51a1cb4f0a17d42e2c929713ce88a01d886b",
+      "html_bytes": 99862,
+      "text_chars": 2022,
+      "fetched_at": "2026-10-06T14:52:22+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/restrict-permissions-of-new-members",
+      "requested": "https://zulip.com/help/restrict-permissions-of-new-members",
+      "slug": "restrict-permissions-of-new-members",
+      "title": "Restrict permissions of new members | Zulip help center",
+      "sha256": "ef14787027e9b5739b5b0515364e9cb2c824a28c04de88397f573b863d3cc959",
+      "html_bytes": 89187,
+      "text_chars": 1185,
+      "fetched_at": "2026-10-06T14:52:23+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/restrict-profile-picture-changes",
+      "requested": "https://zulip.com/help/restrict-profile-picture-changes",
+      "slug": "restrict-profile-picture-changes",
+      "title": "Restrict profile picture changes | Zulip help center",
+      "sha256": "5640a4c91529af5c38dd17de94eaf59f77502e90a52c167232267fcb8e9afb62",
+      "html_bytes": 87410,
+      "text_chars": 736,
+      "fetched_at": "2026-10-06T14:52:22+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/restrict-resolving-topics",
+      "requested": "https://zulip.com/help/restrict-resolving-topics",
+      "slug": "restrict-resolving-topics",
+      "title": "Restrict resolving topics | Zulip help center",
+      "sha256": "e72d91130d407d29c8d9c35358a5c927d1a378eb54367c598743016c065a711a",
+      "html_bytes": 98591,
+      "text_chars": 1213,
+      "fetched_at": "2026-10-06T14:52:21+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/restrict-wildcard-mentions",
+      "requested": "https://zulip.com/help/restrict-wildcard-mentions",
+      "slug": "restrict-wildcard-mentions",
+      "title": "Restrict wildcard mentions | Zulip help center",
+      "sha256": "b33b98ae16ca1740dc06be3728821ae0795bd8af80dd201946d0d08638ecff56",
+      "html_bytes": 87098,
+      "text_chars": 860,
+      "fetched_at": "2026-10-06T14:52:19+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/review-your-settings",
+      "requested": "https://zulip.com/help/review-your-settings",
+      "slug": "review-your-settings",
+      "title": "Review your settings | Zulip help center",
+      "sha256": "f62482284931b69044a358e0e1a1b9c5afd2e39816ee06c0fe4b9d3697c85696",
+      "html_bytes": 105008,
+      "text_chars": 982,
+      "fetched_at": "2026-10-06T14:50:54+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/running-bots",
+      "requested": "https://zulip.com/help/running-bots",
+      "slug": "running-bots",
+      "title": "Running interactive bots | Zulip help center",
+      "sha256": "634c59d3ffc060d7152115b523828d1144a575775c4caedb111c6d482617a523",
+      "html_bytes": 92876,
+      "text_chars": 2568,
+      "fetched_at": "2026-10-06T14:52:37+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/saml-authentication",
+      "requested": "https://zulip.com/help/saml-authentication",
+      "slug": "saml-authentication",
+      "title": "SAML authentication | Zulip help center",
+      "sha256": "0396f170e0505e6761e1cd35570f4b4a96ed0079b7b4e48f5d08976fb9b9e1f2",
+      "html_bytes": 107467,
+      "text_chars": 9790,
+      "fetched_at": "2026-10-06T14:52:02+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/saved-snippets",
+      "requested": "https://zulip.com/help/saved-snippets",
+      "slug": "saved-snippets",
+      "title": "Saved snippets | Zulip help center",
+      "sha256": "7946016c84b2ea969452355c82787632ccd29d680f4024ff3e30cf0589af7a2b",
+      "html_bytes": 108570,
+      "text_chars": 1892,
+      "fetched_at": "2026-10-06T14:51:07+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/schedule-a-message",
+      "requested": "https://zulip.com/help/schedule-a-message",
+      "slug": "schedule-a-message",
+      "title": "Schedule a message | Zulip help center",
+      "sha256": "ca99a0b9f698dcb55f2ed26a6a7da4b05258ab4c0d9fa659476a546a4fec7a5f",
+      "html_bytes": 125544,
+      "text_chars": 2532,
+      "fetched_at": "2026-10-06T14:51:19+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/schedule-a-reminder",
+      "requested": "https://zulip.com/help/schedule-a-reminder",
+      "slug": "schedule-a-reminder",
+      "title": "Schedule a reminder | Zulip help center",
+      "sha256": "abe3d492f58ab0acf30862631be72ae9a11ca1c8cd2b1c46b8e7b65436441af5",
+      "html_bytes": 107792,
+      "text_chars": 1366,
+      "fetched_at": "2026-10-06T14:51:27+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/scim",
+      "requested": "https://zulip.com/help/scim",
+      "slug": "scim",
+      "title": "SCIM provisioning | Zulip help center",
+      "sha256": "9b13755b5aea295e2f45688ea50c6cbe50a7e171e7583277706f6262424ef274",
+      "html_bytes": 100068,
+      "text_chars": 7906,
+      "fetched_at": "2026-10-06T14:52:03+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/scroll-to-date",
+      "requested": "https://zulip.com/help/scroll-to-date",
+      "slug": "scroll-to-date",
+      "title": "Scroll to date | Zulip help center",
+      "sha256": "d9ec9feabaecded72d6a54c8b105b0cde518f0a0ee8ad7ab85bb6068659cd17e",
+      "html_bytes": 83948,
+      "text_chars": 414,
+      "fetched_at": "2026-10-06T14:51:29+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/search-for-messages",
+      "requested": "https://zulip.com/help/search-for-messages",
+      "slug": "search-for-messages",
+      "title": "Searching for messages | Zulip help center",
+      "sha256": "54f7e920bb9508d3acaed73eadf871ad52a5bb3efacff8eed250d01632d786ca",
+      "html_bytes": 119280,
+      "text_chars": 5985,
+      "fetched_at": "2026-10-06T14:51:03+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/self-hosted-billing",
+      "requested": "https://zulip.com/help/self-hosted-billing",
+      "slug": "self-hosted-billing",
+      "title": "Self-hosted Zulip billing | Zulip help center",
+      "sha256": "6ae73a007b9088a2902dd5c64aba876b9fa97c00ede4d67c8fc3285e089cab6d",
+      "html_bytes": 159616,
+      "text_chars": 19037,
+      "fetched_at": "2026-10-06T14:52:40+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/self-hosting-to-cloud",
+      "requested": "https://zulip.com/help/self-hosting-to-cloud",
+      "slug": "self-hosting-to-cloud",
+      "title": "Move from self-hosting to Zulip Cloud | Zulip help center",
+      "sha256": "94166347a426ef199bb29b3f4defec5a94d370a419ec269393fb83252f0b5bbd",
+      "html_bytes": 83977,
+      "text_chars": 551,
+      "fetched_at": "2026-10-06T14:51:59+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/set-default-channels-for-new-users",
+      "requested": "https://zulip.com/help/set-default-channels-for-new-users",
+      "slug": "set-default-channels-for-new-users",
+      "title": "Set default channels for new users | Zulip help center",
+      "sha256": "c56e1b6607fa49293f8c559153c9092cb49e06d2f241e4269f4c7894b4c283b0",
+      "html_bytes": 95173,
+      "text_chars": 1381,
+      "fetched_at": "2026-10-06T14:52:13+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/set-up-your-account",
+      "requested": "https://zulip.com/help/set-up-your-account",
+      "slug": "set-up-your-account",
+      "title": "Set up your account | Zulip help center",
+      "sha256": "374f2f0b955a09037a9e1f6d5654095028fccc212bac8152bdd26bdb419cb6f6",
+      "html_bytes": 80791,
+      "text_chars": 815,
+      "fetched_at": "2026-10-06T14:50:42+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/setting-up-zulip-for-a-class",
+      "requested": "https://zulip.com/help/setting-up-zulip-for-a-class",
+      "slug": "setting-up-zulip-for-a-class",
+      "title": "Setting up Zulip for a class | Zulip help center",
+      "sha256": "d7a1505664f4c92ad6e0f989c39d0bd8dcb4dc7bb03478178c42829a7c3c3841",
+      "html_bytes": 160552,
+      "text_chars": 13971,
+      "fetched_at": "2026-10-06T14:50:37+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/share-and-upload-files",
+      "requested": "https://zulip.com/help/share-and-upload-files",
+      "slug": "share-and-upload-files",
+      "title": "Share and upload files | Zulip help center",
+      "sha256": "8f1c346c6a81f53db2667045bbe8101f5d50e887172bfeb13fbe4fcf22b967f9",
+      "html_bytes": 100809,
+      "text_chars": 3372,
+      "fetched_at": "2026-10-06T14:51:07+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/spoilers",
+      "requested": "https://zulip.com/help/spoilers",
+      "slug": "spoilers",
+      "title": "Spoilers | Zulip help center",
+      "sha256": "c85a880d82127d0016844966f187ddfe408a620a9bc9c0c090ec8d750c28486a",
+      "html_bytes": 93727,
+      "text_chars": 1380,
+      "fetched_at": "2026-10-06T14:51:12+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/star-a-message",
+      "requested": "https://zulip.com/help/star-a-message",
+      "slug": "star-a-message",
+      "title": "Star a message | Zulip help center",
+      "sha256": "336cda9cc8ebae54f54cc7876657a8a049a3c080d32587a7b2d0cd31d311f258",
+      "html_bytes": 117863,
+      "text_chars": 2415,
+      "fetched_at": "2026-10-06T14:51:27+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/start-a-call",
+      "requested": "https://zulip.com/help/start-a-call",
+      "slug": "start-a-call",
+      "title": "Start a call | Zulip help center",
+      "sha256": "5163da6186c777813f497e8653d89a50b0ea7a2119961ab13d3395dcc7a290fe",
+      "html_bytes": 93312,
+      "text_chars": 1638,
+      "fetched_at": "2026-10-06T14:51:15+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/starting-a-new-direct-message",
+      "requested": "https://zulip.com/help/starting-a-new-direct-message",
+      "slug": "starting-a-new-direct-message",
+      "title": "Starting a new direct message | Zulip help center",
+      "sha256": "52144c71b56181197c12e701444e8f8ca2b089d28db339c01cd38c4e92b176d1",
+      "html_bytes": 95980,
+      "text_chars": 1663,
+      "fetched_at": "2026-10-06T14:50:44+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/status-and-availability",
+      "requested": "https://zulip.com/help/status-and-availability",
+      "slug": "status-and-availability",
+      "title": "Status and availability | Zulip help center",
+      "sha256": "fc4b0a3b8a74cde4a1dc8669396e0fda3c2a9b3e709ef617393cf58e6ea0fbd0",
+      "html_bytes": 138165,
+      "text_chars": 5603,
+      "fetched_at": "2026-10-06T14:51:34+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/subscribe-users-to-a-channel",
+      "requested": "https://zulip.com/help/subscribe-users-to-a-channel",
+      "slug": "subscribe-users-to-a-channel",
+      "title": "Subscribe users to a channel | Zulip help center",
+      "sha256": "1fb75bf8bae0ef9f14a208bf14aebdb3cca3906e54a046115e7006931271e6e5",
+      "html_bytes": 95607,
+      "text_chars": 2176,
+      "fetched_at": "2026-10-06T14:52:12+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/support-zulip-project",
+      "requested": "https://zulip.com/help/support-zulip-project",
+      "slug": "support-zulip-project",
+      "title": "Support the Zulip project | Zulip help center",
+      "sha256": "de80899e1b79a416d59d6294c743c8d258a5ca5da2780405c461d15fd3b0cbdd",
+      "html_bytes": 88299,
+      "text_chars": 3237,
+      "fetched_at": "2026-10-06T14:52:41+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/supported-browsers",
+      "requested": "https://zulip.com/help/supported-browsers",
+      "slug": "supported-browsers",
+      "title": "Supported browsers | Zulip help center",
+      "sha256": "23d8567cfd976f1772fa9fca56663a3c097fd70d3f32236329d169839ed532c7",
+      "html_bytes": 83324,
+      "text_chars": 1041,
+      "fetched_at": "2026-10-06T14:51:51+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/switching-between-organizations",
+      "requested": "https://zulip.com/help/switching-between-organizations",
+      "slug": "switching-between-organizations",
+      "title": "Switching between organizations | Zulip help center",
+      "sha256": "fa3975f9e7235282e8f0b107678b4b58f64e9d839669076afdfdd2703708a82f",
+      "html_bytes": 87398,
+      "text_chars": 749,
+      "fetched_at": "2026-10-06T14:50:53+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/tables",
+      "requested": "https://zulip.com/help/tables",
+      "slug": "tables",
+      "title": "Tables | Zulip help center",
+      "sha256": "338303519e4a81d12aee3600c7a568bbe6ff4aff7cd4e5ed164f30524cd2ec08",
+      "html_bytes": 82344,
+      "text_chars": 449,
+      "fetched_at": "2026-10-06T14:51:11+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/text-emphasis",
+      "requested": "https://zulip.com/help/text-emphasis",
+      "slug": "text-emphasis",
+      "title": "Text emphasis | Zulip help center",
+      "sha256": "789e5a2f96c9442bd4b0bdef55229e0abe41b8f6a5fbab66245e118de3aba843",
+      "html_bytes": 109657,
+      "text_chars": 1472,
+      "fetched_at": "2026-10-06T14:51:08+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/topic-notifications",
+      "requested": "https://zulip.com/help/topic-notifications",
+      "slug": "topic-notifications",
+      "title": "Topic notifications | Zulip help center",
+      "sha256": "99a3fd1263a57434c77b47c03b68855b3cd36e4bbb6b22bbae958506dcff1a13",
+      "html_bytes": 110417,
+      "text_chars": 2195,
+      "fetched_at": "2026-10-06T14:51:45+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/trying-out-zulip",
+      "requested": "https://zulip.com/help/trying-out-zulip",
+      "slug": "trying-out-zulip",
+      "title": "Trying out Zulip | Zulip help center",
+      "sha256": "34d7f69aa1b8d9a4e75e93c3560d83831ec951fe7f1558e87a29e862a0fbc4f2",
+      "html_bytes": 84368,
+      "text_chars": 1589,
+      "fetched_at": "2026-10-06T14:50:35+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/typing-notifications",
+      "requested": "https://zulip.com/help/typing-notifications",
+      "slug": "typing-notifications",
+      "title": "Typing notifications | Zulip help center",
+      "sha256": "9063afe6f1b3dd1efbb22de73eec1eb784be0b5410d26d64b33b9904f5afbfaa",
+      "html_bytes": 97165,
+      "text_chars": 1494,
+      "fetched_at": "2026-10-06T14:51:16+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/unsubscribe-from-a-channel",
+      "requested": "https://zulip.com/help/unsubscribe-from-a-channel",
+      "slug": "unsubscribe-from-a-channel",
+      "title": "Unsubscribe from a channel | Zulip help center",
+      "sha256": "1b4934c92dedece972aed97a2f18339eaaad1da739bbd5388ebf5ef4a19c279a",
+      "html_bytes": 104151,
+      "text_chars": 1636,
+      "fetched_at": "2026-10-06T14:51:40+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/unsubscribe-users-from-a-channel",
+      "requested": "https://zulip.com/help/unsubscribe-users-from-a-channel",
+      "slug": "unsubscribe-users-from-a-channel",
+      "title": "Unsubscribe users from a channel | Zulip help center",
+      "sha256": "a168a1f4c7fee9777971414382ec220facad9e682efbc14eef9e1fb164286cc8",
+      "html_bytes": 93800,
+      "text_chars": 1252,
+      "fetched_at": "2026-10-06T14:52:12+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/user-cards",
+      "requested": "https://zulip.com/help/user-cards",
+      "slug": "user-cards",
+      "title": "User cards | Zulip help center",
+      "sha256": "c65f89f8166225538f091336ec9649a22548d8418b3fd900cf698eacb62a0723",
+      "html_bytes": 98524,
+      "text_chars": 1501,
+      "fetched_at": "2026-10-06T14:51:34+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/user-groups",
+      "requested": "https://zulip.com/help/user-groups",
+      "slug": "user-groups",
+      "title": "User groups | Zulip help center",
+      "sha256": "df93300cefd280273591cf997630d03749fc7ae9ee82c12a199c40be4fc8f44d",
+      "html_bytes": 105315,
+      "text_chars": 1695,
+      "fetched_at": "2026-10-06T14:51:36+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/user-list",
+      "requested": "https://zulip.com/help/user-list",
+      "slug": "user-list",
+      "title": "User list | Zulip help center",
+      "sha256": "3b8f8525370fbde7fed95851196cc1f5ec431b421ea9f92d90aeb571f2fe641c",
+      "html_bytes": 107783,
+      "text_chars": 1913,
+      "fetched_at": "2026-10-06T14:51:33+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/user-roles",
+      "requested": "https://zulip.com/help/user-roles",
+      "slug": "user-roles",
+      "title": "User roles | Zulip help center",
+      "sha256": "de4d3852a2289d37374766ddff40f2582b81454284bc3133c1e09808eb1df82a",
+      "html_bytes": 128526,
+      "text_chars": 4187,
+      "fetched_at": "2026-10-06T14:52:18+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/using-zulip-for-a-class",
+      "requested": "https://zulip.com/help/using-zulip-for-a-class",
+      "slug": "using-zulip-for-a-class",
+      "title": "Using Zulip for a class | Zulip help center",
+      "sha256": "18a173ed6c1b8835119abbcbad01e4c3159b5b7660455064a01efa0bb237c692",
+      "html_bytes": 92137,
+      "text_chars": 2897,
+      "fetched_at": "2026-10-06T14:50:37+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/using-zulip-via-email",
+      "requested": "https://zulip.com/help/using-zulip-via-email",
+      "slug": "using-zulip-via-email",
+      "title": "Using Zulip via email | Zulip help center",
+      "sha256": "6ee1375c7d7ccffe80d924363ae3b67ee8346ce0f55cdd7bbb720cd9935cc4b3",
+      "html_bytes": 90048,
+      "text_chars": 1380,
+      "fetched_at": "2026-10-06T14:51:03+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/verify-your-message-was-successfully-sent",
+      "requested": "https://zulip.com/help/verify-your-message-was-successfully-sent",
+      "slug": "verify-your-message-was-successfully-sent",
+      "title": "Verify your message was successfully sent | Zulip help center",
+      "sha256": "d41cfcedf30b1efd8c321fad4e1769ebc0c10d16ab6d58e2020dc614861937de",
+      "html_bytes": 83846,
+      "text_chars": 1134,
+      "fetched_at": "2026-10-06T14:51:17+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-a-messages-edit-history",
+      "requested": "https://zulip.com/help/view-a-messages-edit-history",
+      "slug": "view-a-messages-edit-history",
+      "title": "View a message's edit history | Zulip help center",
+      "sha256": "c2adb0d679759e4aef8780fe9fbfd32a9672def87a3413ca22c109c1182992f3",
+      "html_bytes": 89943,
+      "text_chars": 799,
+      "fetched_at": "2026-10-06T14:51:31+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-all-bots-in-your-organization",
+      "requested": "https://zulip.com/help/view-all-bots-in-your-organization",
+      "slug": "view-all-bots-in-your-organization",
+      "title": "View all bots in your organization | Zulip help center",
+      "sha256": "6f14d56d808e104ed64c2fb7cf95d511ea51f328d71887c4214d8b20d7f278f5",
+      "html_bytes": 86079,
+      "text_chars": 369,
+      "fetched_at": "2026-10-06T14:52:35+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-and-edit-your-message-drafts",
+      "requested": "https://zulip.com/help/view-and-edit-your-message-drafts",
+      "slug": "view-and-edit-your-message-drafts",
+      "title": "Draft messages | Zulip help center",
+      "sha256": "c207da8be059cd5bf891598f49eb906ddaf1ea7e7298d14d36121cc751514cdb",
+      "html_bytes": 139555,
+      "text_chars": 3818,
+      "fetched_at": "2026-10-06T14:51:19+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-channel-information",
+      "requested": "https://zulip.com/help/view-channel-information",
+      "slug": "view-channel-information",
+      "title": "View channel information | Zulip help center",
+      "sha256": "7bbb64b0c1acd4ccc44850f7be0ddfed0b24827b8676e73a828602f574dd9d98",
+      "html_bytes": 89580,
+      "text_chars": 1007,
+      "fetched_at": "2026-10-06T14:51:41+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-channel-subscribers",
+      "requested": "https://zulip.com/help/view-channel-subscribers",
+      "slug": "view-channel-subscribers",
+      "title": "View channel subscribers | Zulip help center",
+      "sha256": "750ab1bf677b725caab3630f7e2d66118895a3ca8a9b82da567f1e26d9d08e89",
+      "html_bytes": 93123,
+      "text_chars": 1158,
+      "fetched_at": "2026-10-06T14:51:42+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-group-members",
+      "requested": "https://zulip.com/help/view-group-members",
+      "slug": "view-group-members",
+      "title": "View group members | Zulip help center",
+      "sha256": "632e4eb705679a84f2e014d6976278d8a1211980a2c4d62833c6bb0feecdb3be",
+      "html_bytes": 90987,
+      "text_chars": 598,
+      "fetched_at": "2026-10-06T14:51:37+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-images-and-videos",
+      "requested": "https://zulip.com/help/view-images-and-videos",
+      "slug": "view-images-and-videos",
+      "title": "View images and videos | Zulip help center",
+      "sha256": "a33ad6eb1e43300eb640b0a4fe34e50e110581ddbcda948f6c26f0cfccfb8933",
+      "html_bytes": 105626,
+      "text_chars": 2809,
+      "fetched_at": "2026-10-06T14:51:28+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-messages-sent-by-a-user",
+      "requested": "https://zulip.com/help/view-messages-sent-by-a-user",
+      "slug": "view-messages-sent-by-a-user",
+      "title": "View messages sent by a user | Zulip help center",
+      "sha256": "b574bb6a3c5aaed0ed641cd0aceaef62dc5a88067d3844416be5b3148fcf1200",
+      "html_bytes": 89388,
+      "text_chars": 950,
+      "fetched_at": "2026-10-06T14:51:28+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-someones-profile",
+      "requested": "https://zulip.com/help/view-someones-profile",
+      "slug": "view-someones-profile",
+      "title": "View someone's profile | Zulip help center",
+      "sha256": "f53e117979d9e9f73eb1b5a90f4df5f2217c4bc24540a8a577c407d9d0399ca8",
+      "html_bytes": 93776,
+      "text_chars": 1589,
+      "fetched_at": "2026-10-06T14:51:35+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-the-exact-time-a-message-was-sent",
+      "requested": "https://zulip.com/help/view-the-exact-time-a-message-was-sent",
+      "slug": "view-the-exact-time-a-message-was-sent",
+      "title": "View the exact time a message was sent | Zulip help center",
+      "sha256": "bb083012d93599be8fa7a0c02480e8078a00bd39d9d547f42d3c7dd01f830dbb",
+      "html_bytes": 83976,
+      "text_chars": 248,
+      "fetched_at": "2026-10-06T14:51:30+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-the-markdown-source-of-a-message",
+      "requested": "https://zulip.com/help/view-the-markdown-source-of-a-message",
+      "slug": "view-the-markdown-source-of-a-message",
+      "title": "View, copy, and share message content as Markdown | Zulip help center",
+      "sha256": "eb81eeaf6b851c6da53a632d6965d50a6add3aff25d56e33e6ce131c668f2dc3",
+      "html_bytes": 101453,
+      "text_chars": 1358,
+      "fetched_at": "2026-10-06T14:51:30+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-your-bots",
+      "requested": "https://zulip.com/help/view-your-bots",
+      "slug": "view-your-bots",
+      "title": "View your bots | Zulip help center",
+      "sha256": "1f3d0f12d907bdc7a98b7ae965e99040863f0eff619af0383180f907bc380707",
+      "html_bytes": 86368,
+      "text_chars": 300,
+      "fetched_at": "2026-10-06T14:52:34+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-your-mentions",
+      "requested": "https://zulip.com/help/view-your-mentions",
+      "slug": "view-your-mentions",
+      "title": "View your mentions | Zulip help center",
+      "sha256": "5ace02e15a30b6db092e56cb231ae9d739963b572518152244463a9fa184c6a8",
+      "html_bytes": 93346,
+      "text_chars": 981,
+      "fetched_at": "2026-10-06T14:51:26+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/view-zulip-version",
+      "requested": "https://zulip.com/help/view-zulip-version",
+      "slug": "view-zulip-version",
+      "title": "View Zulip version | Zulip help center",
+      "sha256": "f462061b716913aef35cdf051ad656d8a756a40278e9fbc0d98b816d8da86294",
+      "html_bytes": 99977,
+      "text_chars": 1550,
+      "fetched_at": "2026-10-06T14:52:39+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/writing-bots",
+      "requested": "https://zulip.com/help/writing-bots",
+      "slug": "writing-bots",
+      "title": "Writing interactive bots | Zulip help center",
+      "sha256": "56228df95a6e2a4a54bbe2ff401be8b29a8484a70bc7388b2842f8e282b88a44",
+      "html_bytes": 100734,
+      "text_chars": 3271,
+      "fetched_at": "2026-10-06T14:52:36+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/writing-tests-for-interactive-bots",
+      "requested": "https://zulip.com/help/writing-tests-for-interactive-bots",
+      "slug": "writing-tests-for-interactive-bots",
+      "title": "Writing tests for interactive bots | Zulip help center",
+      "sha256": "33cd0f2dd92862bf0ac585ed12c25a818894753c2ff3056955c0f35637a0fa3b",
+      "html_bytes": 100476,
+      "text_chars": 3210,
+      "fetched_at": "2026-10-06T14:52:37+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/zulip-cloud-billing",
+      "requested": "https://zulip.com/help/zulip-cloud-billing",
+      "slug": "zulip-cloud-billing",
+      "title": "Zulip Cloud billing | Zulip help center",
+      "sha256": "e3b3172299690dae9f79cb24241f5f083e953e439244a1385b7f9a79ccb62a25",
+      "html_bytes": 157868,
+      "text_chars": 10819,
+      "fetched_at": "2026-10-06T14:52:39+00:00"
+    },
+    {
+      "url": "https://zulip.com/help/zulip-cloud-or-self-hosting",
+      "requested": "https://zulip.com/help/zulip-cloud-or-self-hosting",
+      "slug": "zulip-cloud-or-self-hosting",
+      "title": "Choosing between Zulip Cloud and self-hosting | Zulip help center",
+      "sha256": "bf594c70708fa8caa00da91ece60a62d1aff3ca842be5c03c7f28deefea4c562",
+      "html_bytes": 87748,
+      "text_chars": 2417,
+      "fetched_at": "2026-10-06T14:50:36+00:00"
+    }
+  ],
+  "errors": [],
+  "redirects": [
+    {
+      "url": "https://zulip.com/help/roles-and-permissions",
+      "to": "https://zulip.com/help/user-roles"
+    }
+  ],
+  "extracted_at": "2026-10-07T11:54:52+00:00"
+}

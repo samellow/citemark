@@ -1,0 +1,1041 @@
+name: zulip
+version: 1
+snapshot:
+  crawled_at: 2026-10-06
+  pages: 257
+drafting:
+  method: drafted with AI help before the bot was built, then reviewed and edited by the builder
+questions:
+  - id: Q001
+    type: answerable
+    question: "How do I edit a message I already sent?"
+    expected_answer:
+      - "Desktop/Web: hover over the message, click the pencil icon, change the content, click Save"
+      - "Mobile: press and hold the message, tap Edit message, change the content, tap Save"
+      - "Administrators control who can edit messages and can set a time limit for editing"
+      - "Even organization owners cannot edit the content of a message someone else sent"
+      - "Everyone sees the message labeled as edited afterwards, and the edit history can be viewed if the organization allows it"
+    expected_sources:
+      - url: https://zulip.com/help/edit-a-message
+        section: Edit a message
+        quote: "Organization administrators can configure who can edit messages, and set time limits for this action."
+      - url: https://zulip.com/help/edit-a-message
+        section: Edit a message
+        quote: "Hover over a message to reveal three icons on the right."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    locked: true
+    notes: "Two sources from the same article: the permission/time-limit caveat is in the text above the first section heading (so section is the article title), the steps are in the section of the same name."
+  - id: Q002
+    type: answerable
+    question: "How do I schedule a message to send later?"
+    expected_answer:
+      - "Desktop/Web: open the compose box and write the message"
+      - "Click the ellipsis next to the send button, then click Schedule message"
+      - "Pick one of the suggested scheduling options, or choose a custom time"
+      - "Keyboard route from the compose box: Tab, Tab, Enter opens the compose menu to start scheduling"
+      - "You can click Undo in the confirmation banner shown right after a message is scheduled"
+      - "Scheduled messages live under Scheduled messages in the left sidebar, where you can edit, reschedule, send now, delete or view them"
+    expected_sources:
+      - url: https://zulip.com/help/schedule-a-message
+        section: Schedule a message
+        quote: "Select one of the suggested scheduling options, or pick a custom time."
+      - url: https://zulip.com/help/schedule-a-message
+        section: Edit or reschedule a message
+        quote: "Click on the message you want to edit or reschedule."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    locked: true
+    notes: "Every set of steps in this article is labelled Desktop/Web only. The article gives no Mobile steps for scheduling, rescheduling, sending now, deleting or viewing scheduled messages."
+  - id: Q003
+    type: answerable
+    question: "How do I mute a channel I don't care about?"
+    expected_answer:
+      - "Via left sidebar: hover over the channel, click the ellipsis, click Mute channel (Unmute channel to undo)"
+      - "Via channel settings: gear icon, select the channel, Personal tab, under Notification settings toggle Mute channel"
+      - "Muting a channel effectively mutes all topics in that channel"
+      - "Muted messages do not generate notifications unless you are mentioned, and do not appear in Combined feed"
+      - "Unread messages in muted topics do not contribute to channel unread counts. Muted topics and channels are grayed out in the left sidebar of the desktop/web app, and in the mobile app. In the desktop/web app, muted topics are sorted to the bottom of their channel, and muted channels appear in a collapsible section at the bottom of their channel folder in the left sidebar."
+      - "Mobile: not implemented in the app; follow the web app instructions in your mobile browser"
+    expected_sources:
+      - url: https://zulip.com/help/mute-a-channel
+        section: Mute or unmute a channel
+        quote: "Messages in muted topics do not generate notifications (including alert word notifications), unless you are mentioned."
+      - url: https://zulip.com/help/mute-a-channel
+        section: Mute or unmute a channel
+        quote: "Click Mute channel or Unmute channel."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    locked: true
+    notes: "The article title and its steps section are both called Mute or unmute a channel, so both sources carry that section name; the effects are above the first heading and the steps are under it."
+  - id: Q004
+    type: answerable
+    question: "I forgot my password. How do I reset it?"
+    expected_answer:
+      - "Log out first if you are currently logged in"
+      - "Go to your organization's login page at https://<organization-url>/login/"
+      - "Click the Forgot your password? link below the Log in button"
+      - "Enter your email address and click Send reset link"
+      - "A confirmation email arrives within a few minutes; open it and click Reset password"
+      - "This works as long as you have access to the email address on your account"
+    expected_sources:
+      - url: https://zulip.com/help/change-your-password
+        section: If you’ve forgotten or never had a password
+        quote: "Enter your email address, and click Send reset link."
+      - url: https://zulip.com/help/logging-in
+        section: Set or reset your password
+        quote: "You can also reset a forgotten password."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    locked: true
+    notes: "The same five steps appear in two articles; both are listed. The logging-in copy is framed around creating a password after passwordless signup, and adds that the same steps reset a forgotten one."
+  - id: Q005
+    type: answerable
+    question: "How do I switch to dark mode?"
+    expected_answer:
+      - "Desktop/Web: click your profile picture in the upper right, then pick the theme from the row of icons in the middle of the menu"
+      - "Mobile: menu tab in the bottom right, Settings, then select the theme"
+      - "The default is Automatic on desktop and web, or System on mobile, which follows your operating system's colour scheme"
+      - "Choose Dark (or Light) to keep one theme regardless of the operating system setting"
+    expected_sources:
+      - url: https://zulip.com/help/dark-theme
+        section: Manage color theme
+        quote: "Select the desired theme using the row of icons in the middle of the menu."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    locked: true
+    notes: ""
+  - id: Q006
+    type: answerable
+    question: "How do I star a message?"
+    expected_answer:
+      - "Desktop/Web: hover over the message and click the star icon; the same steps unstar it"
+      - "Keyboard: Ctrl + S stars or unstars the selected message"
+      - "Mobile: press and hold the message, then tap Star message (Unstar message to undo)"
+      - "Starred messages show a filled in star to their right"
+      - "Find them under Starred messages in the left sidebar (Desktop/Web) or in the mobile menu tab, or search with the is:starred filter"
+    expected_sources:
+      - url: https://zulip.com/help/star-a-message
+        section: Star a message
+        quote: "Starred messages have a filled in star () to their right."
+      - url: https://zulip.com/help/star-a-message
+        section: View your starred messages
+        quote: "You can also search your starred messages"
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    locked: true
+    notes: ""
+  - id: Q007
+    type: answerable
+    question: "How do I appear offline?"
+    expected_answer:
+      - "Turn on invisible mode: you will always appear as Offline to other users regardless of your activity in Zulip"
+      - "Desktop/Web: hover over your name in the right sidebar, click the ellipsis to open your user card, select Go invisible (Turn off invisible mode to undo)"
+      - "Desktop/Web alternative: the same setting is in the Account & privacy tab of Personal settings"
+      - "Mobile: menu tab in the bottom right, My profile, toggle Invisible mode"
+      - "Your Last active time shown to others freezes at roughly the time you enabled it"
+      - "Your activity is still counted in your organization's statistics"
+    expected_sources:
+      - url: https://zulip.com/help/status-and-availability
+        section: Toggle invisible mode
+        quote: "To enable, you’ll select Go invisible."
+      - url: https://zulip.com/help/status-and-availability
+        section: Invisible mode
+        quote: "Zulip supports the privacy option of never updating the availability"
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    locked: true
+    notes: "The article calls this invisible mode; a customer asking to appear offline has to be matched to that wording. Not a key fact: the help center also suggests turning off read receipts for yourself."
+  - id: Q008
+    type: answerable
+    question: "i posted something in the wrong place, how do i take it down for good"
+    expected_answer:
+      - "You only see these options if you have permission to take the action in your organization"
+      - "Desktop/Web: hover over the message, click the ellipsis, select Delete message, then click Confirm"
+      - "Mobile: press and hold the message, tap Delete message, then tap Delete"
+      - "Deleted messages immediately disappear from the UI in all official Zulip clients"
+      - "Uploaded files referenced only by deleted messages become immediately inaccessible"
+      - "Anyone who already received it could have a copy, including via email or mobile notifications, so change any secret you leaked"
+      - "Only server administrators can restore deleted messages. Messages deleted directly or via a message retention policy are archived for 30 days in a format that can be restored by a server administrator. Server administrators can adjust the archival time using the ARCHIVED_DATA_VACUUMING_DELAY_DAYS setting."
+      - "Organization administrators can set time limits on message editing and deletion"
+      - "An uploaded file shared in multiple messages will be deleted only when all of those messages are deleted"
+    expected_sources:
+      - url: https://zulip.com/help/delete-a-message
+        section: Delete a message completely
+        quote: "Deleted messages will immediately disappear from the UI in all official Zulip clients."
+      - url: https://zulip.com/help/delete-a-message
+        section: Delete a message
+        quote: "Only server administrators can restore deleted messages."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Deleting the content by editing it is a different thing in this article, and leaves the message showing as (deleted) with the original content still in edit history."
+  - id: Q009
+    type: answerable
+    question: "how do i put a thumbs up on someones message"
+    expected_answer:
+      - "Desktop/Web: hover over the message, click the add emoji reaction icon, then pick an emoji; on your own messages use the ellipsis, then Add emoji reaction"
+      - "Keyboard: Use : to add any reaction, = to add the first emoji reaction added by others, or + to react with 👍."
+      - "Mobile: press and hold the message, then pick an emoji from the top of the menu or tap more and search by name"
+      - "Click or tap an existing reaction to add or remove your own; your reactions are highlighted in a different colour"
+      - "Hold Shift while picking emoji to add several without closing the picker"
+      - "Any emoji can be used as a reaction, including custom emoji"
+    expected_sources:
+      - url: https://zulip.com/help/emoji-reactions
+        section: Add a new reaction
+        quote: "Select an emoji. Type to search, use the arrow keys, or click on an emoji with your mouse."
+      - url: https://zulip.com/help/emoji-reactions
+        section: Add or remove an existing reaction
+        quote: "Click on an existing emoji reaction to add or remove your reaction."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: ""
+  - id: Q010
+    type: answerable
+    question: "What's the way to notify everybody subscribed to a channel at once?"
+    expected_answer:
+      - "Use a wildcard mention: @**all**, or equivalently @**everyone** or @**channel**"
+      - "Best used only when the message needs timely attention from many channel subscribers"
+      - "An organization can be configured to restrict wildcard mentions in channels with more than 15 subscribers"
+      - "Recipients can opt out by disabling wildcard mention notifications globally or per channel, or by muting the topic or channel"
+      - "To reach only people already in the conversation, @**topic** mentions everyone who has sent a message or reacted in that topic"
+    expected_sources:
+      - url: https://zulip.com/help/mention-a-user-or-group
+        section: Mention everyone on a channel
+        quote: "only when your message requires timely attention from many channel subscribers."
+      - url: https://zulip.com/help/mention-a-user-or-group
+        section: Mention a user or group
+        quote: "A wildcard mention allows you to mention everyone on a channel, or mention all topic participants."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Has a permission caveat: wildcard mentions can be restricted in large channels, so the answer should not promise it will work."
+  - id: Q011
+    type: answerable
+    question: "whats the bigest file i can attach to a message"
+    expected_answer:
+      - "Zulip Cloud Standard and Zulip Cloud Plus: each uploaded file can be up to 1 GB, with 5 GB of storage per user"
+      - "The Zulip Cloud Free plan includes a total of 5 GB of file storage. Each uploaded file can be up to 10 MB."
+      - "On a self-hosted server the limit is whatever the server administrator sets as MAX_FILE_UPLOAD_SIZE"
+      - "Setting that server value to 0 disables uploads and hides the upload UI in the web and desktop apps"
+    expected_sources:
+      - url: https://zulip.com/help/share-and-upload-files
+        section: File upload limits
+        quote: "The Zulip Cloud Free plan includes a total of 5 GB of file storage."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Answer depends on the plan, so a bot that gives a single number is wrong."
+  - id: Q012
+    type: answerable
+    question: "How do I mark a question as answered so people know it's handled?"
+    expected_answer:
+      - "Resolve the topic, if you have permission to do so"
+      - "Desktop/Web: hover over the topic in the left sidebar, click the ellipsis, select Mark as resolved"
+      - "Desktop/Web alternative: click the mark as resolved icon in the message recipient bar"
+      - "Mobile: press and hold the topic, then tap Mark as resolved"
+      - "Resolving puts a check mark at the start of the topic name and triggers an automated notice from Notification Bot"
+      - "Mark as unresolved removes it; doing that right after resolving removes the original notice instead"
+      - "You can still send messages to a resolved topic"
+    expected_sources:
+      - url: https://zulip.com/help/resolve-a-topic
+        section: Resolve a topic
+        quote: "Users can resolve or unresolve a topic if they have permission to do so."
+      - url: https://zulip.com/help/resolve-a-topic
+        section: Mark a topic as resolved
+        quote: "Hover over a topic in the left sidebar."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Permission caveat: the article says users can do this only if they have permission."
+  - id: Q013
+    type: answerable
+    question: "is there a way to see if my boss actually read my dm"
+    expected_answer:
+      - "Read receipts show who has read a message, for both channel messages and direct messages"
+      - "Desktop/Web: hover over the message, click the ellipsis, click View read receipts (Shift + V toggles them)"
+      - "Mobile: press and hold the message, then tap View read receipts"
+      - "You also see a count of how many people have read it"
+      - "Administrators can choose whether read receipts are enabled in the organization at all"
+      - "Each person can turn off Let others see when I've read messages, and then never appears in the list"
+      - "A receipt only means the message was marked as read, including by marking messages read in bulk"
+      - "Muted users are excluded from read receipts for all messages. Zulip never shares whether or not you have read a message with a user you’ve muted."
+    expected_sources:
+      - url: https://zulip.com/help/read-receipts
+        section: View who has read a message
+        quote: "In addition to a list of names, you will see how many people have read"
+      - url: https://zulip.com/help/read-receipts
+        section: Read receipts
+        quote: "administrators can choose whether to enable read receipts in their organization."
+      - url: https://zulip.com/help/mute-a-user
+        section: Mute a user
+        quote: "Muted users are excluded from read receipts for all messages."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Double caveat: the feature can be disabled org-wide, and an individual can opt out, so absence from the list proves nothing."
+  - id: Q014
+    type: answerable
+    question: "How do I stop popups while I'm presenting on my laptop?"
+    expected_answer:
+      - "The Zulip desktop app has a Do Not Disturb mode that disables desktop notifications across every organization you added to it"
+      - "Desktop: click the bell (or bell with a slash) icon in the organizations sidebar on the left"
+      - "Desktop alternative: select Toggle Do Not Disturb from the Zulip menu in the top menu bar"
+      - "A bell icon means it is off; a bell with a slash means it is on and desktop notifications are not arriving"
+      - "It does not affect mobile notifications, email notifications, or desktop notifications in the Zulip web app"
+    expected_sources:
+      - url: https://zulip.com/help/do-not-disturb
+        section: Do Not Disturb
+        quote: "Other types of notifications will not be affected, including mobile notifications, email notifications, and desktop notifications in the Zulip web app."
+      - url: https://zulip.com/help/do-not-disturb
+        section: Toggle Do Not Disturb
+        quote: "You can also select Toggle Do Not Disturb from the Zulip menu in"
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Desktop app only. A bot that offers this for the web app or for phone notifications is wrong. Not a key fact: in the web app, the alternative is unticking the Desktop column in Personal settings > Notifications (desktop-notifications)."
+  - id: Q015
+    type: answerable
+    question: "We're switching over from Slack. Will our old messages and channels come with us?"
+    expected_answer:
+      - "An import brings over the organization name and logo, message history including attachments and emoji reactions, users with names, emails, roles, avatars, time zones and custom profile fields, channels including all user subscriptions, and custom emoji"
+      - "Steps: export your Slack data, import it into Zulip, clean up after the Slack export, then decide how users will log in"
+      - "Slack's export service covers all public channel messages, including older ones no longer searchable under your Slack plan"
+      - "Only Slack workspaces on the Business+ or Enterprise Grid plans can export private channels and direct messages"
+      - "Owners of those workspaces can request special access to export direct message data"
+      - "You can only import a workspace as a new Zulip organization. Your imported message history cannot be added into an existing Zulip organization."
+      - "Slack does not export workspace settings. Message edit history and @user joined #channel_name messages are not imported."
+    expected_sources:
+      - url: https://zulip.com/help/import-from-slack
+        section: Import from Slack
+        quote: "Message history, including attachments and emoji reactions"
+      - url: https://zulip.com/help/import-from-slack
+        section: Export your Slack data
+        quote: "workspaces that are on the Business+ or Enterprise Grid plans"
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "The limit on private channels and DMs is a Slack plan limit, not a Zulip one; an answer that just says yes is misleading."
+  - id: Q016
+    type: answerable
+    question: "i hit escape and lost what i was typing, can i get it back"
+    expected_answer:
+      - "Zulip saves it automatically as a draft when you close the compose box"
+      - "Via left sidebar: click Drafts in the left sidebar (or the ellipsis in the views section, then Drafts), then click the draft you want"
+      - "Via compose box: open the compose box and click the Drafts button on its right side"
+      - "Keyboard: D opens the drafts list, Enter restores the selected draft"
+      - "Drafts for the conversation you are composing to are listed at the top, and the Drafts button shows a count for the current conversation"
+      - "When you start composing again, the most recently edited draft for that conversation reappears in the compose box"
+      - "Drafts are local to your client and are not synced to other devices and browsers"
+    expected_sources:
+      - url: https://zulip.com/help/view-and-edit-your-message-drafts
+        section: Draft messages
+        quote: "Zulip automatically saves the content of your message as a draft when you close the compose box"
+      - url: https://zulip.com/help/view-and-edit-your-message-drafts
+        section: Restore a draft
+        quote: "Click on the draft you want to restore."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "The article URL says view-and-edit-your-message-drafts but its title is Draft messages. The not-synced caveat matters if the customer switched devices. Not a key fact: the save-a-draft steps say to type at least 3 characters, which suggests shorter text isn't saved."
+  - id: Q017
+    type: answerable
+    question: "How do I get out of a channel someone added me to?"
+    expected_answer:
+      - "Desktop/Web: hover over the channel in the left sidebar, click the ellipsis, click Unsubscribe"
+      - "Mobile: channels tab, press and hold the channel, tap Unsubscribe"
+      - "Also possible from the subscribed channels list, or from Channel settings using the Unsubscribe button near the top right"
+      - "Keyboard: Shift + S unsubscribes from the selected channel"
+      - "Unsubscribing removes that channel's conversations from your inbox, recent conversations and left sidebar, and stops mention notifications there"
+      - "You can still follow a link to a conversation in any channel you have content access to"
+      - "Muting the channel is the alternative if you want to stay subscribed but quiet"
+    expected_sources:
+      - url: https://zulip.com/help/unsubscribe-from-a-channel
+        section: Unsubscribe from a channel
+        quote: "Unsubscribing from a channel removes conversations in that channel from your inbox, recent conversations, and left sidebar."
+      - url: https://zulip.com/help/unsubscribe-from-a-channel
+        section: Via channel settings
+        quote: "You can also use `Shift` + `S` to unsubscribe from the"
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "The main steps are above the first section heading, so the section is the article title."
+  - id: Q018
+    type: answerable
+    question: "How do I take a vote in a channel?"
+    expected_answer:
+      - "Send a poll. Via compose box button: open an empty compose box, click the add poll icon, fill in the poll, click Add poll, then send"
+      - "Via Markdown: in an empty compose box type /poll followed by a space and your question, then each option on its own line, then send"
+      - "You can add options after the poll is created"
+      - "Polls are collaborative: anyone can add new options"
+      - "Only the creator of the poll can edit the question, using the pencil icon to its right"
+      - "Existing options cannot be modified, so that votes keep their meaning"
+    expected_sources:
+      - url: https://zulip.com/help/create-a-poll
+        section: Polls
+        quote: "Polls in Zulip are collaborative, so anyone can add new options to a poll."
+      - url: https://zulip.com/help/create-a-poll
+        section: Create a poll
+        quote: "Type `/poll` followed by a space, and the question you want to ask."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "The article URL is create-a-poll but its title is Polls."
+  - id: Q019
+    type: answerable
+    question: "When I answer an old message, how do I show the part I'm replying to?"
+    expected_answer:
+      - "Quote it. Desktop/Web: optionally select the text first, hover over the message, click the ellipsis, click Quote message (the label becomes Quote selection or Quote selected messages if you selected something)"
+      - "Keyboard: > quotes the selected message or text, including selections spanning several messages"
+      - "Mobile: press and hold the message, tap Quote message, then trim anything irrelevant before sending"
+      - "A selection can be part of one message or span several messages"
+      - "The first line of the quote is a permanent link to the original message"
+      - "Mentions inside quoted text are turned into silent mentions so nobody is pinged twice"
+    expected_sources:
+      - url: https://zulip.com/help/quote-or-forward-a-message
+        section: Quote a message
+        quote: "Select the text you want to quote. Your selection can be"
+      - url: https://zulip.com/help/quote-or-forward-a-message
+        section: Quote or forward a message
+        quote: "The first line of a quoted or forwarded message contains a permanent link to the original message."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Forwarding is a separate action in the same article and sends the content to a different conversation; it is not the same as quoting in a reply."
+  - id: Q020
+    type: answerable
+    question: "How do I paste code so it keeps its line breaks and gets colors?"
+    expected_answer:
+      - "Use a code block: triple backticks around the text, or ~~~, or indent the code 4 or more spaces"
+      - "Via compose box button: optionally select the text, then click the code icon; with nothing selected or multiple lines selected it inserts a code block, with one line selected it inserts a code span"
+      - "Keyboard: Ctrl + Shift + C inserts code formatting"
+      - "For the colours, type the language name right after the opening triple backticks and pick it from the autocomplete"
+      - "Tagging the language enables syntax highlighting, and code playgrounds if configured; Zulip supports hundreds of languages"
+      - "Administrators can set a default language for untagged code blocks; use ```text to get no highlighting"
+      - "A widget in the top right corner of a code block copies the code to your clipboard"
+    expected_sources:
+      - url: https://zulip.com/help/code-blocks
+        section: Insert code formatting
+        quote: "To create an inline code span, use single backticks around the text:"
+      - url: https://zulip.com/help/code-blocks
+        section: Language tagging
+        quote: "Tagging a code block with a language enables syntax highlighting and (if configured) code playgrounds."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: ""
+  - id: Q021
+    type: answerable
+    question: "why is the name field greyed out for me"
+    expected_answer:
+      - "By default everyone can change their own name, from the gear icon, Personal settings, Profile, then the Name field"
+      - "If you cannot edit the Name field, check whether your organization allows name changes"
+      - "Administrators can prevent users from changing their names, which is useful when names come from LDAP or another data source"
+      - "Administrators can also change anyone's name"
+      - "You can write your name in any language"
+    expected_sources:
+      - url: https://zulip.com/help/change-your-name
+        section: Change your name
+        quote: "If you are unable to edit the name field, check"
+      - url: https://zulip.com/help/change-your-name
+        section: Change your name
+        quote: "Organization administrators can change anyone’s name, and prevent users from changing their names."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Both sources carry the section name Change your name: one is the article title text, one is the ### steps section. The real answer is a permission one, not a steps one."
+  - id: Q022
+    type: answerable
+    question: "the timestamps on messages are off by a few hours for me, how do i fix that"
+    expected_answer:
+      - "Zulip displays dates and times using the time zone configured on your computer or mobile device"
+      - "Fix it by changing the time zone on the device itself, then reloading Zulip"
+      - "Separately, the local time shown to other people on your user card and profile is set in the app: gear icon, Personal settings, Profile, then pick a time zone under Profile"
+      - "If your local time setting does not match your computer's time zone, the web and desktop apps show a banner offering to update it"
+      - "You can permanently hide that banner by toggling Offer to update to my computer's time zone under Profile"
+    expected_sources:
+      - url: https://zulip.com/help/change-your-timezone
+        section: Configure time zone used by Zulip to display dates and times
+        quote: "Configure the time zone on your computer or mobile device."
+      - url: https://zulip.com/help/change-your-timezone
+        section: Configure your local time
+        quote: "Under Profile, select a time zone."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Two different settings with similar names; the one in Zulip's settings only changes what others see, not your own timestamps."
+  - id: Q023
+    type: answerable
+    question: "i send the same blurb over and over, can i store it somewhere handy"
+    expected_answer:
+      - "Use saved snippets. To create one: open the compose box, click the add saved snippet icon, select Create a new saved snippet, enter a Title and the Content, click Save"
+      - "You can write the text in the compose box first and save that as the snippet"
+      - "To use one: click the add saved snippet icon, type to filter by title, select it to insert it into the compose box"
+      - "Keyboard: Ctrl + ' opens the saved snippets menu"
+      - "Hover over a snippet in the menu to edit it or delete it with the icons on the right"
+    expected_sources:
+      - url: https://zulip.com/help/saved-snippets
+        section: Create a saved snippet
+        quote: "Enter a Title for the saved snippet, which will be used for finding saved"
+      - url: https://zulip.com/help/saved-snippets
+        section: Insert a saved snippet
+        quote: "Start typing to filter saved snippets by title. Select a saved snippet to insert it into the compose box."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: ""
+  - id: Q024
+    type: answerable
+    question: "Can I see what a message said before someone changed it?"
+    expected_answer:
+      - "Yes, if it is allowed in your organization"
+      - "Desktop/Web: click the message's edited or moved label, shown next to the sender's name or to the left of the message"
+      - "If there is no such label, the message has not been edited or moved"
+      - "Keyboard: Shift + H opens the edit history of the selected message"
+      - "Messages are tagged as edited or moved, with the edited indicator taking priority"
+      - "Organizations can restrict message edit history access to only show moves, or disable it altogether"
+    expected_sources:
+      - url: https://zulip.com/help/view-a-messages-edit-history
+        section: View a message’s edit history
+        quote: "Click on the message’s edited or moved label shown next to the"
+      - url: https://zulip.com/help/view-a-messages-edit-history
+        section: View a message's edit history
+        quote: "edited and moved, if this is allowed in your organization."
+      - url: https://zulip.com/help/restrict-message-edit-history-access
+        section: Restrict message edit history access
+        quote: "You can restrict message edit history access to only show moves, or disable it altogether."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "The article title uses a straight apostrophe and the section heading a curly one, so the two sources look alike but are different sections. Access can be restricted by the organization."
+  - id: Q025
+    type: answerable
+    question: "How do I drop a video meeting link into a message?"
+    expected_answer:
+      - "Desktop/Web: open the compose box, click the add video call icon, which inserts a Join video call. link, then send the message and click the link to start or join"
+      - "You can replace the Join video call. label with any text you like"
+      - "There is an add voice call icon that works the same way and inserts a Join voice call. link"
+      - "The call uses the provider configured by your organization's administrators, such as Jitsi or Zoom"
+      - "You may need to log in to a separate account for that provider when you join"
+      - "Mobile: not implemented in the app; follow the web app instructions in your mobile browser"
+    expected_sources:
+      - url: https://zulip.com/help/start-a-call
+        section: Start a video call
+        quote: "This will insert a Join video call. link into your"
+      - url: https://zulip.com/help/start-a-call
+        section: Start a call
+        quote: "using the call provider (Jitsi, Zoom, etc.) configured by your organization’s administrators."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Not a key fact: admins can turn the call buttons off by setting the call provider to None (configure-call-provider)."
+  - id: Q026
+    type: answerable
+    question: "i lost my laptop, how do i make sure nobody can use my acount on it"
+    expected_answer:
+      - "Change both your password and your API key, because losing a device you are logged in on is one of the cases the help center says to do this"
+      - "Gear icon, Personal settings, Account & privacy; under Account click Change your password, enter the old and new password, click Change"
+      - "Then under API key click Manage your API key, enter your new password, click Get API key, and click Generate new API key"
+      - "Resetting the API key immediately logs you out of that account on all mobile devices"
+      - "Resetting your password logs you out of all browsers and desktop apps"
+      - "If you have forgotten the password you can reset it from your email account instead"
+    expected_sources:
+      - url: https://zulip.com/help/logging-out
+        section: Log out of a Zulip account on all devices
+        quote: "Resetting the API key for a Zulip account will immediately log you out of that account on all mobile devices."
+      - url: https://zulip.com/help/protect-your-account
+        section: Protect your account
+        quote: "Losing a device where you’re logged in to Zulip (e.g., a cell phone or laptop)."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Two articles give the same procedure for different reasons; the password change and the API key reset log you out of different sets of devices, so only doing one is not enough."
+  - id: Q027
+    type: answerable
+    question: "How do I get my coworkers signed up for our Zulip?"
+    expected_answer:
+      - "You only see the Invite users menu option if you have permission to invite users; administrators configure who is allowed to"
+      - "Email invitations: gear icon, Invite users, enter the email addresses, choose when they expire, choose the role they join as, choose channels and groups, then click Invite"
+      - "Reusable link: gear icon, Invite users, select Invitation link, set expiry, role, channels and groups, click Create link, then share it"
+      - "You can toggle Send me a direct message when my invitation is accepted"
+      - "Administrators can also customize the welcome message"
+      - "On the Zulip Cloud Free plan the number of email invitations per day is limited; use an invitation link or contact support for a higher limit"
+    expected_sources:
+      - url: https://zulip.com/help/invite-new-users
+        section: Send email invitations
+        quote: "you can send in a day is limited on the Zulip Cloud Free plan."
+      - url: https://zulip.com/help/invite-new-users
+        section: Invite new users
+        quote: "Set the role that they will have when they join."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Has both a permission caveat and a plan caveat."
+  - id: Q028
+    type: answerable
+    question: "we dont use a channel anymore but want to keep the history, what do we do"
+    expected_answer:
+      - "Archive the channel. Gear icon, Channel settings, click All in the upper left, select the channel, click the archive icon in the upper right of the panel, then Confirm"
+      - "Archiving removes it from the left sidebar for everyone and stops new messages, edits, deletions and moves in it"
+      - "Messages in archived channels still appear in search results, the combined feed and recent conversations"
+      - "It does not unsubscribe users or change who can access it"
+      - "To hide the content too, remove all subscribers, make the channel private, and clear the subscribe permissions under Advanced configuration"
+      - "See archived channels by choosing Archived channels from the dropdown next to the Filter box, where you can also unarchive one"
+      - "Organization administrators and channel administrators can archive the channel"
+    expected_sources:
+      - url: https://zulip.com/help/archive-a-channel
+        section: Archive a channel
+        quote: "Messages in archived channels still appear in search results, the combined feed, and recent conversations."
+      - url: https://zulip.com/help/archive-a-channel
+        section: View archived channels
+        quote: "Select Archived channels from the dropdown next to the Filter box"
+      - url: https://zulip.com/help/configure-who-can-administer-a-channel
+        section: Configure who can administer a channel
+        quote: "Organization administrators can automatically administer all channels."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Deleting a topic, by contrast, deletes every message in it; archiving a channel keeps the messages."
+  - id: Q029
+    type: answerable
+    question: "As an admin, can I stop people editing their messages after an hour?"
+    expected_answer:
+      - "Only organization owners and administrators can configure this"
+      - "Gear icon, Organization settings, Organization permissions; under Message editing toggle Allow message editing and configure Time limit for editing messages, then Save changes"
+      - "Message content can only ever be modified by the original author, whatever you configure"
+      - "Deletion is configured separately under Message deletion, including who can delete any message, who can delete their own everywhere, and a time limit for deleting"
+      - "The deletion time limit does not apply to users who can delete any message"
+      - "A user who can edit a message can effectively blank it, which still leaves the original content in edit history and in data exports"
+      - "Per-channel deletion permissions are set in Channel settings, Permissions, under Moderation permissions"
+    expected_sources:
+      - url: https://zulip.com/help/restrict-message-editing-and-deletion
+        section: Configure message editing permissions
+        quote: "Configure Time limit for editing messages."
+      - url: https://zulip.com/help/restrict-message-editing-and-deletion
+        section: Restrict message editing and deletion
+        quote: "Regardless of the configuration you select, message content can only ever be modified by the original author."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "The help center does not list the available time limit values, so the answer should describe the setting rather than confirm that one hour specifically is offered. Not a key fact: topic editing has its own time limit, which never applies to administrators and moderators (restrict-moving-messages)."
+  - id: Q030
+    type: answerable
+    question: "How do we stop paying and go back to the free tier?"
+    expected_answer:
+      - "Desktop/Web: Click on the gear icon in the upper right corner of the web or desktop app. Select Billing. At the bottom of the page, click Cancel plan. Click Downgrade to confirm."
+      - "The organization is downgraded to Zulip Cloud Free at the end of the current billing period"
+      - "Who can do this is controlled by the Who can manage plans and billing permission under Organization settings, Organization permissions"
+    expected_sources:
+      - url: https://zulip.com/help/zulip-cloud-billing
+        section: Cancel paid plan
+        quote: "If you cancel your plan, your organization will be downgraded to Zulip Cloud"
+      - url: https://zulip.com/help/zulip-cloud-billing
+        section: Configure who can manage plans and billing
+        quote: "Under Other permissions, configure Who can manage plans and billing."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Permission caveat: billing is a configurable permission, so not every admin can cancel."
+  - id: Q031
+    type: answerable
+    question: "why cant i scroll back to messages from last year"
+    expected_answer:
+      - "On the Zulip Cloud Free plan only the most recent 10,000 messages can be viewed and searched"
+      - "Older messages are still stored, and become available again if the organization is upgraded to Zulip Cloud Standard"
+      - "Zulip says it will not switch to a time-based limit like 90 days"
+      - "Separately, an organization owner can set a message retention policy that deletes messages after a number of days, org-wide or per channel"
+      - "In Zulip Cloud, message retention policies are available on the Zulip Cloud Standard and Zulip Cloud Plus plans"
+      - "In private channels with protected history, new subscribers can only see messages sent after they join"
+    expected_sources:
+      - url: https://zulip.com/help/zulip-cloud-billing
+        section: How does having 10,000 messages of search history on Zulip Cloud Free work?
+        quote: "Only the most recent 10,000 messages can be viewed and searched on the Zulip"
+      - url: https://zulip.com/help/message-retention-policy
+        section: Message retention policy
+        quote: "By default, Zulip stores messages indefinitely, allowing full-text search of your complete history."
+      - url: https://zulip.com/help/channel-permissions
+        section: Private channels
+        quote: "In private channels with protected history, new subscribers can only see messages sent after they join."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Two different causes with different fixes: a plan limit that hides history, and a retention policy that actually deletes it."
+  - id: Q032
+    type: answerable
+    question: "Can I let a contractor in to just one channel and nothing else?"
+    expected_answer:
+      - "Add them as a guest; the help center names contractors and customers as the example"
+      - "Guests can view and send messages in channels they have been subscribed to, including the history other subscribers see"
+      - "Guests cannot see private or public channels unless specifically subscribed, and cannot create channels or user groups, add or manage bots, add custom emoji, or invite users"
+      - "Other guest permissions are configurable, such as moving or editing messages and wildcard mentions"
+      - "Zulip Cloud plans have special discounted pricing for guest users"
+      - "You can restrict guests’ ability to see other users in the organization. Zulip Cloud customers who wish to use this feature must upgrade to the Zulip Cloud Plus plan."
+      - "Optional settings: show (guest) after guest names, and warn when composing a DM to a guest"
+      - "Invite them with the guest role and choose the channels they will be subscribed to; the organization's default channels will be preselected"
+    expected_sources:
+      - url: https://zulip.com/help/guest-users
+        section: Guest users
+        quote: "View and send messages in channels they have been subscribed to"
+      - url: https://zulip.com/help/guest-users
+        section: Configure whether guests can see all other users
+        quote: "Zulip Cloud customers who wish to use this feature must upgrade to the Zulip Cloud Plus plan."
+      - url: https://zulip.com/help/invite-new-users
+        section: Invite new users
+        quote: "Configure which channels they will be subscribed to. The organization’s default channels will be preselected."
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Plan caveat: on Zulip Cloud, hiding other users from a guest is a Plus-only feature, so a plain yes overstates what a Free or Standard organization gets."
+  - id: Q033
+    type: partial
+    question: "I set my status to 'in a meeting'. Does it clear itself when the meeting ends?"
+    expected_answer:
+      - "A status is a customizable emoji and a short message, shown next to your name in the sidebars, message feed and compose box"
+      - "Set it from your user card: hover over your name in the right sidebar, click the ellipsis, click Set status or Edit status, pick a common status or your own emoji and message, click Save"
+      - "Or from your profile picture in the upper right, then Set status or Edit status"
+      - "Keyboard: Shift + Y opens the status menu"
+      - "Mobile: menu tab, My profile, Set status or Status, choose, then Save"
+      - "To clear it, open the status menu and click the icon to the right of your current status; on mobile tap Status, Clear, then Save"
+    expected_sources:
+      - url: https://zulip.com/help/status-and-availability
+        section: Set a status
+        quote: "Click Set status or Edit status."
+      - url: https://zulip.com/help/status-and-availability
+        section: Clear a status
+        quote: "Tap Clear, and then Save in the top right corner of the app."
+    uncovered_part: "whether a status can be cleared automatically"
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Setting and manually clearing a status are both covered; nothing in the help center mentions an expiry, timer or automatic clearing. Availability (the coloured dot) does update itself, which is a tempting thing to confuse with this."
+  - id: Q034
+    type: partial
+    question: "is anything i send actually encrypted so the server cant read it"
+    expected_answer:
+      - "Zulip Server 12.0+ and Zulip Cloud support end-to-end encrypted mobile push notifications"
+      - "This applies to push notifications sent from an up-to-date server to an updated app, 30.0.271+ on Android and 30.0.272+ on iOS"
+      - "For those notifications, E2EE means the message content and metadata, including sender and recipient names and the channel and topic, are not visible to Apple, Google, or Zulip's Mobile Push Notification Service"
+      - "Administrators can require end-to-end encryption for push notifications, under Organization settings, Notifications security; older apps without E2EE support then receive no push notifications at all"
+    expected_sources:
+      - url: https://zulip.com/help/mobile-notifications
+        section: End-to-end encryption (E2EE) for mobile push notifications
+        quote: "will be end-to-end encrypted. E2EE ensures that message content and metadata"
+    uncovered_part: "whether message content itself is end-to-end encrypted, as opposed to mobile push notifications"
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "The only encryption claim in the help center for messaging is about mobile push notifications. The call provider Jitsi Meet is also described as fully-encrypted, which is about calls, not messages. A bot that answers yes because it found the E2EE heading is overclaiming."
+  - id: Q035
+    type: partial
+    question: "Can I pick a different alert sound on my phone?"
+    expected_answer:
+      - "You can select the sound Zulip uses for audible desktop notifications"
+      - "Gear icon, Personal settings, Notifications, then configure Notification sound under Desktop message notifications"
+      - "Click the icon to the right of your selection to hear it"
+      - "Choosing None disables all audible desktop notifications"
+      - "For mobile, the Notifications page is where you toggle the checkboxes in the Mobile column of the Notification triggers table"
+    expected_sources:
+      - url: https://zulip.com/help/desktop-notifications
+        section: Notification sound
+        quote: "You can select the sound Zulip uses for audible desktop notifications. Choosing"
+      - url: https://zulip.com/help/desktop-notifications
+        section: Change notification sound
+        quote: "Under Desktop message notifications, configure Notification sound."
+    uncovered_part: "whether the notification sound can be changed in the mobile apps"
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "The only sound setting documented sits under Desktop message notifications. The customer asked about their phone, so a bot that hands over the desktop steps as the answer is wrong."
+  - id: Q036
+    type: partial
+    question: "How long after sending do I still have a chance to fix a typo?"
+    expected_answer:
+      - "Administrators configure who can edit messages and set a time limit for editing"
+      - "The setting is Time limit for editing messages, under Organization settings, Organization permissions, Message editing, alongside Allow message editing"
+      - "Permissions for editing and for deleting are configured separately, and both can have time limits"
+      - "Whatever the configuration, only the original author can modify a message's content"
+      - "You will only see the edit option at all if you have permission to use it"
+    expected_sources:
+      - url: https://zulip.com/help/edit-a-message
+        section: Edit a message
+        quote: "set time limits for this action. However, even organization owners cannot edit"
+      - url: https://zulip.com/help/restrict-message-editing-and-deletion
+        section: Restrict message editing and deletion
+        quote: "Zulip lets you separately configure permissions for editing and deleting messages, and you can set time limits for both actions."
+    uncovered_part: "what the default time limit for editing messages is, or what values it can be set to"
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "The help center repeatedly says a time limit exists and can be configured, but never states a default or any concrete duration anywhere. A bot that names a number is drawing on outside knowledge."
+  - id: Q037
+    type: partial
+    question: "how do i stop one specific person from dming me"
+    expected_answer:
+      - "You can mute that user, which hides them from your own view only"
+      - "Hover over their name in the right sidebar, open their user card, click the ellipsis in the card, click Mute this user, then Confirm"
+      - "You can also open the user card from their profile picture or name on a message they sent"
+      - "Everything a muted user sends is marked as read for you and never generates desktop, email or mobile notifications"
+      - "Muted users are hidden from the direct messages list in the left sidebar and the user list in the right sidebar, and DMs with them are excluded from all views unless you search dm-with:<that user>"
+      - "Their messages are hidden behind a Click here to reveal banner, and a revealed message can be re-hidden"
+      - "Muting does not notify them and does not affect their Zulip experience; to flag behaviour to moderators, report a message"
+      - "Your list of muted users is under Personal settings, Muted users, where you can unmute them"
+    expected_sources:
+      - url: https://zulip.com/help/mute-a-user
+        section: Mute a user
+        quote: "All messages sent by a muted user will automatically be marked as read for you"
+      - url: https://zulip.com/help/mute-a-user
+        section: Mute a user
+        quote: "On the confirmation popup, click Confirm."
+    uncovered_part: "whether you can block a specific person from sending you direct messages at all"
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Muting hides the DMs from you but the messages are still sent. Administrators can restrict who can start direct messages, down to named individual users, but that stops the person messaging anyone, not just you, and a regular user can't set it, so it is not an answer to this question."
+  - id: Q038
+    type: ambiguous
+    question: "How do I reset it?"
+    expected_answer:
+      - "If you have forgotten your password: log out, go to https://<organization-url>/login/, click Forgot your password?, enter your email address, click Send reset link, then open the confirmation email and click Reset password"
+      - "If you know your current password: gear icon, Personal settings, Account & privacy, under Account click Change your password, enter the old and new password, click Change"
+      - "You can reset it at any time as long as you know the current password or have access to the email address on the account"
+      - "The same reset steps are also written up as part of logging in, for people who signed up with passwordless authentication"
+    expected_sources:
+      - url: https://zulip.com/help/change-your-password
+        section: If you’ve forgotten or never had a password
+        quote: "You will receive a confirmation email within a few minutes. Open it and click"
+      - url: https://zulip.com/help/change-your-password
+        section: If you know your current password
+        quote: "Enter your old password and your new password, and click Change."
+      - url: https://zulip.com/help/logging-in
+        section: Set or reset your password
+        quote: "If you signed up using passwordless authentication and want to start logging in via email/password"
+    uncovered_part: null
+    expected_option:
+      - "your password"
+      - "password"
+      - "reset your password"
+      - "resetting your password"
+    not_covered_terms: []
+    doc_gap: false
+    locked: true
+    notes: "Other things this could mean, covered differently: your profile picture (change-your-profile-picture, Reset your profile picture to default) and a channel's notification settings (channel-notifications, where a reset to default notifications icon appears in the notification triggers table). The admin-only Reset settings for users article resets other people's preferences org-wide and is not an option for a regular user asking this, so it must not be offered as one of the meanings. The help center also describes resetting your API key (logging-out), and resetting font size and line spacing to the default (font-size, line-spacing)."
+  - id: Q039
+    type: ambiguous
+    question: "how do i turn off notifications"
+    expected_answer:
+      - "Desktop notifications are controlled from the gear icon, Personal settings, Notifications"
+      - "Untick the checkboxes in the Desktop column of the Notification triggers table"
+      - "Choosing None for Notification sound disables all audible desktop notifications"
+      - "Under Desktop message notifications you can also set Unread count badge to None to remove the count on the app sidebar and browser tab"
+      - "They only fire when a message arrives and Zulip is not in focus or the message is offscreen, and you need Zulip open in a tab or the desktop app to get them at all"
+    expected_sources:
+      - url: https://zulip.com/help/desktop-notifications
+        section: Desktop notifications
+        quote: "Toggle the checkboxes in the Desktop column of the Notification"
+      - url: https://zulip.com/help/desktop-notifications
+        section: Notification sound
+        quote: "None disables all audible desktop notifications."
+    uncovered_part: null
+    expected_option:
+      - "desktop notifications"
+      - "notifications on your computer"
+      - "desktop notification settings"
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Other meanings the help center treats separately: mobile push notifications (mobile-notifications), email notifications (email-notifications), notifications for one channel or topic (channel-notifications, mute-a-topic), and Do Not Disturb in the desktop app, which silences desktop notifications across all organizations but leaves mobile and email alone. A good answer should ask which, or cover the main ones."
+  - id: Q040
+    type: ambiguous
+    question: "how do i change the color"
+    expected_answer:
+      - "Zulip assigns each channel you subscribe to a colour, and changing it does not change it for anyone else"
+      - "Via left sidebar: hover over the channel, click the ellipsis, click Change color, pick from the grid, use the colour picker or enter a hex code, click Confirm, then click outside the box"
+      - "Via channel settings: gear icon, select the channel, Personal tab, click the coloured square below Channel color, choose, then click Choose"
+    expected_sources:
+      - url: https://zulip.com/help/change-the-color-of-a-channel
+        section: Change the color of a channel
+        quote: "Select a color from the grid, use the color picker, or enter a hex code."
+    uncovered_part: null
+    expected_option:
+      - "a channel's color"
+      - "channel color"
+      - "the color of a channel"
+    not_covered_terms: []
+    doc_gap: false
+    notes: "The other meaning is the app's light or dark colour theme (dark-theme, Manage color theme), which is set from your profile picture in the upper right rather than from a channel. This article has no section headings, so the section is the article title."
+  - id: Q041
+    type: decline
+    question: "How do I set up an out-of-office auto-reply while I'm on vacation?"
+    expected_answer: []
+    expected_sources: []
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms:
+      - "out of office"
+      - "out-of-office"
+      - "auto-reply"
+      - "autoresponder"
+      - "vacation"
+      - "away message"
+    doc_gap: false
+    locked: true
+    notes: "Tempting near-miss: status-and-availability, where you set a status emoji and short message such as a common status, which tells people you are away but sends nothing back to them. Do Not Disturb and muting also only silence your own notifications. Nothing in the help center describes an automatic reply to incoming messages."
+  - id: Q042
+    type: decline
+    question: "Can I share my screen during a Zulip call?"
+    expected_answer: []
+    expected_sources: []
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms:
+      - "screen share"
+      - "screen sharing"
+      - "share my screen"
+      - "screenshare"
+      - "sharing your screen"
+    doc_gap: false
+    locked: true
+    notes: "Tempting near-miss: start-a-call, which only covers inserting a call link into a message, and configure-call-provider, which lists the supported providers. The call itself happens in the provider (Jitsi Meet, Zoom and so on), and the help center documents nothing about what you can do once inside it."
+  - id: Q043
+    type: decline
+    question: "Can I send a message that disappears after it's read?"
+    expected_answer: []
+    expected_sources: []
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms:
+      - "disappearing"
+      - "self-destruct"
+      - "ephemeral"
+      - "vanishing"
+      - "read once"
+    doc_gap: false
+    locked: true
+    notes: "Tempting near-miss: message-retention-policy, which deletes messages after a number of days org-wide or per channel, is owner-only, and is not tied to anyone reading them; also delete-a-message, which is manual. The word disappear does occur in the help center, but only about deleted messages vanishing from the UI and about typing notifications, so neither covers this question."
+  - id: Q044
+    type: decline
+    question: "how do i turn on 2 factor authentication for my zulip login"
+    expected_answer: []
+    expected_sources: []
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms:
+      - "two-factor"
+      - "2FA"
+      - "authenticator app"
+      - "multi-factor"
+      - "two-step verification"
+    doc_gap: false
+    notes: "Tempting near-misses: protect-your-account, which is about changing your password and API key, and configure-authentication-methods and saml-authentication, which are about which login methods an organization allows. None of them mentions a second factor on your own account."
+  - id: Q045
+    type: decline
+    question: "can i make a message go out every monday automatically instead of scheduling each one"
+    expected_answer: []
+    expected_sources: []
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms:
+      - "recurring"
+      - "repeat every"
+      - "repeating message"
+      - "every Monday"
+    doc_gap: false
+    notes: "Tempting near-misses: schedule-a-message and schedule-a-reminder, both of which schedule exactly one delivery at a chosen time. A bot is likely to answer with the scheduling steps and quietly drop the word automatically."
+  - id: Q046
+    type: decline
+    question: "Is there a way to send a quick voice recording instead of typing it out?"
+    expected_answer: []
+    expected_sources: []
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms:
+      - "voice message"
+      - "voice note"
+      - "voice memo"
+      - "record audio"
+      - "audio message"
+    doc_gap: false
+    notes: "Tempting near-misses: share-and-upload-files says sound files you upload are previewed directly in your message, and start-a-call inserts a Join voice call. link. Neither is recording a voice message inside Zulip, which the help center never describes."
+  - id: Q047
+    type: decline
+    question: "can i send stickers in a message like in other chat apps"
+    expected_answer: []
+    expected_sources: []
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms:
+      - "sticker"
+      - "stickers"
+      - "sticker pack"
+      - "sticker set"
+    doc_gap: false
+    notes: "Tempting near-misses: custom-emoji for adding your organization's own emoji, animated-gifs, emoji-and-emoticons, and emoji-reactions. The help center covers emoji and GIFs in detail and never mentions stickers, so the bot has plenty of nearly-right material to get pulled into."
+  - id: Q048
+    type: off_topic
+    question: "Can you write me a Python function that strips duplicates out of a list?"
+    expected_answer: []
+    expected_sources: []
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Coding help, not a Zulip product question. Mild bait: the help center has a code-blocks article that mentions Python code playgrounds and syntax highlighting, so a bot may latch onto the word Python."
+  - id: Q049
+    type: off_topic
+    question: "How do I create a team in Microsoft Teams?"
+    expected_answer: []
+    expected_sources: []
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "Another company's product. Strong bait: the help center contains import-from-microsoft-teams and moving-from-teams, so a bot may answer with Zulip's migration steps instead of saying this is not about Zulip."
+  - id: Q050
+    type: off_topic
+    question: "What's a good icebreaker to start a remote standup with?"
+    expected_answer: []
+    expected_sources: []
+    uncovered_part: null
+    expected_option: []
+    not_covered_terms: []
+    doc_gap: false
+    notes: "General advice, not about the Zulip product. No source should be offered."

@@ -1,0 +1,19 @@
+{
+  "test_set": "zulip",
+  "version": 1,
+  "file": "zulip-v1.yaml",
+  "sha256": "2766f216e20f793dc281ed21f1c9466592ada9f9d5950c5d1dd5b3ed8cae7e24",
+  "frozen_at": "2026-10-08T11:28:00+00:00",
+  "questions": 50,
+  "by_type": {
+    "ambiguous": 3,
+    "answerable": 32,
+    "decline": 7,
+    "off_topic": 3,
+    "partial": 5
+  },
+  "flagged": 0,
+  "edited": 18,
+  "draft_sha256": "da8cdd067db3dfe895d212c579e71593e4af5e4d265e21dfb4a7ed091b27d96f",
+  "snapshot_manifest_sha256": "925c4b8f066112e59d888dbdccac990f1b8a38834378f3103600382bb4f1dff4"
+}

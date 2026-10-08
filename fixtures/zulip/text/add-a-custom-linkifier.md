@@ -1,0 +1,206 @@
+# Add a custom linkifier
+
+**Note:**
+
+This feature is only available to organization owners and administrators.
+
+Linkifiers make it easy to refer to issues or tickets in third
+party issue trackers, like GitHub, Salesforce, Zendesk, and others.
+For instance, you can add a linkifier that automatically turns `#2468`
+into a link to `https://github.com/zulip/zulip/issues/2468`.
+
+You can configure linkifiers to work in reverse as well: when you paste a URL
+that matches the linkifier into the compose box, Zulip will automatically
+convert it to linked text (e.g., `https://github.com/zulip/zulip/issues/2468`
+becomes `#2468`).
+
+If a linkifier pattern (e.g., `#2468`) appears in the name of a topic, Zulip adds
+an **open** () button to the right of the topic in the
+message recipient bar that links to the appropriate URL.
+
+If you have any trouble creating the linkifiers you want, please contact Zulip support with details on what you’re trying to do.
+
+## Add a custom linkifier
+
+All linkifiers automatically turn text matching the specified pattern into
+links. You can also configure pasted links matching the **URL template** to
+automatically convert to linked text.
+
+1. Click on the **gear** () icon in the upper right corner of the web or desktop app.
+2. Select  **Organization settings**.
+3. On the left, click **Linkifiers**.
+4. Click **Add linkifier**.
+5. Enter the **Example text to linkify**, and the **Pattern** that will match
+it and similar text.
+6. Enter the **URL template** for where text matching the pattern should link.
+7. *(optional)* To enable automatic conversion of pasted URLs to linked text,
+fill in **Auto-convert pasted URLs matching the template to**.
+8. Click **Add**.
+
+ **Tip:** Use the same variables in the **Pattern**, **URL template**, and
+**Auto-convert pasted URLs matching the template to** fields.
+
+## Edit a custom linkifier
+
+1. Click on the **gear** () icon in the upper right corner of the web or desktop app.
+2. Select  **Organization settings**.
+3. On the left, click **Linkifiers**.
+4. In the **Actions** column, click the **edit** ()
+icon for the linkifier you want to edit.
+5. Edit linkifier information as desired, and click **Save changes**.
+
+## Delete a custom linkifier
+
+1. Click on the **gear** () icon in the upper right corner of the web or desktop app.
+2. Select  **Organization settings**.
+3. On the left, click **Linkifiers**.
+4. In the **Actions** column, click the **delete** ()
+icon for the linkifier you want to delete.
+5. Approve by clicking **Confirm**.
+
+## Reorder linkifiers
+
+Linkifiers are processed in order, and will not apply to text that is already linkified. You can therefore choose which linkifiers to prioritize when more than one linkifier applies. The same priority order applies for converting URLs to shortened links. See the overlapping patterns section for examples.
+
+1. Click on the **gear** () icon in the upper right corner of the web or desktop app.
+2. Select  **Organization settings**.
+3. On the left, click **Linkifiers**.
+4. In the **Example** column, click and drag the vertical
+dots to reorder the list of linkifiers.
+
+## Common linkifier patterns
+
+The following examples cover the most common types of linkifiers, with a focus on linkifiers for issues or tickets.
+
+### Link to an issue or ticket
+
+This is a pattern that turns a `#` followed by a number into a link. It is often
+used to link to issues or tickets in third party issue trackers, like GitHub,
+Salesforce, Zendesk, and others.
+
+- Example text to linkify: `#2468`
+- Pattern: `#(?P<id>[0-9]+)`
+- URL template: `https://github.com/zulip/zulip/issues/{id}`
+- Auto-convert pasted URLs matching the template to: `#{id}`
+- Automatically links to: `https://github.com/zulip/zulip/issues/2468`
+
+### Link to issues or tickets in multiple projects or apps
+
+To set up linkifiers for issues or tickets in multiple projects,
+consider extending the `#2468` format with project-specific
+variants. For example, the Zulip development community
+uses
+`#M2468` for an issue in the repository for the Zulip mobile app,
+`#D2468` and issue in the desktop app repository, etc.
+
+- Example text to linkify: `#F245`
+- Pattern: `#F(?P<id>[0-9]+)`
+- URL template: `https://github.com/zulip/zulip-flutter/issues/{id}`
+- Auto-convert pasted URLs matching the template to: `#F{id}`
+- Automatically links to: `https://github.com/zulip/zulip-flutter/issues/245`
+
+### Link to issues or tickets in multiple repositories
+
+For organizations that commonly link to multiple GitHub repositories, this
+linkfier pattern turns `org/repo#ID` into an issue or pull request link.
+
+- Example text to linkify: `zulip/zulip#2468`
+- Pattern: `(?P<org>[a-zA-Z0-9_-]+)/(?P<repo>[a-zA-Z0-9_-]+)#(?P<id>[0-9]+)`
+- URL template: `https://github.com/{org}/{repo}/issues/{id}`
+- Auto-convert pasted URLs matching the template to: `{org}/{repo}#{id}`
+- Automatically links to: `https://github.com/zulip/zulip/issues/2468`
+
+### Link to a hexadecimal issue or ticket number
+
+The following pattern linkfies a string of hexadecimal digits between 7 and 40 characters long, such as a Git commit ID.
+
+- Example text to linkify: `abdc123`
+- Pattern: `(?P<id>[0-9a-f]{7,40})`
+- URL template: `https://github.com/zulip/zulip/commit/{id}`
+- Auto-convert pasted URLs matching the template to: `{id}`
+- Automatically links to: `https://github.com/zulip/zulip/commit/abcd123`
+
+## Advanced linkifier patterns
+
+Linkifiers are a flexible system that can be used to construct rules for a wide variety of situations. Linkifier patterns are regular expressions, using the re2 regular expression engine.
+
+Linkifiers use RFC 6570 compliant
+URL templates to describe how links should be generated. These templates support
+several expression types. The default expression type (`{var}`) will URL-encode
+special characters like `/` and `&`; this behavior is desired for the vast
+majority of linkifiers. Fancier URL template expression types can allow you to
+get the exact behavior you want in corner cases like optional URL query
+parameters. For example:
+
+- Use `{+var}` when you want URL delimiter characters to not be URL-encoded.
+- Use `{?var}` and `{&var}` for variables in URL query parameters.
+- Use `{#var}` when generating `#` fragments in URLs.
+
+The URL template specification has brief examples and detailed examples explaining the precise behavior of URL templates.
+
+### Linking to documentation pages
+
+This example pattern is a shorthand for linking to pages on Zulip’s ReadTheDocs site.
+
+- Example text to linkify: `RTD/overview/changelog.html`
+- Pattern: `RTD/(?P<article>[a-zA-Z0-9_/.#-]+)`
+- URL template: `https://zulip.readthedocs.io/en/latest/{+article}`
+- Auto-convert pasted URLs matching the template to: `RTD/{article}`
+- Automatically links to: `https://zulip.readthedocs.io/en/latest/overview/changelog.html`
+
+ **Tip:** This pattern uses the `{+var}` expression type. With the
+default expression type (`{article}`), the `/` between `overview` and
+`changelog` would incorrectly be URL-encoded.
+
+### Linking to Google search results
+
+This example pattern allows linking to Google searches.
+
+- Pattern: `google:(?P<q>\w+)?`
+- URL template: `https://google.com/search{?q}`
+- Original text: `google:foo` or `google:`
+- Automatically links to: `https://google.com/search?q=foo` or `https://google.com/search`
+
+ **Tip:** This pattern uses the `{?var}` expression type. With the default expression
+type (`{q}`), there would be no way to only include the `?` in the URL
+if the optional `q` is present.
+
+### Overlapping patterns
+
+This example shows how specific linkifiers can be combined with more general ones to offer succinct linked text for the most commonly referenced links. For example, if you could have:
+
+- A specific linkifier for the `zulip/zulip` GitHub repository, so that `#123` links to an issue or pull request in that repository.
+- A general linkifier for all GitHub repositories.
+
+You would set that up with:
+
+- Specific linkifier (ordered before the general linkifier)
+  - Example text to linkify: `#123`
+  - Pattern: `#(?P<id>[0-9]+)`
+  - URL template: `https://github.com/zulip/zulip/pull/{id}`
+  - Auto-convert pasted URLs matching the template to: `#{id}`
+- General linkifier
+  - Example text to linkify: `org/repo#123`
+  - Pattern: `(?P<org>[a-zA-Z0-9_-]+)/(?P<repo>[a-zA-Z0-9_-]+)#(?P<id>[0-9]+)`
+  - URL template: `https://github.com/{org}/{repo}/pull/{id}`
+  - Auto-convert pasted URLs matching the template to: `{org}/{repo}#{id}`
+
+With the specific linkifier ordered first, when both linkifiers match, the specific linkifier will take precedence:
+
+- Original text: `#123`
+- Automatically links to: `https://github.com/zulip/zulip/pull/123`
+- Pasting `https://github.com/zulip/zulip/pull/123` auto-converts to: `#123`
+
+When only the general linkifier matches:
+
+- Original text: `django/django#123`
+- Automatically links to: `https://github.com/django/django/pull/123`
+- Pasting `https://github.com/django/django/pull/123` auto-converts to: `django/django#123`
+
+ **Tip:** This set of patterns has overlapping regular expressions and URL
+templates. The specific linkifier will only get prioritized over
+the general linkifier if it is ordered before the more general
+pattern. The same priority order applies when auto-converting
+pasted URLs. This can be customized by dragging and dropping
+existing linkifiers into the desired order. New linkifiers will
+automatically be ordered last.

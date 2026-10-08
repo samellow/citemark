@@ -1,0 +1,13 @@
+Citemark
+Copyright (c) 2026 samellow. Licensed under the MIT License (see LICENSE).
+
+fixtures/zulip/ holds text extracted from Zulip's help center
+(https://zulip.com/help/), saved on 2026-10-06 for an unofficial demo that is
+not affiliated with Zulip. That content is licensed under the Apache License,
+Version 2.0 (fixtures/zulip/LICENSE-APACHE-2.0.txt). Zulip's notice reads:
+
+    Copyright 2012–2015 Dropbox, Inc., 2015–2021 Kandra Labs, Inc., and contributors
+
+Changes made: only the main content of each published page was kept, converted
+to Markdown, with tab labels and Note and Tip callouts kept as plain text.
+Nothing else was edited. Source: https://github.com/zulip/zulip
