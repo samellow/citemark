@@ -12,11 +12,6 @@ from citemark.db.session import make_engine
 
 
 @pytest.fixture
-def anyio_backend():
-    return "asyncio"
-
-
-@pytest.fixture
 async def session():
     engine = make_engine(poolclass=NullPool)
     try:

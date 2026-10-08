@@ -1,0 +1,61 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://api.anthropic.com/v1/messages",
+    "body": {
+      "max_tokens": 1024,
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "search_result",
+              "source": "https://zulip.com/help/star-a-message",
+              "title": "Star a message",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Starring messages is a good way to keep track of important messages, such as tasks you need to go back to or documents you reference often."
+                },
+                {
+                  "type": "text",
+                  "text": "Desktop/Web: Hover over a message to reveal three icons on the right. Click the star icon."
+                },
+                {
+                  "type": "text",
+                  "text": "Mobile: Press and hold a message until the long-press menu appears. Tap Star message."
+                },
+                {
+                  "type": "text",
+                  "text": "Tip: You can unstar a message using the same instructions used to star it."
+                }
+              ],
+              "citations": {
+                "enabled": true
+              }
+            },
+            {
+              "type": "text",
+              "text": "How do I star a message?"
+            }
+          ]
+        }
+      ],
+      "model": "claude-haiku-5-5",
+      "output_config": {
+        "effort": "low"
+      },
+      "system": "Answer the customer's question using only the search results, and cite them.",
+      "thinking": {
+        "type": "disabled"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "content_type": "application/json",
+    "body": [
+      "{\"model\":\"claude-haiku-5-5\",\"id\":\"msg_011Cfq3VZ8bNWUS5YjZKqa9J\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"thinking\",\"thinking\":\"\",\"signature\":\"CAQSqQkKEAgSGAI4AUIIdGhpbmtpbmcSDKaQwNoqeCvoNUAChRoMRWWk08/98xd34Iq9IjDiX0CWXtJYdT0Edo1KsZm+YpuuDlPXvX3CJ03fKc3eboVWp7ykw7BM8WYHDHaAAvsqxgjRpj7cH0QnhR3rHjU3/NPL6PrppfPuLt3QscVF8aMNLrMLocQ6MfThacGJl5YU74x0baMV6sepq/JXhziaqB1GS3vJQgKSIyTh7LpUT1YbCR0jhAxehcRSKaabpoAYe/5XBwESVPgPk0tq6DvEqRgz9mpUq+oEV9VgJIz6exMcsvxV51vv9lJNs7NvV2pl5kgvwVjpFMlGcyyGQwpG/9769f9Gs4LVS1yazCniBdpXyFyfPxJ/UGB0FdseaqlECdZ8tDiWrEivnI6aYH25CtY3o6A84ABx8I7wK6b17izoDdZOVcbGW4F7RvGGsa9BDIXYG3pALTGn6vUMiziHh0DbUdarxQNyXgY59hzuKx9mpiwdl2yG4/2xVYCR1k+vQ9vJPRKIWbvjLJBLZk7Ofb2fC8K5KRfOZUKMlt9q3D4pU29figRBARFLgNTjy7UXN26clX0pao4PDdObnvFWkHVemggTmLNMjMiaL9BVYwOvLlNx+HJhik8rtTNcCUSdgaukTQSfhTn7OtoqN7fFyBYf6tS5dDZlWJO4lnTM062P6cjnEIlDEqX4Q1o4wt1YTq+tIchKU4uRhtFVOy57FPGuXAJK0FKsVJ1LUchaoQA5oAuurG9kyrcJ/Z7RU6oDTeMv2WKsO0/aDgPOCIehrCn91NvcC99d5SN/6nB7GWtMsTJXVzyEqYHMHl9bUr9bowROEsl6Zv2EwniTSS2xCxSfzzBS4duFqvaHY+w0jOo8emhs0JPkKOszk2YGW644MwwtIhCN/wulDftSKUUCcYMrbJbmFQKD++5+RxFc6CfjCzuX9koModN5bDkUim0nPCmAPES7Q4u5ralDMMEUTPp/89U4cs/dC2u0ZecWlztz0LhkjtsY3YNqEjY7U3YZ4k7WBBCsWr1C49HVnu53CgO6qs5j//b/vFAxHOsVMFyr5aY0+y9PcJbRTCoxgZKqwIgSNznOFkzSwfZhTRmvC7SDpu+JMgaK0b6EoCTBDtHSN82jIVx+wkRCGCCdWDbOOnOJG6eZ9QH+C+kcN9+APuhrMccjaszeDMg2EPWR1ujNiaw5nEvGazafgSrtMEtizV57TmVzK7yMDLwKeNLl4ZbMFPEr8WQKT9J8ktK42aGj+20jm57UR6sd6nbG5/DVllLYzvnHeyY0Tlp/qYdswaAswlSsUEV01EWABol2jAY7KnAqyoFp7+jLt6GU4igKkuX1F5fZN5n94nx/NgfDN14mdpGasJC2ib/QQFKUdoWT1aa1J+LdBG2CFq88Ox9o2LI5lQl8UmAUqw6deqykIRIB+0f3fb4em/6tWJ91P4+nWh/GrRJycYtOuDhkYA2mj0p/176pjVT3AYtGuZtBMepFL6WHecjUOVIz0Uwy1ePMNbm1aRzUY23X8/ex39Rn4WBvCnSZ3eLUqmlNT9IUmha489S1dyFCCfs43M1tObr93KiFQfIudBgB\"},{\"type\":\"text\",\"text\":\"On a computer or in the web app, move your cursor over the message you want. Three icons appear on its right side, and you click the star among them. \"},{\"citations\":[{\"type\":\"search_result_location\",\"cited_text\":\"Desktop/Web: Hover over a message to reveal three icons on the right. Click the star icon.\",\"source\":\"https://zulip.com/help/star-a-message\",\"title\":\"Star a message\",\"search_result_index\":0,\"start_block_index\":1,\"end_block_index\":2}],\"type\":\"text\",\"text\":\"Desktop/Web: Hover over a message to reveal three icons on the right. Click the star icon.\"},{\"type\":\"text\",\"text\":\"\\n\\nOn a phone, touch and hold the message until a menu opens, then choose the star option. \"},{\"citations\":[{\"type\":\"search_result_location\",\"cited_text\":\"Mobile: Press and hold a message until the long-press menu appears. Tap Star message.\",\"source\":\"https://zulip.com/help/star-a-message\",\"title\":\"Star a message\",\"search_result_index\":0,\"start_block_index\":2,\"end_block_index\":3}],\"type\":\"text\",\"text\":\"Mobile: Press and hold a message until the long-press menu appears. Tap Star message.\"}],\"container\":null,\"stop_reason\":\"end_turn\",\"stop_sequence\":null,\"stop_details\":null,\"usage\":{\"input_tokens\":1115,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":0},\"output_tokens\":378,\"output_tokens_details\":{\"thinking_tokens\":210},\"service_tier\":\"standard\",\"inference_geo\":\"global\"},\"diagnostics\":null}"
+    ]
+  }
+}
