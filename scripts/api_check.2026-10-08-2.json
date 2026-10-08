@@ -1,0 +1,389 @@
+{
+  "results": [
+    {
+      "model": "-",
+      "check": "models listed",
+      "status": "note",
+      "detail": "Haiku models: claude-haiku-4-5-20251001, claude-haiku-5-5"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "context window",
+      "status": "note",
+      "detail": "max_input_tokens 200000, max_tokens 64000"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "search_result citations",
+      "status": "pass",
+      "detail": "text+cite text text+cite"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "streamed citations_delta",
+      "status": "pass",
+      "detail": "2 citations_delta events; first visible block text at 0.78s; first text at 0.79s"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "decision first: not_covered",
+      "status": "pass",
+      "detail": "tool first; tool:decline"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "decision first: off_topic",
+      "status": "pass",
+      "detail": "tool first; tool:decline"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "decision first: ambiguous",
+      "status": "fail",
+      "detail": "text came before the tool call: \"I need to clarify what you're asking about. The search results mention a few different limits for Ac\"; text tool:ask_clarifying_question"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "decision first: small_talk",
+      "status": "pass",
+      "detail": "tool first; tool:small_talk"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "text then report_gap #1",
+      "status": "pass",
+      "detail": "cited text, then report_gap; text+cite text text+cite tool:report_gap"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "text then report_gap #2",
+      "status": "pass",
+      "detail": "cited text, then report_gap; text+cite text text+cite text tool:report_gap"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "text then report_gap #3",
+      "status": "pass",
+      "detail": "cited text, then report_gap; text+cite text text+cite text tool:report_gap"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "cache, short prefix",
+      "status": "pass",
+      "detail": "about 1541 tokens (minimum 4096): first call wrote 0 to the cache, second read 0"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "cache, long prefix",
+      "status": "pass",
+      "detail": "about 6581 tokens (minimum 4096): first call wrote 6252 to the cache, second read 6252"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "citations + structured output",
+      "status": "fail",
+      "detail": "accepted, where PRD 5.3 assumes a 400; reply text"
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "check": "full help center",
+      "status": "note",
+      "detail": "265,407 tokens for 257 articles (133% of the window); does not fit"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "context window",
+      "status": "note",
+      "detail": "max_input_tokens 1000000, max_tokens 128000"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "search_result citations",
+      "status": "pass",
+      "detail": "thinking(empty) text text+cite"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "streamed citations_delta",
+      "status": "pass",
+      "detail": "1 citations_delta events; first visible block text at 2.87s; first text at 2.87s"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "decision first: not_covered",
+      "status": "pass",
+      "detail": "tool first; thinking(empty) tool:decline"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "decision first: off_topic",
+      "status": "pass",
+      "detail": "tool first; tool:decline"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "decision first: ambiguous",
+      "status": "pass",
+      "detail": "tool first; thinking(empty) tool:ask_clarifying_question"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "decision first: small_talk",
+      "status": "pass",
+      "detail": "tool first; thinking(empty) tool:small_talk"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "text then report_gap #1",
+      "status": "pass",
+      "detail": "cited text, then report_gap; thinking(empty) text text+cite text text+cite text text+cite text tool:report_gap"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "text then report_gap #2",
+      "status": "pass",
+      "detail": "cited text, then report_gap; thinking(empty) text text+cite text tool:report_gap"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "text then report_gap #3",
+      "status": "pass",
+      "detail": "cited text, then report_gap; thinking(empty) text text+cite text text+cite text tool:report_gap"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "cache, short prefix",
+      "status": "note",
+      "detail": "about 1820 tokens (minimum not documented): first call wrote 1735 to the cache, second read 1735"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "cache, long prefix",
+      "status": "note",
+      "detail": "about 9740 tokens (minimum not documented): first call wrote 9655 to the cache, second read 9655"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "citations + structured output",
+      "status": "fail",
+      "detail": "accepted, where PRD 5.3 assumes a 400; reply text"
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "check": "full help center",
+      "status": "note",
+      "detail": "329,157 tokens for 257 articles (33% of the window); fits"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "context window",
+      "status": "note",
+      "detail": "max_input_tokens 1000000, max_tokens 128000"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "search_result citations",
+      "status": "pass",
+      "detail": "text+cite text text+cite text text+cite"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "streamed citations_delta",
+      "status": "pass",
+      "detail": "3 citations_delta events; first visible block text at 0.93s; first text at 0.94s"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "decision first: not_covered",
+      "status": "pass",
+      "detail": "tool first; tool:decline"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "decision first: off_topic",
+      "status": "pass",
+      "detail": "tool first; tool:decline"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "decision first: ambiguous",
+      "status": "pass",
+      "detail": "tool first; tool:ask_clarifying_question"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "decision first: small_talk",
+      "status": "pass",
+      "detail": "tool first; tool:small_talk"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "text then report_gap #1",
+      "status": "fail",
+      "detail": "report_gap without cited text before it; tool:report_gap"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "answer after report_gap #1",
+      "status": "pass",
+      "detail": "cited answer after the tool result; text+cite text text+cite text text+cite text"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "text then report_gap #2",
+      "status": "fail",
+      "detail": "report_gap without cited text before it; tool:report_gap"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "answer after report_gap #2",
+      "status": "pass",
+      "detail": "cited answer after the tool result; text text+cite text text+cite text text+cite text"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "text then report_gap #3",
+      "status": "fail",
+      "detail": "report_gap without cited text before it; tool:report_gap"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "answer after report_gap #3",
+      "status": "pass",
+      "detail": "cited answer after the tool result; text+cite text text+cite text text+cite text"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "cache, short prefix",
+      "status": "pass",
+      "detail": "about 1820 tokens (minimum 512): first call wrote 1735 to the cache, second read 1735"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "cache, long prefix",
+      "status": "pass",
+      "detail": "about 9740 tokens (minimum 512): first call wrote 9655 to the cache, second read 9655"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "citations + structured output",
+      "status": "fail",
+      "detail": "accepted, where PRD 5.3 assumes a 400; reply text"
+    },
+    {
+      "model": "claude-sonnet-5-5",
+      "check": "full help center",
+      "status": "note",
+      "detail": "329,150 tokens for 257 articles (33% of the window); fits"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "context window",
+      "status": "note",
+      "detail": "max_input_tokens 1000000, max_tokens 128000"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "search_result citations",
+      "status": "pass",
+      "detail": "text text+cite text text+cite text text+cite"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "streamed citations_delta",
+      "status": "pass",
+      "detail": "3 citations_delta events; first visible block text at 0.86s; first text at 0.86s"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "decision first: not_covered",
+      "status": "pass",
+      "detail": "tool first; tool:decline"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "decision first: off_topic",
+      "status": "pass",
+      "detail": "tool first; tool:decline"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "decision first: ambiguous",
+      "status": "pass",
+      "detail": "tool first; thinking(empty) tool:ask_clarifying_question"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "decision first: small_talk",
+      "status": "pass",
+      "detail": "tool first; tool:small_talk"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "text then report_gap #1",
+      "status": "pass",
+      "detail": "cited text, then report_gap; thinking(empty) text text+cite text text+cite text text+cite text tool:report_gap"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "text then report_gap #2",
+      "status": "pass",
+      "detail": "cited text, then report_gap; text text+cite text text+cite text text+cite tool:report_gap"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "text then report_gap #3",
+      "status": "pass",
+      "detail": "cited text, then report_gap; thinking(empty) text text+cite text text+cite text text+cite text tool:report_gap"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "cache, short prefix",
+      "status": "pass",
+      "detail": "about 1820 tokens (minimum 512): first call wrote 1735 to the cache, second read 1735"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "cache, long prefix",
+      "status": "pass",
+      "detail": "about 9740 tokens (minimum 512): first call wrote 9655 to the cache, second read 9655"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "citations + structured output",
+      "status": "fail",
+      "detail": "accepted, where PRD 5.3 assumes a 400; reply text"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "full help center",
+      "status": "note",
+      "detail": "329,067 tokens for 257 articles (33% of the window); fits"
+    },
+    {
+      "model": "claude-opus-5-5",
+      "check": "judge structured output",
+      "status": "pass",
+      "detail": "verdict incorrect, missing ['A download link is emailed and works for 24 hours']"
+    },
+    {
+      "model": "voyage-4",
+      "check": "embeddings",
+      "status": "pass",
+      "detail": "dimensions [1024], 110 tokens"
+    },
+    {
+      "model": "rerank-2.5",
+      "check": "rerank",
+      "status": "pass",
+      "detail": "top result 0 (score 0.77)"
+    },
+    {
+      "model": "rerank-3",
+      "check": "rerank",
+      "status": "pass",
+      "detail": "top result 0 (score 0.82)"
+    }
+  ],
+  "cost_usd": 0.3306
+}

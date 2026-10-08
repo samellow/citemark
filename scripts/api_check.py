@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import statistics
 import sys
 import time
 from dataclasses import asdict, dataclass
@@ -34,22 +35,35 @@ import anthropic
 from dotenv import dotenv_values
 
 ROOT = Path(__file__).resolve().parents[1]
-MODELS = ["claude-haiku-4-5", "claude-sonnet-5-5", "claude-opus-5-5"]
+MODELS = ["claude-haiku-4-5", "claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5"]
 JUDGE_MODEL = "claude-opus-5-5"
-# Answer calls: Haiku 4.5 has no adaptive thinking. Opus 5.5 can't turn thinking
-# off, so effort is its only control, and its default is medium.
+# Answer calls: Haiku 4.5 has no adaptive thinking or effort. Opus 5.5 can't turn
+# thinking off, so effort is its only control, and its default is medium. The 5.5
+# models all run at low effort, so they're compared on the same setting. Haiku 5.5
+# also runs with thinking off, as the bot will (PRD Q11): with it on, the first text
+# took a median 2.47 s over 5 streams, against 0.83 s with it off (2026-10-08).
 ANSWER_SETTINGS: dict[str, dict] = {
     "claude-haiku-4-5": {},
+    "claude-haiku-5-5": {"thinking": {"type": "disabled"}, "output_config": {"effort": "low"}},
     "claude-sonnet-5-5": {"output_config": {"effort": "low"}},
     "claude-opus-5-5": {"output_config": {"effort": "low"}},
 }
-# USD per million tokens: input, output, 5-minute cache write, cache read (pricing page, 2026-10-08)
+# USD per million tokens: input, output, 5-minute cache write, cache read (pricing page, 2026-10-08).
+# Haiku 5.5's rates are for prompts up to 100K tokens, which every billed call here is; its cache
+# rates are assumed at the usual 1.25x and 0.1x of input.
 PRICES = {
     "claude-haiku-4-5": (1.00, 5.00, 1.25, 0.10),
+    "claude-haiku-5-5": (0.10, 0.50, 0.125, 0.01),
     "claude-sonnet-5-5": (2.00, 10.00, 2.50, 0.10),
     "claude-opus-5-5": (4.00, 20.00, 5.00, 0.20),
 }
-CACHE_MINIMUM = {"claude-haiku-4-5": 4096, "claude-sonnet-5-5": 512, "claude-opus-5-5": 512}  # prompt caching docs
+# Prompt caching docs. Haiku 5.5 isn't listed there yet.
+CACHE_MINIMUM: dict[str, int | None] = {
+    "claude-haiku-4-5": 4096,
+    "claude-haiku-5-5": None,
+    "claude-sonnet-5-5": 512,
+    "claude-opus-5-5": 512,
+}
 
 ARTICLES = [
     (
@@ -167,13 +181,15 @@ class Check:
         tokens = usage.input_tokens * price_in + usage.output_tokens * price_out
         self.spent[model] = self.spent.get(model, 0.0) + (tokens + written * price_write + read * price_read) / 1e6
 
-    def ask(self, model: str, question: str) -> anthropic.types.Message:
+    def ask(self, model: str, question: str, after: list[dict] | None = None) -> anthropic.types.Message:
+        """`after` continues the conversation: an assistant turn, then the tool results for it."""
+        question_turn = {"role": "user", "content": [*search_results(), {"type": "text", "text": question}]}
         message = self.client.messages.create(
             model=model,
             max_tokens=4096,
             system=SYSTEM,
             tools=TOOLS,
-            messages=[{"role": "user", "content": [*search_results(), {"type": "text", "text": question}]}],
+            messages=[question_turn, *(after or [])],
             **ANSWER_SETTINGS[model],
         )
         self.bill(model, message.usage)
@@ -250,8 +266,25 @@ def check_citations(check: Check, model: str) -> None:
     check.record(model, "search_result citations", status, detail)
 
 
-def check_streaming(check: Check, model: str) -> None:
-    """Citations arrive as citations_delta. The tools stream eagerly, as the answer pipeline will send them."""
+def check_streaming(check: Check, model: str, streams: int) -> None:
+    """Citations arrive as citations_delta. The tools stream eagerly, as the answer pipeline will send them.
+    Each stream also times the first text: from this machine, without retrieval."""
+    runs = [stream_once(check, model) for _ in range(streams)]
+    deltas = [deltas for deltas, _, _ in runs]
+    first_blocks = sorted({block for _, _, block in runs})
+    detail = f"citations_delta events per stream {deltas}; first visible block {', '.join(first_blocks)}"
+    check.record(model, "streamed citations_delta", "pass" if all(deltas) else "fail", detail)
+    times = sorted(first_text for _, first_text, _ in runs if first_text is not None)
+    if times:
+        spread = f"median {statistics.median(times):.2f}s, range {times[0]:.2f}-{times[-1]:.2f}s"
+        detail = f"{spread} over {len(times)} stream{'s' if len(times) > 1 else ''}"
+    else:
+        detail = "no text"
+    check.record(model, "time to first text", "note", detail)
+
+
+def stream_once(check: Check, model: str) -> tuple[int, float | None, str]:
+    """citations_delta events, seconds to the first text, and the first visible block's type."""
     started = time.perf_counter()
     first_visible = first_text = None
     citation_deltas = 0
@@ -267,7 +300,7 @@ def check_streaming(check: Check, model: str) -> None:
             elapsed = time.perf_counter() - started
             if event.type == "content_block_start" and first_visible is None:
                 if event.content_block.type not in ("thinking", "redacted_thinking"):
-                    first_visible = f"first visible block {event.content_block.type} at {elapsed:.2f}s"
+                    first_visible = event.content_block.type
             elif event.type == "content_block_delta":
                 if event.delta.type == "citations_delta":
                     citation_deltas += 1
@@ -275,9 +308,7 @@ def check_streaming(check: Check, model: str) -> None:
                     first_text = elapsed
         message = stream.get_final_message()
     check.bill(model, message.usage)
-    timing = f"first text at {first_text:.2f}s" if first_text is not None else "no text"
-    detail = f"{citation_deltas} citations_delta events; {first_visible or 'no visible block'}; {timing}"
-    check.record(model, "streamed citations_delta", "pass" if citation_deltas else "fail", detail)
+    return citation_deltas, first_text, first_visible or "none"
 
 
 def check_decisions(check: Check, model: str) -> None:
@@ -291,7 +322,9 @@ def check_decisions(check: Check, model: str) -> None:
         if seen and seen[0].type == "tool_use":
             status, why = ("pass", "tool first") if seen[0].name == tool else ("note", f"called {seen[0].name}")
         elif tool in called:
-            status, why = "fail", "text came before the tool call"
+            at = next(i for i, block in enumerate(seen) if block.type == "tool_use")
+            said = " ".join(" ".join(block.text.split()) for block in seen[:at] if block.type == "text")
+            status, why = "fail", f"text came before the tool call: {said[:100]!r}"
         else:
             status, why = "note", f"no {tool} call: the prompt, not the API, decides this"
         check.record(model, f"decision first: {case}", status, f"{why}; {shape(message.content)}")
@@ -312,6 +345,25 @@ def check_report_gap(check: Check, model: str, repeats: int) -> None:
         else:
             status, why = "fail", "report_gap without cited text before it"
         check.record(model, f"text then report_gap #{attempt}", status, f"{why}; {shape(message.content)}")
+        if status == "fail":
+            check_answer_after_gap(check, model, message, attempt)
+
+
+def check_answer_after_gap(check: Check, model: str, message: anthropic.types.Message, attempt: int) -> None:
+    """The other order: report_gap first, then the cited answer once the tool result comes back."""
+    results = [
+        {"type": "tool_result", "tool_use_id": block.id, "content": "Recorded."}
+        for block in message.content
+        if block.type == "tool_use"
+    ]
+    follow = check.ask(
+        model, PARTIAL, after=[{"role": "assistant", "content": message.content}, {"role": "user", "content": results}]
+    )
+    cited = any(block.type == "text" and block.citations for block in visible(follow.content))
+    why = "cited answer after the tool result" if cited else "no cited answer after the tool result"
+    check.record(
+        model, f"answer after report_gap #{attempt}", "pass" if cited else "fail", f"{why}; {shape(follow.content)}"
+    )
 
 
 def check_caching(check: Check, model: str) -> None:
@@ -329,14 +381,23 @@ def check_caching(check: Check, model: str) -> None:
         prefix = check.client.messages.count_tokens(
             model=model, system=request["system"], tools=TOOLS, messages=request["messages"]
         ).input_tokens
+        written = []
         for _ in range(2):
             message = check.client.messages.create(**request)
             check.bill(model, message.usage)
+            written.append(message.usage.cache_creation_input_tokens or 0)
         read = message.usage.cache_read_input_tokens or 0
-        expected = prefix >= CACHE_MINIMUM[model]
-        # cached exactly when the docs say it should be; caching below the minimum is only a note
-        status = "pass" if bool(read) == expected else ("fail" if expected else "note")
-        detail = f"about {prefix} tokens (minimum {CACHE_MINIMUM[model]}): second call read {read} from cache"
+        minimum = CACHE_MINIMUM[model]
+        if minimum is None:
+            status = "note"
+        else:
+            expected = prefix >= minimum
+            # cached exactly when the docs say it should be; caching below the minimum is only a note
+            status = "pass" if bool(read) == expected else ("fail" if expected else "note")
+        detail = (
+            f"about {prefix} tokens (minimum {minimum or 'not documented'}): "
+            f"first call wrote {written[0]} to the cache, second read {read}"
+        )
         check.record(model, f"cache, {label}", status, detail)
 
 
@@ -352,7 +413,8 @@ def check_citations_reject_structured_output(check: Check, model: str) -> None:
         check.record(model, "citations + structured output", "pass", f"refused: {exc.message[:90]}")
         return
     check.bill(model, message.usage)
-    check.record(model, "citations + structured output", "fail", "accepted; PRD 5.3 assumes a 400")
+    detail = f"accepted, where PRD 5.3 assumes a 400; reply {shape(message.content)}"
+    check.record(model, "citations + structured output", "fail", detail)
 
 
 def check_full_context(check: Check, model: str, window: int | None) -> None:
@@ -381,7 +443,8 @@ def check_full_context(check: Check, model: str, window: int | None) -> None:
     fits = window is None or tokens.input_tokens <= window
     share = f" ({tokens.input_tokens / window:.0%} of the window)" if window else ""
     detail = f"{tokens.input_tokens:,} tokens for {len(blocks)} articles{share}; {'fits' if fits else 'does not fit'}"
-    check.record(model, "full help center", "note" if fits else "fail", detail)
+    # PRD 5.2 offers full-context mode only on models it fits, so not fitting is a fact, not a failure
+    check.record(model, "full help center", "note", detail)
 
 
 def check_judge(check: Check) -> None:
@@ -449,6 +512,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--models", nargs="+", default=MODELS, choices=MODELS)
     parser.add_argument("--repeats", type=int, default=3, help="Runs of the text-then-report_gap check per model")
+    parser.add_argument("--streams", type=int, default=3, help="Streams per model, for the time to first text")
     parser.add_argument("--skip-voyage", action="store_true")
     parser.add_argument("--json", type=Path, help="Also write the results here")
     args = parser.parse_args()
@@ -465,7 +529,7 @@ def main() -> int:
         for model in args.models:
             window = check_model_facts(check, model)
             check_citations(check, model)
-            check_streaming(check, model)
+            check_streaming(check, model, args.streams)
             check_decisions(check, model)
             check_report_gap(check, model, args.repeats)
             check_caching(check, model)
