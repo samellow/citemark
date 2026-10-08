@@ -57,9 +57,10 @@ Handler = Callable[[JobContext], Awaitable[None]]
 
 def handlers() -> dict[str, Handler]:
     """The job types this app runs. Imported here, so modules can queue jobs without a cycle."""
+    from citemark.ingest.pipeline import ingest
     from citemark.jobs.purge import purge
 
-    return {"purge": purge}
+    return {"ingest": ingest, "purge": purge}
 
 
 class Worker:

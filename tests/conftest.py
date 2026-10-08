@@ -17,6 +17,11 @@ from citemark.testing.network import block_network
 from citemark.testing.recordings import RecordingTransport
 
 RECORDINGS = Path(__file__).parent / "recordings"
+ZULIP = Path(__file__).parents[1] / "fixtures" / "zulip"
+GET_RAW = (
+    "gh release download zulip-v1-frozen -p raw.tar.gz -D fixtures/zulip && "
+    "tar -xzf fixtures/zulip/raw.tar.gz -C fixtures/zulip"
+)
 
 
 def pytest_addoption(parser):
@@ -45,6 +50,15 @@ def no_network(recording):
 @pytest.fixture
 def anyio_backend():
     return "asyncio"
+
+
+@pytest.fixture(scope="session")
+def zulip_raw() -> Path:
+    """The snapshot's raw HTML. It's attached to the freeze tag's release rather than committed."""
+    raw = ZULIP / "raw"
+    if not raw.is_dir():
+        pytest.fail(f"The Zulip snapshot's raw HTML isn't in {raw}. Get it with: {GET_RAW}", pytrace=False)
+    return raw
 
 
 @pytest.fixture

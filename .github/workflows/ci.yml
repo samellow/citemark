@@ -36,6 +36,13 @@ jobs:
       - run: uv run alembic upgrade head
       - name: Migrations also run down and back up
         run: uv run alembic downgrade base && uv run alembic upgrade head
+      - name: The Zulip snapshot's raw HTML, from the freeze tag's release, checked against the manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download zulip-v1-frozen --pattern raw.tar.gz --dir fixtures/zulip
+          echo "$(jq -r .raw_tarball_sha256 fixtures/zulip/manifest.json)  fixtures/zulip/raw.tar.gz" | sha256sum --check
+          tar -xzf fixtures/zulip/raw.tar.gz -C fixtures/zulip
       - run: uv run pytest
 
   security:
