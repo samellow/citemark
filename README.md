@@ -2,7 +2,7 @@
 
 A support bot for SaaS help centers that ships with proof it works: a test report, run on the client's own help center, showing how often the bot answers correctly, shows the right source, and says so when the help center doesn't cover a question. Each client runs their own copy in their own hosting account. MIT-licensed.
 
-**Status: early.** The demo's 50 test questions were frozen on 2026-10-08, before any bot code exists, so the published results can't be fitted to them. The tag `zulip-v1-frozen` marks that commit. The bot can load a help center, keep it up to date, find the passages that answer a question, answer with sources or decline, and run its own test set, scored and judged. The report that publishes those results comes next.
+**Status: early.** The demo's 50 test questions were frozen on 2026-10-08, before any bot code exists, so the published results can't be fitted to them. The tag `zulip-v1-frozen` marks that commit. The bot can load a help center, keep it up to date, find the passages that answer a question, answer with sources or decline, and run its own test set, scored and judged, three times over when a decision rests on it. The report that publishes those results comes next.
 
 ## What's here so far
 
@@ -15,6 +15,7 @@ A support bot for SaaS help centers that ships with proof it works: a test repor
   - It refuses a test set that changed after it was frozen.
   - It shows a cost estimate first, and stops before passing its budget. `citemark test resume` finishes a run that stopped, without asking any question twice.
   - Whether the bot looked in the right place, showed the right source and declined what it should is scored mechanically, so `citemark test rescore` gives the same scores every time. Claude Opus 5.5 judges the answers against a written rubric, `prompts/judge.v1.md`.
+  - `--runs 3` makes a decision run: three runs of the same settings, from committed code, reported as each measure's median and range (`citemark test decision`). A model and its judge don't answer the same way twice, so decisions aren't made on one run. When the judge grades a question differently across the three, a person grades those answers, and that grade counts.
 - `fixtures/zulip/`: the text of Zulip's help center, saved on 2026-10-06, used for the demo. The raw HTML is attached to the `zulip-v1-frozen` release.
 - `scripts/snapshot.py`: how that copy was made. `scripts/verify_snapshot.py` checks what the extraction kept.
 - `scripts/api_check.py`: checks what the bot assumes about the Claude and Voyage APIs, on each model, before anything is built on it. The results from 2026-10-08 are next to it.

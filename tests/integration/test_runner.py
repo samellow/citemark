@@ -13,178 +13,34 @@ questions can't use it at once.
 import datetime as dt
 import functools
 from decimal import Decimal
-from pathlib import Path
 
-import anthropic
-import httpx2
 import pytest
 import yaml
+from scripted_run import (
+    OPTIONS,
+    QUESTIONS,
+    SCRIPT,
+    SHA,
+    Scripted,
+    correct,
+    failing_client,
+    frozen_set,
+    no_wait,
+    results,
+    services,
+    started,
+)
 from sqlalchemy import func, select
 from zulip_subset import add_zulip
 
-from citemark.db.models import Price, TestQuestion, TestResult, TestRun
+from citemark.db.models import TestQuestion
 from citemark.embed import EmbedError
 from citemark.evals import judge as judging
 from citemark.evals import testset
-from citemark.evals.runner import RunError, Services, create_run, load_test_set, prepare, rescore, run_tests, summary
-from citemark.models import CitationEvent, DecisionEvent, ModelCallFailed, TextEvent, UsageEvent
+from citemark.evals.runner import RunError, Services, load_test_set, prepare, rescore, run_tests, summary
 from citemark.models.claude import ClaudeAnswerer
 from citemark.models.registry import ContextTooLarge
-from citemark.retrieve import RetrievalConfig
 from citemark.testing.fakes import FakeEmbedder, FakeReranker
-
-TYPING = "https://zulip.com/help/typing-notifications"
-EMAILS = "https://zulip.com/help/email-notifications"
-SENDING = "Disable sending typing notifications"
-TYPING_SOURCE = {"url": TYPING, "section": SENDING, "quote": "you can configure Zulip to not send typing notifications"}
-QUESTIONS = [
-    {
-        "id": "Q001",
-        "type": "answerable",
-        "question": "Is there a way to stop people from seeing when I'm typing?",  # unlike test_answer's question
-        "expected_answer": [
-            "Yes: turn off sending typing notifications",
-            "Desktop/Web: gear icon, then Personal settings, then Account & privacy",
-            "Under Privacy, toggle the settings that let recipients see when you're typing",
-        ],
-        "expected_sources": [TYPING_SOURCE],
-    },
-    {
-        "id": "Q002",
-        "type": "partial",
-        "question": "How do I stop people seeing that I'm typing? And can I hide it from just one person?",
-        "expected_answer": [
-            "Turn off sending typing notifications: gear icon, Personal settings, Account & privacy",
-            "Under Privacy, toggle the settings that let recipients see when you're typing",
-        ],
-        "expected_sources": [TYPING_SOURCE],
-        "uncovered_part": "whether typing can be hidden from one specific person",
-    },
-    {
-        "id": "Q003",
-        "type": "ambiguous",
-        "question": "How do I stop getting emails?",
-        "expected_answer": [
-            "Gear icon, then Personal settings, then Notifications",
-            "Under Other emails, turn off Send email notifications for new logins to my account",
-        ],
-        "expected_sources": [
-            {
-                "url": EMAILS,
-                "section": "Disable new login emails",
-                "quote": "Send email notifications for new logins to my account",
-            }
-        ],
-        "expected_option": ["new login emails", "login emails"],
-    },
-    {"id": "Q004", "type": "decline", "question": "How do I change my profile picture?"},
-    {"id": "Q005", "type": "off_topic", "question": "What's the capital of Australia?"},
-]
-OPTIONS = ["Message notification emails", "New login emails", "Newsletter"]
-SCRIPT = {
-    QUESTIONS[0]["question"]: ("answer", SENDING),
-    QUESTIONS[1]["question"]: ("partial", SENDING),
-    QUESTIONS[2]["question"]: ("clarify", OPTIONS),
-    "New login emails": ("answer", "Disable new login emails"),
-    QUESTIONS[3]["question"]: ("decline", "not_covered"),
-    QUESTIONS[4]["question"]: ("decline", "off_topic"),
-}
-SCRIPTED = "fake-answer"
-
-
-def frozen_set(folder: Path, questions=QUESTIONS, *, name: str = "runner-test") -> Path:
-    path = folder / f"{name}-v1.yaml"
-    path.write_text(yaml.safe_dump({"name": name, "version": 1, "questions": questions}, sort_keys=False))
-    testset.freeze(path, testset.load(path), None)
-    return path
-
-
-class Scripted:
-    """An answer model that replies from a script, keyed by the message it's sent. Each reply
-    cites the passage under the scripted heading, so its scores are known in advance."""
-
-    company = "Zulip"
-    prompt_version = "scripted.v1"
-
-    def __init__(self, script, *, model: str = SCRIPTED, window: int = 1_000, failing: frozenset = frozenset()):
-        self.script, self.model, self.window, self.failing = script, model, window, failing
-        self.asked: list[str] = []
-
-    async def count_tokens(self, request) -> int:
-        return self.window
-
-    async def stream(self, request):
-        self.asked.append(request.question)
-        usage = UsageEvent(self.model, 1_000, 100, 0, 0, "end_turn")
-        if request.question in self.failing:
-            yield UsageEvent(self.model, 1_000, 10, 0, 0, None)  # billed, then the call failed
-            raise ModelCallFailed(f"The call to {self.model} failed (APIStatusError).")
-        kind, detail = self.script[request.question]
-        if kind in ("answer", "partial"):
-            found = [n for n, p in enumerate(request.passages) if p.title.endswith(detail)]
-            assert found, f"search didn't return the passage under {detail!r}"
-            yield TextEvent(0, "Turn it off in your settings.")
-            yield CitationEvent(0, found[0], request.passages[found[0]].blocks[0], 0, 1)
-            if kind == "partial":
-                yield DecisionEvent("report_gap", {"missing": "whether you can hide it from one person"})
-        elif kind == "clarify":
-            yield DecisionEvent("ask_clarifying_question", {"options": detail})
-        else:
-            yield DecisionEvent("decline", {"reason": detail})
-        yield usage
-
-
-async def correct(**asked) -> judging.Verdict:
-    return judging.Verdict("correct", [], [], "It has every key fact.", 100, 50, {"verdict": "correct"})
-
-
-async def no_wait(seconds: float) -> None:
-    pass
-
-
-def failing_client() -> anthropic.AsyncAnthropic:
-    """For the follow-up's rewrite: it fails, so the follow-up is searched as it is."""
-    transport = httpx2.MockTransport(lambda request: httpx2.Response(500, json={"type": "error"}))
-    http_client = anthropic.DefaultAsyncHttpxClient(transport=transport)
-    return anthropic.AsyncAnthropic(api_key="unused", max_retries=0, http_client=http_client)
-
-
-def services(answerer, *, judge=correct, client=None) -> Services:
-    return Services(answerer, client or failing_client(), FakeEmbedder(), FakeReranker(), judge)
-
-
-async def started(session, path: Path, answerer, *, mode="retrieval", budget="5", price_per_mtok="1") -> TestRun:
-    await add_zulip(session)
-    session.add(
-        Price(
-            model=SCRIPTED,
-            input_per_mtok=Decimal(price_per_mtok),
-            output_per_mtok=Decimal("10"),
-            effective_from=dt.date(2026, 1, 1),
-        )
-    )
-    test_set = await load_test_set(session, path)
-    run = await create_run(
-        session,
-        test_set,
-        mode=mode,
-        answerer=answerer,
-        config=RetrievalConfig(),
-        budget_usd=Decimal(budget),
-        sha="test",
-    )
-    await session.commit()
-    return run
-
-
-async def results(session, run_id) -> dict[str, TestResult]:
-    rows = await session.execute(
-        select(TestQuestion.ext_id, TestResult)
-        .join(TestResult, TestResult.test_question_id == TestQuestion.id)
-        .where(TestResult.test_run_id == run_id)
-    )
-    return {ext_id: result for ext_id, result in rows}
-
 
 # --- Loading (QA promise 13) ---
 
@@ -239,7 +95,7 @@ async def test_a_run_asks_every_question_then_scores_and_judges_the_answers(sess
         judged.append(asked["question"])
         return await correct(**asked)
 
-    outcome = await run_tests(run.id, sessions=sessions, services=services(answerer, judge=judge), parallel=1)
+    outcome = await run_tests(run.id, sessions=sessions, services=services(answerer, judge=judge), parallel=1, sha=SHA)
     assert (outcome.status, outcome.finished, outcome.total) == ("done", 5, 5)
 
     found = await results(session, run.id)
@@ -277,7 +133,7 @@ async def test_a_run_stops_at_its_budget_and_covers_only_what_ran(session, sessi
     $0.10 and is estimated at about $0.15. With $0.40, the third would pass the cap."""
     answerer = Scripted(SCRIPT)
     run = await started(session, frozen_set(tmp_path), answerer, budget="0.40", price_per_mtok="100")
-    outcome = await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1)
+    outcome = await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1, sha=SHA)
     assert outcome.status == "over_budget" and outcome.finished == 2
     assert answerer.asked == [QUESTIONS[0]["question"], QUESTIONS[1]["question"]]
     await session.refresh(run)
@@ -291,7 +147,7 @@ async def test_a_stopped_run_resumes_without_asking_finished_questions_again(ses
     stuck = QUESTIONS[2]["question"]
     first = Scripted(SCRIPT, failing=frozenset({stuck}))
     run = await started(session, frozen_set(tmp_path), first)
-    outcome = await run_tests(run.id, sessions=sessions, services=services(first), parallel=1, sleep=no_wait)
+    outcome = await run_tests(run.id, sessions=sessions, services=services(first), parallel=1, sleep=no_wait, sha=SHA)
     assert outcome.status == "failed" and first.asked.count(stuck) == 3  # each attempt, then it gave up
     assert sorted(await results(session, run.id)) == ["Q001", "Q002"]
     await session.refresh(run)
@@ -302,7 +158,7 @@ async def test_a_stopped_run_resumes_without_asking_finished_questions_again(ses
     assert run.cost_usd - stored - judged >= 3 * attempt  # the failed attempts count
 
     second = Scripted(SCRIPT)
-    outcome = await run_tests(run.id, sessions=sessions, services=services(second), parallel=1)
+    outcome = await run_tests(run.id, sessions=sessions, services=services(second), parallel=1, sha=SHA)
     assert (outcome.status, outcome.finished) == ("done", 5)
     assert second.asked == [stuck, "New login emails", QUESTIONS[3]["question"], QUESTIONS[4]["question"]]
 
@@ -317,7 +173,7 @@ async def test_a_declined_answerable_question_isnt_judged_and_fails_as_a_wrong_d
         judged.append(asked)
         return await correct(**asked)
 
-    await run_tests(run.id, sessions=sessions, services=services(answerer, judge=judge), parallel=1)
+    await run_tests(run.id, sessions=sessions, services=services(answerer, judge=judge), parallel=1, sha=SHA)
     result = (await results(session, run.id))["Q001"]
     assert not judged and result.judge_verdict is None and result.failure_type == "declined_answerable"
 
@@ -340,7 +196,7 @@ async def test_an_outage_stops_the_run_as_resumable_and_keeps_what_finished(sess
     answerer = Scripted(SCRIPT)
     run = await started(session, frozen_set(tmp_path), answerer)
     down = Services(answerer, failing_client(), DownFor(QUESTIONS[1]["question"]), FakeReranker(), correct)
-    outcome = await run_tests(run.id, sessions=sessions, services=down, parallel=1, sleep=no_wait)
+    outcome = await run_tests(run.id, sessions=sessions, services=down, parallel=1, sleep=no_wait, sha=SHA)
     assert outcome.status == "failed" and sorted(await results(session, run.id)) == ["Q001"]
     await session.refresh(run)
     assert run.status == "failed" and run.finished_at is None
@@ -355,7 +211,7 @@ async def test_an_unexpected_error_ends_the_run_as_failed_not_stuck_running(sess
 
     answerer = Broken(SCRIPT)
     run = await started(session, frozen_set(tmp_path), answerer)
-    outcome = await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1)
+    outcome = await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1, sha=SHA)
     await session.refresh(run)
     assert outcome.status == run.status == "failed" and not await results(session, run.id)
 
@@ -368,8 +224,8 @@ async def test_a_run_marked_running_is_resumed_only_with_force(session, sessions
     run.status = "running"
     await session.commit()
     with pytest.raises(RunError, match="resume it with --force"):
-        await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1)
-    outcome = await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1, force=True)
+        await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1, sha=SHA)
+    outcome = await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1, force=True, sha=SHA)
     assert outcome.status == "done"
 
 
@@ -386,7 +242,7 @@ async def test_a_judge_reply_with_no_verdict_still_counts_what_it_cost(session, 
         return await correct(**asked)
 
     flaky = services(answerer, judge=unusable_once)
-    await run_tests(run.id, sessions=sessions, services=flaky, parallel=1, sleep=no_wait)
+    await run_tests(run.id, sessions=sessions, services=flaky, parallel=1, sleep=no_wait, sha=SHA)
     await session.refresh(run)
     [result] = (await results(session, run.id)).values()
     wasted = (1_000 * Decimal("4") + 16_000 * Decimal("20")) / 1_000_000  # Opus 5.5's prices
@@ -398,14 +254,16 @@ async def test_a_judge_reply_with_no_verdict_still_counts_what_it_cost(session, 
 async def test_a_run_is_resumed_only_with_its_own_settings(session, sessions, tmp_path):
     run = await started(session, frozen_set(tmp_path), Scripted(SCRIPT))
     with pytest.raises(RunError, match="Resume it with the same settings"):
-        await run_tests(run.id, sessions=sessions, services=services(Scripted(SCRIPT, model="claude-haiku-5-5")))
+        await run_tests(
+            run.id, sessions=sessions, services=services(Scripted(SCRIPT, model="claude-haiku-5-5")), sha=SHA
+        )
 
 
 @pytest.mark.anyio
 async def test_rescoring_a_stored_run_twice_gives_identical_scores(session, sessions, tmp_path):
     answerer = Scripted(SCRIPT)
     run = await started(session, frozen_set(tmp_path), answerer)
-    await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1)
+    await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1, sha=SHA)
     stored = {k: (r.retrieval_hit, r.citation_correct, r.decline_correct, r.failure_type)
               for k, r in (await results(session, run.id)).items()}  # fmt: skip
     once = await rescore(session, run.id)
@@ -441,7 +299,7 @@ async def test_full_context_mode_scores_no_retrieval_and_pays_once_to_cache_the_
     )  # fmt: skip
     first, *rest = prepared.questions
     assert prepared.docs_tokens == 20_000 and prepared.estimates[first.id] > prepared.estimates[rest[0].id]
-    outcome = await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1)
+    outcome = await run_tests(run.id, sessions=sessions, services=services(answerer), parallel=1, sha=SHA)
     assert outcome.status == "done"
     found = await results(session, run.id)
     assert found["Q001"].retrieval_hit is None and not found["Q001"].retrieved and found["Q001"].citation_correct
@@ -459,7 +317,7 @@ async def test_the_real_bot_and_judge_run_a_test_set(session, sessions, tmp_path
     real = Services(
         answerer, anthropic_client, FakeEmbedder(), FakeReranker(), functools.partial(judging.judge, anthropic_client)
     )
-    outcome = await run_tests(run.id, sessions=sessions, services=real, parallel=1, sleep=no_wait)
+    outcome = await run_tests(run.id, sessions=sessions, services=real, parallel=1, sleep=no_wait, sha=SHA)
     assert (outcome.status, outcome.finished) == ("done", 5)
     found = await results(session, run.id)
     assert found["Q005"].decline_correct is True
@@ -494,6 +352,9 @@ def test_the_command_refuses_an_edited_or_unfrozen_set_before_calling_anything(t
 
     monkeypatch.setenv("ANTHROPIC_API_KEY", "unused")
     monkeypatch.setenv("VOYAGE_API_KEY", "unused")
+    monkeypatch.setenv(
+        "DATABASE_URL", "postgresql://nobody@localhost:1/none"
+    )  # if a check were missed, the command still couldn't write anywhere
     get_settings.cache_clear()
     try:
         path = frozen_set(tmp_path)

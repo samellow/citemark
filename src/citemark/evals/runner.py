@@ -44,7 +44,16 @@ from citemark.db.models import TestQuestion, TestResult, TestRun, TestSet
 from citemark.embed import Embedder, EmbedError, Reranker
 from citemark.evals import judge as judging
 from citemark.evals import testset
-from citemark.evals.scoring import ANSWER_EXPECTED, JUDGED, Scores, Summary, chosen_option, score, summarize
+from citemark.evals.scoring import (
+    ANSWER_EXPECTED,
+    JUDGED,
+    Scores,
+    Summary,
+    chosen_option,
+    failure_type,
+    score,
+    summarize,
+)
 from citemark.evals.voice import voice_problems
 from citemark.models import AnswerModel, AnswerRequest, Turn
 from citemark.models.claude import MAX_TOKENS
@@ -60,6 +69,8 @@ PARALLEL = 4
 ATTEMPTS = 3
 BACKOFF = 2.0  # seconds before the second attempt, doubled before each one after
 STORED_PLACES = Decimal("0.000001")
+UNKNOWN_COMMIT = "unknown"
+DIRTY = "-dirty"  # marks a commit with uncommitted changes on top
 
 # The estimate shown before a run, per call, in tokens, kept a little above what was measured.
 # T8's recordings: an answer read about 1,500 new tokens and 2,300 cached ones, and wrote about
@@ -102,8 +113,8 @@ def git_sha(root: Path = KIT) -> str:
         sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True, check=True)
         dirty = subprocess.run(["git", "status", "--porcelain"], cwd=root, capture_output=True, text=True, check=True)
     except (OSError, subprocess.CalledProcessError):
-        return "unknown"
-    return sha.stdout.strip() + ("-dirty" if dirty.stdout.strip() else "")
+        return UNKNOWN_COMMIT
+    return sha.stdout.strip() + (DIRTY if dirty.stdout.strip() else "")
 
 
 # --- Loading ---
@@ -228,9 +239,11 @@ async def create_run(
     config: RetrievalConfig,
     budget_usd: Decimal,
     sha: str,
+    decision_group: uuid.UUID | None = None,
 ) -> TestRun:
     run = TestRun(
         test_set_id=test_set.id,
+        decision_group=decision_group,
         mode=mode,
         model=answerer.model,
         company=answerer.company,
@@ -487,11 +500,15 @@ async def run_tests(
     attempts: int = ATTEMPTS,
     sleep: Sleep = anyio.sleep,
     force: bool = False,
+    sha: str,
 ) -> Outcome:
     """Ask every question of the run that has no result yet, then mark how the run ended.
 
     A run marked `running` is refused unless `force` is given: either another process is
-    running it, or its process was killed before it could mark how it ended."""
+    running it, or its process was killed before it could mark how it ended. A run goes on only
+    from the commit it started on (`sha`), so all its answers come from one version of the code
+    (PRD Q17). Two different sets of uncommitted changes on one commit can't be told apart, which
+    is why a decision run never starts from any."""
     async with sessions() as session, session.begin():
         run = await session.get(TestRun, run_id)
         if run is None:
@@ -500,6 +517,11 @@ async def run_tests(
             raise RunError(
                 f"Run {run_id} is marked as running. If no other process is running it, because the last one "
                 "stopped without finishing, resume it with --force."
+            )
+        if sha != run.git_sha:
+            raise RunError(
+                f"Run {run_id} started from commit {run.git_sha}, and this is {sha}. A run goes on only from the "
+                "commit it started on, so all its answers come from one version of the code."
             )
         given = (services.answerer.model, services.answerer.company, services.answerer.prompt_version)
         if given != (run.model, run.company, run.prompt_version):
@@ -656,6 +678,36 @@ async def rescore(session: AsyncSession, run_id: uuid.UUID) -> dict[str, Scores]
     return scored
 
 
+def summary_row(result: TestResult, question: TestQuestion, *, verdict: str | None) -> dict[str, Any]:
+    """What `summarize` reads from one result, with the verdict that counts: the judge's, or
+    yours on a decision run's graded answer (`evals.decision`). A different verdict can change
+    the failure type, so it's assigned again."""
+    clarified = None
+    if question.type == "ambiguous":
+        clarified = chosen_option(result.clarify_options, question.expected_option) is not None
+    failure = result.failure_type
+    if verdict != result.judge_verdict:
+        failure = failure_type(
+            question.type,
+            result.kind,
+            clarified=clarified,
+            retrieval_hit=result.retrieval_hit,
+            citation_correct=result.citation_correct,
+            judge_verdict=verdict,
+        )
+    return {
+        "type": question.type,
+        "kind": result.kind,
+        "judge_verdict": verdict,
+        "clarified": clarified,
+        "retrieval_hit": result.retrieval_hit,
+        "citation_correct": result.citation_correct,
+        "decline_correct": result.decline_correct,
+        "failure_type": failure,
+        "swapped": result.swapped,
+    }
+
+
 @dataclass(frozen=True)
 class RunSummary:
     run: TestRun
@@ -674,22 +726,7 @@ async def summary(session: AsyncSession, run_id: uuid.UUID) -> RunSummary:
     flat = []
     voice: dict[str, list[str]] = {}
     for result, question in rows:
-        clarified = None
-        if question.type == "ambiguous":
-            clarified = chosen_option(result.clarify_options, question.expected_option) is not None
-        flat.append(
-            {
-                "type": question.type,
-                "kind": result.kind,
-                "judge_verdict": result.judge_verdict,
-                "clarified": clarified,
-                "retrieval_hit": result.retrieval_hit,
-                "citation_correct": result.citation_correct,
-                "decline_correct": result.decline_correct,
-                "failure_type": result.failure_type,
-                "swapped": result.swapped,
-            }
-        )
+        flat.append(summary_row(result, question, verdict=result.judge_verdict))
         if result.kind in JUDGED and (problems := voice_problems(result.answer or "")):
             voice[question.ext_id] = problems
     times = [result.ttfw_ms for result, _ in rows if result.ttfw_ms is not None]

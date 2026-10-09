@@ -238,11 +238,67 @@ def _print_summary(found) -> None:
     typer.echo(f"  Spent: ${run.cost_usd:.4f} at list prices, of a ${run.budget_usd:.2f} budget.")
 
 
+def _runs_text(numbers: list[int]) -> str:
+    if len(numbers) == 1:
+        return f"run {numbers[0]}"
+    return "runs " + ", ".join(str(n) for n in numbers[:-1]) + f" and {numbers[-1]}"
+
+
+def _print_decision(found) -> None:
+    """A decision run's medians and ranges (content spec 5.2), and the grading queue. The judge's
+    verdicts on the queue aren't shown, so they can't sway your grade."""
+    first = found.runs[0]
+    typer.echo(
+        f"\nDecision run {found.group}: {len(found.runs)} runs of {first.model}, {first.mode.replace('_', ' ')}, "
+        f"commit {first.git_sha[:12]}."
+    )
+    for field, name in MEASURES:
+        measure = found.measures[field]
+        if measure is None:
+            typer.echo(f"  {name}: n/a")
+            continue
+        if field == "correct_answers" and found.provisional:  # its range would hint at the judge's verdicts
+            typer.echo(f"  {name}: shown once you've graded the answers waiting, so it can't sway your grade")
+            continue
+        runs = (
+            f"Same in all {len(found.runs)} runs"
+            if measure.same
+            else f"{len(found.runs)} runs: {measure.low}\u2013{measure.high}"
+        )
+        typer.echo(f"  {name}: {measure.median} of {measure.total} (median) \u00b7 {runs}")
+    questions = sorted({entry.question for entry in found.queue})
+    if not questions:
+        typer.echo(
+            "  The judge gave each answered question the same verdict in every run, so nothing waits for your grade."
+        )
+    else:
+        typer.echo(
+            f"  The judge graded {len(questions)} question(s) differently across the runs, so your grade counts "
+            f"on their {len(found.queue)} answers."
+        )
+        waiting = {q: [e.run for e in found.waiting if e.question == q] for q in questions}
+        if listing := ", ".join(f"{q} ({_runs_text(runs)})" for q, runs in waiting.items() if runs):
+            typer.echo(f"  Waiting for your grade: {listing}. Until they're graded, the decision is provisional.")
+        else:
+            typer.echo("  Every answer in the queue is graded, so your grades count.")
+    typer.echo(f"  Spent: ${found.spent:.4f} at list prices, of a ${found.budget:.2f} budget.")
+
+
 def _run_tests(
-    file: Path | None, run_id: uuid.UUID | None, *, company, model, mode, budget, yes: bool, force: bool = False
+    file: Path | None,
+    run_id: uuid.UUID | None,
+    *,
+    company,
+    model,
+    mode,
+    budget,
+    runs: int = 1,
+    yes: bool,
+    force: bool = False,
 ) -> None:
-    """Start a run of `file`, or resume `run_id`, and print each result and the summary. Exits 1
-    when the run failed or reached its budget, so a script can tell."""
+    """Start a run of `file`, or three sharing a decision group, or resume `run_id` with the rest
+    of its decision run. Prints each result, then the summary. Exits 1 when a run failed or
+    reached its budget, so a script can tell."""
     import functools
     from decimal import Decimal
 
@@ -252,15 +308,26 @@ def _run_tests(
     from citemark.db.models import TestRun
     from citemark.db.session import make_sessionmaker
     from citemark.embed.voyage import VoyageEmbedder, VoyageReranker
+    from citemark.evals import decision as deciding
     from citemark.evals import judge as judging
     from citemark.evals import runner
     from citemark.models.claude import ClaudeAnswerer
     from citemark.retrieve import RetrievalConfig, load_config
 
+    sha = runner.git_sha()
+    many = file is not None and runs == deciding.RUNS
+    if many:
+        try:
+            deciding.committed(sha)  # before anything is called
+        except deciding.DecisionError as exc:
+            _fail(str(exc))
     voyage, claude = _voyage_key(), _anthropic_key()
 
     def show(question_id: str, result) -> None:
         typer.echo(f"  {question_id}  {result.kind:<20} {result.failure_type or 'passed'}")
+
+    def announce(number: int, run) -> None:
+        typer.echo(f"Run {number} of {deciding.RUNS} ({run.id}):")
 
     async def work(engine):
         sessions = make_sessionmaker(engine)
@@ -290,24 +357,43 @@ def _run_tests(
                         reranker=chosen.reranker,
                         on=dt.datetime.now(dt.UTC).date(),
                     )
-                typer.echo(
-                    f"{len(prepared.questions)} questions on {model}, {mode.value.replace('_', ' ')}. "
-                    f"Estimated cost: about ${prepared.estimate:.2f} at list prices (an estimate). "
-                    f"Budget: ${budget:.2f}."
-                )
-                if not yes and not typer.confirm("Start the run?"):  # no transaction is open while it waits
+                where = f"{len(prepared.questions)} questions on {model}, {mode.value.replace('_', ' ')}"
+                if many:
+                    typer.echo(
+                        f"A decision run: {deciding.RUNS} runs of {where}, from commit {sha[:12]}. Estimated cost: "
+                        f"about ${prepared.estimate * deciding.RUNS:.2f} for all {deciding.RUNS} at list prices "
+                        f"(an estimate). Budget: ${budget:.2f}, a third for each run."
+                    )
+                else:
+                    typer.echo(
+                        f"{where}. Estimated cost: about ${prepared.estimate:.2f} at list prices (an estimate). "
+                        f"Budget: ${budget:.2f}."
+                    )
+                if not yes and not typer.confirm("Start?"):  # no transaction is open while it waits
                     raise typer.Exit(0)
                 async with sessions() as session, session.begin():
-                    run = await runner.create_run(
-                        session,
-                        test_set,
-                        mode=mode.value,
-                        answerer=chosen.answerer,
-                        config=config,
-                        budget_usd=Decimal(str(budget)),
-                        sha=runner.git_sha(),
-                    )
-                started = run.id
+                    if many:
+                        created = await deciding.create_group(
+                            session,
+                            test_set,
+                            mode=mode.value,
+                            answerer=chosen.answerer,
+                            config=config,
+                            budget_usd=Decimal(str(budget)),
+                            sha=sha,
+                        )
+                        started, group = created[0].id, created[0].decision_group
+                    else:
+                        run = await runner.create_run(
+                            session,
+                            test_set,
+                            mode=mode.value,
+                            answerer=chosen.answerer,
+                            config=config,
+                            budget_usd=Decimal(str(budget)),
+                            sha=sha,
+                        )
+                        started, group = run.id, None
             else:
                 async with sessions() as session:
                     found = await session.get(TestRun, run_id)
@@ -315,18 +401,49 @@ def _run_tests(
                         raise runner.RunError(f"There's no test run {run_id}.")
                 config = RetrievalConfig.model_validate(found.retrieval_config or {})
                 chosen = services(found.mode, found.model, found.company, config)
-                started = run_id
-            typer.echo(f"Run {started}:")
-            await runner.run_tests(started, sessions=sessions, services=chosen, on_result=show, force=force)
-            async with sessions() as session:
-                return await runner.summary(session, started)
+                started, group = run_id, found.decision_group
 
-    found = _with_db(work)
+            if group is None:
+                typer.echo(f"Run {started}:")
+                await runner.run_tests(
+                    started, sessions=sessions, services=chosen, on_result=show, force=force, sha=sha
+                )
+                async with sessions() as session:
+                    return await runner.summary(session, started), None, None
+            ended = await deciding.finish_group(
+                group,
+                sessions=sessions,
+                services=chosen,
+                sha=sha,
+                force=run_id if force else None,
+                on_run=announce,
+                on_result=show,
+            )
+            async with sessions() as session:
+                if ended and (stopped := ended[-1])[1].status != "done":
+                    numbered = await deciding.group_runs(session, group)
+                    position = [run.id for run in numbered].index(stopped[0].id) + 1
+                    return await runner.summary(session, stopped[0].id), None, position
+                return None, await deciding.decision(session, group), None
+
+    found, decided, position = _with_db(work)
+    if decided is not None:
+        _print_decision(decided)
+        return
     _print_summary(found)
+    which = f"Run {position} of {deciding.RUNS}" if position else "The run"
     if found.run.status == "failed":
-        _fail(f"The run stopped before it finished. Finish it with: citemark test resume {found.run.id}")
+        whole = "the decision run" if position else "it"
+        _fail(f"{which} stopped before it finished. Finish {whole} with: citemark test resume {found.run.id}")
     if found.run.status == "over_budget":
+        if position:
+            _fail(
+                f"{which} stopped at its budget, so this decision run can't be completed. "
+                "Start a new one with a bigger budget."
+            )
         _fail(f"The run stopped at its budget, so its results cover {found.finished} of {found.total} questions.")
+    if position:  # any other way a run of the group ended short
+        _fail(f"{which} ended {found.run.status.replace('_', ' ')}, so this decision run has no result yet.")
 
 
 @test_app.command("run")
@@ -334,16 +451,27 @@ def run_tests(
     file: FileArg,
     company: Annotated[str, typer.Option(help="The product the help center is for, as the bot names it.")],
     budget: Annotated[
-        float, typer.Option(min=0.01, help="The most the run may spend, in US dollars. It stops short of it.")
+        float,
+        typer.Option(
+            min=0.01,
+            help="The most it may spend, in US dollars; a decision run gives each of its runs a third. "
+            "It stops short of it.",
+        ),
     ],
     mode: Annotated[RunMode, typer.Option(help="Search for passages, or read the whole help center.")] = (
         RunMode.retrieval
     ),
     model: Annotated[str, typer.Option(help="The answer model.")] = "claude-haiku-5-5",
+    runs: Annotated[
+        int,
+        typer.Option(help="1 for a single run, or 3 for a decision run: three runs whose medians decide."),
+    ] = 1,
     yes: Annotated[bool, typer.Option("--yes", help="Start without asking, after showing the estimate.")] = False,
 ) -> None:
     """Run a frozen test set: ask every question, score the replies and judge the answers. Calls Claude and Voyage."""
-    _run_tests(file, None, company=company, model=model, mode=mode, budget=budget, yes=yes)
+    if runs not in (1, 3):
+        _fail("--runs takes 1 for a single run, or 3 for a decision run.")
+    _run_tests(file, None, company=company, model=model, mode=mode, budget=budget, runs=runs, yes=yes)
 
 
 @test_app.command("resume")
@@ -356,7 +484,7 @@ def resume_tests(
         ),
     ] = False,
 ) -> None:
-    """Finish a run that stopped, asking only the questions with no result yet."""
+    """Finish a run that stopped, asking only unanswered questions. A decision run's other runs follow."""
     try:
         found = uuid.UUID(run_id)
     except ValueError:
@@ -382,6 +510,26 @@ def rescore(run_id: Annotated[str, typer.Argument(help="The run to score again."
             return await runner.summary(session, found)
 
     _print_summary(_with_db(work))
+
+
+@test_app.command("decision")
+def decision_summary(
+    run_id: Annotated[str, typer.Argument(help="The decision run, or any of its three runs.")],
+) -> None:
+    """Show a decision run's medians and ranges, and which answers wait for your grade."""
+    from citemark.db.session import make_sessionmaker
+    from citemark.evals import decision as deciding
+
+    try:
+        found = uuid.UUID(run_id)
+    except ValueError:
+        _fail(f"{run_id} isn't a run ID.")
+
+    async def work(engine):
+        async with make_sessionmaker(engine)() as session:
+            return await deciding.decision(session, await deciding.find_group(session, found))
+
+    _print_decision(_with_db(work))
 
 
 @jobs_app.command("work")
