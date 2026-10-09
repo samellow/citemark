@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import datetime as dt
 import sys
 import uuid
 from collections import Counter
@@ -56,6 +57,7 @@ def _with_db[T](work: Callable[..., Awaitable[T]]) -> T:
     from citemark.costs import PriceMissing
     from citemark.db.session import make_engine
     from citemark.embed import EmbedError
+    from citemark.evals.runner import RunError
     from citemark.ingest import IngestError
     from citemark.models.registry import ModelError
     from citemark.retrieve import RetrievalError
@@ -69,7 +71,9 @@ def _with_db[T](work: Callable[..., Awaitable[T]]) -> T:
 
     try:
         return asyncio.run(main())
-    except (IngestError, EmbedError, RetrievalError, ModelError, PriceMissing) as exc:
+    except (IngestError, EmbedError, RetrievalError, ModelError, PriceMissing, RunError) as exc:
+        _fail(str(exc))
+    except (testset.TestSetChanged, testset.TestSetError) as exc:
         _fail(str(exc))
 
 
@@ -201,6 +205,183 @@ def freeze(
         typer.echo(f"Wording check flagged {flagged} in the draft; {edited} of {lock['questions']} changed in review.")
     files = [file.name, testset.lock_path(file).name, *([draft.name] if draft else [])]
     typer.echo(f"Commit {', '.join(files)} together.")
+
+
+class RunMode(StrEnum):
+    retrieval = "retrieval"
+    full_context = "full_context"
+
+
+MEASURES = (  # the names readers see (content spec 5.2)
+    ("correct_answers", "Correct answers"),
+    ("right_source", "Right source shown"),
+    ("correct_declines", 'Correctly said "not covered"'),
+    ("wrongly_declined", 'Wrongly said "not covered" (lower is better)'),
+    ("right_place", "Looked in the right place"),
+)
+
+
+def _print_summary(found) -> None:
+    run = found.run
+    typer.echo(f"\nRun {run.id}: {run.model}, {run.mode.replace('_', ' ')}, {run.status}.")
+    typer.echo(f"{found.finished} of {found.total} questions answered.")
+    for field, name in MEASURES:
+        measure = getattr(found.measures, field)
+        typer.echo(f"  {name}: " + ("n/a" if measure is None else f"{measure.passed} of {measure.total}"))
+    failures = ", ".join(f"{kind} {count}" for kind, count in sorted(found.measures.failures.items()))
+    typer.echo(f"  Failures: {failures or 'none'}")
+    typer.echo(f"  Text shown, then swapped for a decision: {found.measures.swapped}")
+    for question_id, problems in found.voice.items():
+        typer.echo(f"  Voice check, {question_id}: {'; '.join(problems)}")
+    if found.median_ttfw_ms is not None:
+        typer.echo(f"  Median time to first word: {found.median_ttfw_ms / 1000:.2f} s, without a network between.")
+    typer.echo(f"  Spent: ${run.cost_usd:.4f} at list prices, of a ${run.budget_usd:.2f} budget.")
+
+
+def _run_tests(
+    file: Path | None, run_id: uuid.UUID | None, *, company, model, mode, budget, yes: bool, force: bool = False
+) -> None:
+    """Start a run of `file`, or resume `run_id`, and print each result and the summary. Exits 1
+    when the run failed or reached its budget, so a script can tell."""
+    import functools
+    from decimal import Decimal
+
+    import anthropic
+    import httpx2
+
+    from citemark.db.models import TestRun
+    from citemark.db.session import make_sessionmaker
+    from citemark.embed.voyage import VoyageEmbedder, VoyageReranker
+    from citemark.evals import judge as judging
+    from citemark.evals import runner
+    from citemark.models.claude import ClaudeAnswerer
+    from citemark.retrieve import RetrievalConfig, load_config
+
+    voyage, claude = _voyage_key(), _anthropic_key()
+
+    def show(question_id: str, result) -> None:
+        typer.echo(f"  {question_id}  {result.kind:<20} {result.failure_type or 'passed'}")
+
+    async def work(engine):
+        sessions = make_sessionmaker(engine)
+        async with httpx2.AsyncClient() as api, anthropic.AsyncAnthropic(api_key=claude) as client:
+
+            def services(run_mode: str, run_model: str, run_company: str, config: RetrievalConfig) -> runner.Services:
+                reranker = VoyageReranker(voyage, api, model=config.reranker) if config.rerank else None
+                return runner.Services(
+                    answerer=ClaudeAnswerer(client, run_model, company=run_company),
+                    client=client,
+                    embedder=VoyageEmbedder(voyage, api),
+                    reranker=reranker if run_mode == "retrieval" else None,
+                    judge=functools.partial(judging.judge, client),
+                )
+
+            if run_id is None:
+                async with sessions() as session, session.begin():  # the set's copy is kept either way
+                    test_set = await runner.load_test_set(session, file)
+                    config = await load_config(session)
+                    chosen = services(mode.value, model, company, config)
+                    prepared = await runner.prepare(
+                        session,
+                        test_set.id,
+                        mode=mode.value,
+                        answerer=chosen.answerer,
+                        embedder=chosen.embedder,
+                        reranker=chosen.reranker,
+                        on=dt.datetime.now(dt.UTC).date(),
+                    )
+                typer.echo(
+                    f"{len(prepared.questions)} questions on {model}, {mode.value.replace('_', ' ')}. "
+                    f"Estimated cost: about ${prepared.estimate:.2f} at list prices (an estimate). "
+                    f"Budget: ${budget:.2f}."
+                )
+                if not yes and not typer.confirm("Start the run?"):  # no transaction is open while it waits
+                    raise typer.Exit(0)
+                async with sessions() as session, session.begin():
+                    run = await runner.create_run(
+                        session,
+                        test_set,
+                        mode=mode.value,
+                        answerer=chosen.answerer,
+                        config=config,
+                        budget_usd=Decimal(str(budget)),
+                        sha=runner.git_sha(),
+                    )
+                started = run.id
+            else:
+                async with sessions() as session:
+                    found = await session.get(TestRun, run_id)
+                    if found is None:
+                        raise runner.RunError(f"There's no test run {run_id}.")
+                config = RetrievalConfig.model_validate(found.retrieval_config or {})
+                chosen = services(found.mode, found.model, found.company, config)
+                started = run_id
+            typer.echo(f"Run {started}:")
+            await runner.run_tests(started, sessions=sessions, services=chosen, on_result=show, force=force)
+            async with sessions() as session:
+                return await runner.summary(session, started)
+
+    found = _with_db(work)
+    _print_summary(found)
+    if found.run.status == "failed":
+        _fail(f"The run stopped before it finished. Finish it with: citemark test resume {found.run.id}")
+    if found.run.status == "over_budget":
+        _fail(f"The run stopped at its budget, so its results cover {found.finished} of {found.total} questions.")
+
+
+@test_app.command("run")
+def run_tests(
+    file: FileArg,
+    company: Annotated[str, typer.Option(help="The product the help center is for, as the bot names it.")],
+    budget: Annotated[
+        float, typer.Option(min=0.01, help="The most the run may spend, in US dollars. It stops short of it.")
+    ],
+    mode: Annotated[RunMode, typer.Option(help="Search for passages, or read the whole help center.")] = (
+        RunMode.retrieval
+    ),
+    model: Annotated[str, typer.Option(help="The answer model.")] = "claude-haiku-5-5",
+    yes: Annotated[bool, typer.Option("--yes", help="Start without asking, after showing the estimate.")] = False,
+) -> None:
+    """Run a frozen test set: ask every question, score the replies and judge the answers. Calls Claude and Voyage."""
+    _run_tests(file, None, company=company, model=model, mode=mode, budget=budget, yes=yes)
+
+
+@test_app.command("resume")
+def resume_tests(
+    run_id: Annotated[str, typer.Argument(help="The run that stopped.")],
+    force: Annotated[
+        bool,
+        typer.Option(
+            "--force", help="Resume a run still marked as running, because its process stopped without finishing."
+        ),
+    ] = False,
+) -> None:
+    """Finish a run that stopped, asking only the questions with no result yet."""
+    try:
+        found = uuid.UUID(run_id)
+    except ValueError:
+        _fail(f"{run_id} isn't a run ID.")
+    _run_tests(None, found, company=None, model=None, mode=None, budget=None, yes=True, force=force)
+
+
+@test_app.command("rescore")
+def rescore(run_id: Annotated[str, typer.Argument(help="The run to score again.")]) -> None:
+    """Recompute a run's scores from its stored results. Nothing is asked again; the judge's verdicts stand."""
+    from citemark.db.session import make_sessionmaker
+    from citemark.evals import runner
+
+    try:
+        found = uuid.UUID(run_id)
+    except ValueError:
+        _fail(f"{run_id} isn't a run ID.")
+
+    async def work(engine):
+        async with make_sessionmaker(engine)() as session, session.begin():
+            await runner.rescore(session, found)
+        async with make_sessionmaker(engine)() as session:
+            return await runner.summary(session, found)
+
+    _print_summary(_with_db(work))
 
 
 @jobs_app.command("work")

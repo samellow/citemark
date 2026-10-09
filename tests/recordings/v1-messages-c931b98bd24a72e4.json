@@ -1,0 +1,64 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://api.anthropic.com/v1/messages",
+    "body": {
+      "max_tokens": 16000,
+      "messages": [
+        {
+          "role": "user",
+          "content": "<question type=\"partial\">\nHow do I stop people seeing that I'm typing? And can I hide it from just one person?\n</question>\n\n<expected_answer>\n- Yes: turn off sending typing notifications\n- Desktop/Web: gear icon, then Personal settings, then Account & privacy\n- Under Privacy, toggle the settings that let recipients see when you're typing\n</expected_answer>\n\n<help_center_quotes>\n- \"you can configure Zulip to not send typing notifications\" (https://zulip.com/help/typing-notifications, Disable sending typing notifications)\n</help_center_quotes>\n\n<answer>\nTurn off typing notifications: click the gear icon, select Personal settings, then Account & privacy, and under Privacy toggle off Let recipients see when I'm typing. To hide it from just one person, mute them first.\n</answer>"
+        }
+      ],
+      "model": "claude-opus-5-5",
+      "output_config": {
+        "effort": "high",
+        "format": {
+          "type": "json_schema",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "verdict": {
+                "type": "string",
+                "enum": [
+                  "correct",
+                  "incorrect"
+                ]
+              },
+              "missing_facts": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contradictions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verdict",
+              "missing_facts",
+              "contradictions",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "system": "You are grading a support bot's answer against an expected answer written by\na person who read the help center.\n\nMark the answer correct only if both are true:\n1. It contains every key fact in the expected answer. Different wording is\n   fine. A missing key fact makes it incorrect.\n2. It says nothing that contradicts the expected answer or the quoted\n   help-center text.\n\nExtra correct detail is fine. Ignore style, length and formatting.\n\nIf the question is marked partial, the answer must also:\n3. say that the help center doesn't cover whether typing can be hidden from one specific person, and\n4. make no claim about whether typing can be hidden from one specific person.\n\nReturn: verdict (correct or incorrect), missing key facts, contradictions,\nand a one-sentence reason."
+    }
+  },
+  "response": {
+    "status": 200,
+    "content_type": "application/json",
+    "body": [
+      "{\"model\":\"claude-opus-5-5\",\"id\":\"msg_011CfraTMb8W5QXpbLeDfRXU\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"thinking\",\"thinking\":\"\",\"signature\":\"CAQSjAYKEAgSGAI4AUIIdGhpbmtpbmcSDOaLc95/VS3owr8EpRoMN7nzDr6WQRqxkpdjIjBL31uL05itw9lRF/0eciuHqHqTzzix/PXJkYD+vx79GGZeQXCL9FbRisqWCALVuY0qqQWQ2SwTxVkWChBdR5H+dd3Q2nKkPOqATAooduWVjtPJchsl6zLb0DCd5Ea0a+mvrJ5UdxZ0cKacgJwLBfKr653AlmkmzhW8UJXK52YOYKLmJt279q5s0xyWi4kWcyW3VriDwx9C1q+AQ1xe88lgi7vFxfUN/TtmIsAcOvG0xM/nHJP3u9GMVCeXrz3W2pkBNZOsmEyvaC2MLD9oEKG9BvEjrZby9NPgrxmqD6Zev7W0s1UsEYq06MGcE6yT/PxljFQTp5Ql4P6eP+8jVGL5xLUM/dinn7WXtR0yXvyLqjbPsKa8+4+tmh4/I8SHllVy1fCpkrtm/TU4rXJAfskSNIIWLvnFnWLObdpIFhUhhcU70l5exje4ydFdDcMBduYiyMRy5HHAABfTpjY14ZJIvgKNf8rEmarLi6RTpuO0kuLxp+6hp4xdCnd8VsQp9eDaJH7L05ESb+Lb9XNwXWLM/0qbjfBHIRVDfR19/bhZ4GGApRbspYrCPHOuez0XeVLW4sFI6lsladpW3EuD40/cYFusM0FLjSR34qzKze9eadMAI3FD1tUXEypVUrlBcr8Wh8qLJxIbzEoT0QXojL1wXQndt0lJWynWK0oAhuEJhhL+FFPQ9x3URhhtHlkaplUKtMP4bcxh+6QscRazIUimj/TIXEzmY407h1dBhI8ZfDpY420ywpYoPSr+AX9SZO0ESQjAXKChlcNPZBRf5IPhJ2xCjQ+XVWjAv37NQxOZ1acsMK+nTvlKKNquQQ8mx00Fs6qOp0otdg4dNQCupPhbvF8qnGnC4zzPJ67mLQqUqQF9ZBGq9nj2e1+EFmgjiIJA3XMqmyLUhBwIIVf0S9RaX0+Xe2bsJfOXxpRftSunlGxMUosRLaoh4LG806xNFmZ3HtwfsY5GkozIkvEYAQ==\"},{\"type\":\"text\",\"text\":\"{\\\"verdict\\\":\\\"incorrect\\\",\\\"missing_facts\\\":[\\\"Does not say that the help center doesn't cover whether typing can be hidden from one specific person\\\"],\\\"contradictions\\\":[\\\"Claims you can hide typing from one person by muting them, a claim about per-person hiding that the help center does not support\\\"],\\\"reason\\\":\\\"The answer covers the steps to disable typing notifications, but it fails the partial-question rules by not acknowledging the gap and by asserting that muting hides typing from one person.\\\"}\"}],\"container\":null,\"stop_reason\":\"end_turn\",\"stop_sequence\":null,\"stop_details\":null,\"usage\":{\"input_tokens\":858,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":0},\"output_tokens\":224,\"output_tokens_details\":{\"thinking_tokens\":70},\"service_tier\":\"standard\",\"inference_geo\":\"global\"},\"diagnostics\":null}"
+    ]
+  }
+}

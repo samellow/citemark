@@ -73,5 +73,5 @@ jobs:
         run: >-
           docker run --rm --entrypoint python citemark:ci -c
           "from citemark import prompts, strings;
-          [prompts.load(name) for name in ('rewrite.v1', 'answer.v1')];
+          [prompts.load(name) for name in ('rewrite.v1', 'answer.v1', 'judge.v1')];
           prompts.load_tools('tools.v1'); strings.load('widget')"

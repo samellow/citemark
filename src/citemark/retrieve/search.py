@@ -1,9 +1,12 @@
 """Search mode (PRD 5.2): the question searched by meaning and by its words, the two lists
 merged by reciprocal rank fusion, and the best few chosen by a reranker.
 
-Only live passages are searched (`retired_at` is null), which is what the vector and keyword
-indexes hold. Every passage handed on keeps all three scores, so a wrong answer can be traced
-to the step that lost the right passage.
+Only live passages are searched (`retired_at` is null). Search by meaning scans every one of
+them, so it's exact and the same passages always give the same candidates (PRD Q15): with an
+approximate HNSW index, which candidates came back depended on the index's state, such as the
+dead entries a re-index leaves until vacuum. An exact scan of Zulip's 1,209 passages took 4.5 ms.
+Every passage handed on keeps all three scores, so a wrong answer can be traced to the step
+that lost the right passage.
 """
 
 from __future__ import annotations
@@ -12,7 +15,7 @@ import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from sqlalchemy import func, select, text
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from citemark.db.models import Chunk, Document, RetrievalHit
@@ -42,7 +45,6 @@ BY_WORDS = text(
 # Ties in keyword score are broken by heading path and page position, not by ID alone. IDs made
 # in the same millisecond end in random bits (UUIDv7), so an ID tie-break gave two runs on the
 # same passages different candidate lists (found in T7, 1 test run in about 20).
-HNSW_MIN_SEARCH = 40  # pgvector's default ef_search: candidates looked at per vector search
 
 
 @dataclass(frozen=True)
@@ -70,8 +72,6 @@ class Retrieval:
 
 
 async def _by_meaning(session: AsyncSession, vector: list[float], limit: int) -> list[tuple[uuid.UUID, float]]:
-    # The HNSW index returns at most ef_search rows, so it's raised when more candidates are wanted
-    await session.execute(select(func.set_config("hnsw.ef_search", str(max(HNSW_MIN_SEARCH, limit)), True)))
     distance = Chunk.embedding.cosine_distance(vector)
     rows = await session.execute(
         select(Chunk.id, distance).where(Chunk.retired_at.is_(None)).order_by(distance).limit(limit)

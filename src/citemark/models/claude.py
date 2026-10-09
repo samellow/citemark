@@ -149,6 +149,18 @@ class ClaudeAnswerer:
             **SETTINGS[self.model],
         }
 
+    async def count_tokens(self, request: AnswerRequest) -> int:
+        """The first call's input tokens, from Anthropic's counting endpoint, which costs nothing.
+        Full-context mode checks the window with it, not with the passages' estimates (PRD 5.2)."""
+        params = self.request(request)
+        try:
+            counted = await self.client.messages.count_tokens(
+                model=params["model"], system=params["system"], tools=params["tools"], messages=params["messages"]
+            )
+        except anthropic.APIError as exc:
+            raise ModelCallFailed(f"Counting tokens for {self.model} failed ({type(exc).__name__}).") from exc
+        return counted.input_tokens
+
     async def stream(self, request: AnswerRequest) -> AsyncIterator[Event]:
         params = self.request(request)
         blocks = 0  # text blocks so far, across both calls

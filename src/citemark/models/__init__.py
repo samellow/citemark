@@ -100,3 +100,7 @@ class AnswerModel(Protocol):
     prompt_version: str  # recorded on every message and test run
 
     def stream(self, request: AnswerRequest) -> AsyncIterator[Event]: ...
+
+    async def count_tokens(self, request: AnswerRequest) -> int:
+        """The first call's input tokens, as the model counts them, without calling the model."""
+        ...

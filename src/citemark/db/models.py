@@ -139,14 +139,8 @@ class Chunk(_Row, Base):
     __tablename__ = "chunk"
     __table_args__ = (
         CheckConstraint("jsonb_typeof(blocks) = 'array' AND jsonb_array_length(blocks) > 0", name="blocks"),
-        # Retrieval only reads live chunks, so its indexes only hold them
-        Index(
-            "ix_chunk_embedding",
-            "embedding",
-            postgresql_using="hnsw",
-            postgresql_ops={"embedding": "vector_cosine_ops"},
-            postgresql_where=sql("retired_at IS NULL"),
-        ),
+        # Retrieval only reads live chunks, so its indexes only hold them. The embedding has no
+        # index: vector search scans every live passage, so it's exact (PRD Q15, T9)
         Index("ix_chunk_tsv", "tsv", postgresql_using="gin", postgresql_where=sql("retired_at IS NULL")),
         Index("ix_chunk_live", "document_id", "position", postgresql_where=sql("retired_at IS NULL")),
     )
@@ -306,6 +300,7 @@ class TestRun(_Row, Base):
     decision_group: Mapped[uuid.UUID | None] = mapped_column(index=True)  # shared by a decision run's three runs
     mode: Mapped[str]
     model: Mapped[str]
+    company: Mapped[str]  # the product name the prompt is filled with
     prompt_version: Mapped[str]
     retrieval_config: Mapped[dict[str, Any] | None] = mapped_column(NULLABLE_JSON)
     git_sha: Mapped[str]
@@ -338,6 +333,8 @@ class TestResult(_Row, Base):
     kind: Mapped[str | None]
     swapped: Mapped[bool] = mapped_column(server_default=FALSE)
     citations: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, server_default=EMPTY_LIST)
+    # The options offered, when the first reply asked which meaning was meant (ambiguous questions)
+    clarify_options: Mapped[list[str] | None] = mapped_column(NULLABLE_JSON)
     retrieved: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, server_default=EMPTY_LIST)
     retrieval_hit: Mapped[bool | None]
     citation_correct: Mapped[bool | None]

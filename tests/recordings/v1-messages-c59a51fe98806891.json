@@ -1,0 +1,64 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://api.anthropic.com/v1/messages",
+    "body": {
+      "max_tokens": 16000,
+      "messages": [
+        {
+          "role": "user",
+          "content": "<question type=\"ambiguous\">\nHow do I stop getting emails?\n(Asked which one they meant, the customer chose: New login emails)\n</question>\n\n<expected_answer>\n- Gear icon, then Personal settings, then Notifications\n- Under Other emails, turn off Send email notifications for new logins to my account\n</expected_answer>\n\n<help_center_quotes>\n- \"Send email notifications for new logins to my account\" (https://zulip.com/help/email-notifications, Disable new login emails)\n</help_center_quotes>\n\n<answer>\nYou can turn off new login emails in your personal settings. Note that these emails are a security measure, so the help center advises changing your password if you see a login email from a time or device you don't recognize.\n\nTo disable new login emails:\n\n1. Click on the **gear** icon in the upper right corner of the web or desktop app.\n2. Select **Personal settings**.\n3. On the left, click **Notifications**.\n4. Under **Other emails**, toggle **Send email notifications for new logins to my account**.\n\nThe help center notes that all Zulip apps (web, mobile, desktop, and terminal) keep you logged in to any organization you've interacted with in the last 1-2 weeks, so these emails are usually infrequent to begin with.\n\nThe help center doesn't say whether turning off login emails affects any other security notifications.\n\nThe help center doesn't say whether turning off login emails affects any other security notifications.\n</answer>"
+        }
+      ],
+      "model": "claude-opus-5-5",
+      "output_config": {
+        "effort": "high",
+        "format": {
+          "type": "json_schema",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "verdict": {
+                "type": "string",
+                "enum": [
+                  "correct",
+                  "incorrect"
+                ]
+              },
+              "missing_facts": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contradictions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verdict",
+              "missing_facts",
+              "contradictions",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "system": "You are grading a support bot's answer against an expected answer written by\na person who read the help center.\n\nMark the answer correct only if both are true:\n1. It contains every key fact in the expected answer. Different wording is\n   fine. A missing key fact makes it incorrect.\n2. It says nothing that contradicts the expected answer or the quoted\n   help-center text.\n\nExtra correct detail is fine. Ignore style, length and formatting.\n\nIf the question is marked partial, the answer must also:\n3. say that the help center doesn't cover the part of the question it doesn't cover, and\n4. make no claim about the part of the question it doesn't cover.\n\nReturn: verdict (correct or incorrect), missing key facts, contradictions,\nand a one-sentence reason."
+    }
+  },
+  "response": {
+    "status": 200,
+    "content_type": "application/json",
+    "body": [
+      "{\"model\":\"claude-opus-5-5\",\"id\":\"msg_011CfrcdBJ2BdCC5kEYSJiFm\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"thinking\",\"thinking\":\"\",\"signature\":\"CAQS/AoKEAgSGAI4AUIIdGhpbmtpbmcSDCVEdCP1I2WNjyuTlRoMVoWory/FRgljRoaHIjCJ9nkk7hOcYXSGz59vtz32t6CBzyZf8200EwjHJFGvP4ca9Iv2Nwhfr8dFkqDwTtAqmQqhYA8yXzqfUHwb9WVZQO2zBm1TmVy0xBXkh3XAdsX6S080oR8K3RAYa+sVntMXkMxpxoOcK4B7wcv6oKufsSzi5JdNsZQcAUf28veYYmKgkW296PpTafu6NnBO5+srFVaVEDcTAl3UO+9DJcmhyEwAGWsv9EodHU55EXimo2pySa5HMzO5N9Y6sWbp6lTEKAX2LAQ3K8M3pJte1HKINmwrypa/6DID3sZlZqnlUYg5JIXExq3R0qn1J20KG4bXdVgbZ4GljvlvVrUNbhY550Qj0V3KvW0NUDvm8pJ/IJG+8/41UemAk1UHxPJ3fFdgVnO5KkRIoDFBwY46JWWNOlsj2LX4BcFCi4iiEk0adHKwZgZj2iGE6p6dal3E3AUkoEdRVUowhleCqG/XK+9Zguk72c+xPsVehEkUd+qtLHZCaKsTo7yZVDkCY/5lWYkjjVIIf5k6oMGO2YLhOKdWqO0hyuc95OJ2lEicYXFg3zcBff2pwoj44deafooNqWgsLkHwVc4NbCRBlMglOq7QzvF09etNVyHBni6IvGnhc/UFiKVlVvzZWOj0kY+cRYz8YgpeMw74Oif3kdW1JN3nfj5KloQ4cnSoo9JuFPwhYoqtsP6y40lMQsPAxVaIn2OvsGJzKum2+vBUhSHKDsMr9+yRtE7o2knBJIQQPETFrJwSnurDZXGsmOuT0/tgM0wFnnCiyPCI3CIZELyYrzuoomRn9eSHmDxFHe0NFycw1AgvFxQu+sLdhsdwe8ffL8Q0NIFPB0jJpy5FHzLZDC0LgYyDIIRt78gzOK/LskKJ08mC+zDVkNL7HEIJ1aIhDTz8XJ15fbAaqvETIkRg1FseVvxO1H/38Q/HI0hJ2c+GboSDWJlknzKpckyXNcdhz1sntLbBHjiTDJ5IluL9ZdE1Syjd2rwRH8UA3G2W2NTcnRtp21PJR32Qf/MU4TUUm/oCieaEQkftc1oMVeKG2hZ+uzJWrPvoeT/bLNILIbA77Uzf3sVkJZ+1aAkhC4BgcOqT5qIBnbniXB5KHeeih04qoP9Bpp/R28QhXwsaie1hgAQpoJhTWHuH2rUYJD7uYz2WTNlj1+WJfQu5Bih/qPeztyAShV9/DKJOyiAEeatsBXHLs+TbFEkQ6ETLm38wJfT6IUHZdw8EP24oMeSom4kyqc0Bg1ffpRjglGUakcmHdY7Cc12Sc1lV+NEh7RQNHCWDCfWLoPsrJZS27j1Lhep2eLopKiS0rXvTVY9jMOHg+BNaaWZZjFS+7B0T1tuYPlwrob9sFtXz+/TkCJCHPQXMpLcZvHrDQEwfX+v/NoKnHeRChBxflSUQRpk/45hAjcHj6i7QqFnZ0WpfN+XvFhO/qNxK78Hms2x4roSUb0+nWbq19U6gNndkMfZOQt2TG0cOanY20vpXZ/AJEAcVXQd4klDl7VLF3rUKgX9BhimYPP/IfqfF78O6zChgnPZCR4aBnomkcN78dVtJvE3CUNhYOAbS6E4GeusDQ5eMylTO+QZ9MMBx6IcK37Jav6792VgHsh3pY2Gl8GOQXb+KBaNaksQ76+mI2eW7M+1VDiAfJtpwGyVNG04KH2+60B4Q9OZq+9CulXzd4uBd+uDJcToZBPEZUwfqqNXcTbJM4cBmoVWEJS/YVrrHexeyWbtFRa3RTdEr97onL96ZJZJ5qSveWdgNMNjf/cuYvnW04q1Apbjad3Ea+yxgbAVXSSy42+6sgL/B/eLjgCWsIdsYAQ==\"},{\"type\":\"text\",\"text\":\"{\\\"verdict\\\":\\\"correct\\\",\\\"missing_facts\\\":[],\\\"contradictions\\\":[],\\\"reason\\\":\\\"The answer gives the full path (gear icon, Personal settings, Notifications) and says to toggle the new-login email setting under Other emails; its extra details don't contradict the expected answer or the quoted help-center text.\\\"}\"}],\"container\":null,\"stop_reason\":\"end_turn\",\"stop_sequence\":null,\"stop_details\":null,\"usage\":{\"input_tokens\":1039,\"cache_creation_input_tokens\":0,\"cache_read_input_tokens\":0,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":0},\"output_tokens\":382,\"output_tokens_details\":{\"thinking_tokens\":280},\"service_tier\":\"standard\",\"inference_geo\":\"global\"},\"diagnostics\":null}"
+    ]
+  }
+}
