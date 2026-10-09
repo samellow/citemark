@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://api.voyageai.com/v1/rerank",
+    "body": {
+      "query": "how do I keep track of an important message",
+      "documents": [
+        "Delete a message › Delete a message completely\n\nIn some cases, such as when a message accidentally shares secret information, or contains spam or abuse, it makes sense to delete a message completely.",
+        "Star a message › Star a message\n\n**Desktop/Web:**\n1. Hover over a message to reveal three icons on the right.\n2. Click the **star** icon.\n\n**Tip:** You can unstar a message using the same instructions used to star it."
+      ],
+      "model": "rerank-3",
+      "top_k": 2
+    }
+  },
+  "response": {
+    "status": 200,
+    "content_type": "application/json",
+    "body": [
+      "{\"object\":\"list\",\"data\":[{\"relevance_score\":0.66015625,\"index\":1},{\"relevance_score\":0.306640625,\"index\":0}],\"model\":\"rerank-3\",\"usage\":{\"total_tokens\":104}}"
+    ]
+  }
+}

@@ -8,6 +8,7 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 COPY README.md LICENSE NOTICE alembic.ini ./
+COPY prompts ./prompts
 COPY src ./src
 RUN uv sync --frozen --no-dev
 

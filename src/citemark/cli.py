@@ -56,6 +56,7 @@ def _with_db[T](work: Callable[..., Awaitable[T]]) -> T:
     from citemark.db.session import make_engine
     from citemark.embed import EmbedError
     from citemark.ingest import IngestError
+    from citemark.retrieve import RetrievalError
 
     async def main() -> T:
         engine = make_engine()
@@ -66,7 +67,7 @@ def _with_db[T](work: Callable[..., Awaitable[T]]) -> T:
 
     try:
         return asyncio.run(main())
-    except (IngestError, EmbedError) as exc:
+    except (IngestError, EmbedError, RetrievalError) as exc:
         _fail(str(exc))
 
 
@@ -319,3 +320,45 @@ def sources_upload(
     )
     if result.failed:
         _fail("\n".join(result.problems))
+
+
+@app.command("search")
+def search(
+    question: Annotated[str, typer.Argument(help="A question, as a customer would ask it.")],
+    top_k: Annotated[int | None, typer.Option(help="How many passages to show. Default: the setting.")] = None,
+    rerank: Annotated[
+        bool | None, typer.Option("--rerank/--no-rerank", help="Rerank, or keep the fused order. Default: the setting.")
+    ] = None,
+) -> None:
+    """Show the passages the bot would be given for a question, with their scores. Calls Voyage."""
+    import httpx2
+
+    from citemark.db.session import make_sessionmaker
+    from citemark.embed.voyage import VoyageEmbedder, VoyageReranker
+    from citemark.retrieve import RetrievalConfig, load_config
+    from citemark.retrieve.search import retrieve
+
+    key = _voyage_key()
+
+    async def run(engine):
+        async with make_sessionmaker(engine)() as session, httpx2.AsyncClient() as api:
+            saved = await load_config(session)
+            changes = {name: value for name, value in {"top_k": top_k, "rerank": rerank}.items() if value is not None}
+            config = RetrievalConfig.model_validate({**saved.model_dump(), **changes})
+            reranker = VoyageReranker(key, api, model=config.reranker) if config.rerank else None
+            embedder = VoyageEmbedder(key, api)
+            return await retrieve(session, question, embedder=embedder, reranker=reranker, config=config)
+
+    result = _with_db(run)
+    if not result.hits:
+        typer.echo("No passages found. Is a source indexed? citemark sources list shows them.")
+        return
+    for hit in result.hits:
+        named = (("rerank", hit.rerank_score), ("vector", hit.vector_score), ("keyword", hit.keyword_score))
+        scores = [f"{name} {value:.3f}" for name, value in named if value is not None]
+        typer.echo(f"{hit.rank}. {hit.heading_path}")
+        typer.echo(f"   {hit.anchor_url or hit.url}")
+        typer.echo("   " + " \u00b7 ".join(scores))
+    typer.echo(
+        f"Voyage counted {result.embed_tokens:,} tokens to embed the question and {result.rerank_tokens:,} to rerank."
+    )

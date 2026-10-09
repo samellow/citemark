@@ -9,7 +9,7 @@ import httpx2
 import pytest
 
 from citemark.embed import EmbedError
-from citemark.embed.voyage import MAX_BATCH, VoyageEmbedder
+from citemark.embed.voyage import MAX_BATCH, VoyageEmbedder, VoyageReranker
 
 # From Zulip's help center as saved on 2026-10-06 (fixtures/zulip/text/)
 STAR = (
@@ -142,3 +142,64 @@ async def test_voyage_puts_a_question_nearest_the_passage_that_answers_it(record
     star, delete = (cosine(query.vectors[0], vector) for vector in documents.vectors)
     assert star > delete
     assert documents.tokens > 0
+
+
+def ranked(*pairs: tuple[int, float], tokens: int = 40) -> httpx2.Response:
+    data = [{"index": index, "relevance_score": score} for index, score in pairs]
+    body = {"object": "list", "data": data, "model": "rerank-3", "usage": {"total_tokens": tokens}}
+    return httpx2.Response(200, json=body)
+
+
+def reranker_answering(*answers: httpx2.Response, seen: list | None = None):
+    queue = list(answers)
+
+    def handle(request: httpx2.Request) -> httpx2.Response:
+        if seen is not None:
+            seen.append(request)
+        return queue.pop(0)
+
+    client = httpx2.AsyncClient(transport=httpx2.MockTransport(handle))
+    return client, VoyageReranker("voyage-key", client, sleep=Waits())
+
+
+@pytest.mark.anyio
+async def test_the_reranker_asks_for_rerank_3_and_returns_the_best_first():
+    seen: list[httpx2.Request] = []
+    client, reranker = reranker_answering(ranked((1, 0.2), (0, 0.9)), seen=seen)
+    async with client:
+        ranking = await reranker.rerank("how do I keep track of a message", [STAR, DELETE, "a third passage"], 2)
+    assert json.loads(seen[0].content) == {
+        "query": "how do I keep track of a message",
+        "documents": [STAR, DELETE, "a third passage"],
+        "model": "rerank-3",
+        "top_k": 2,
+    }
+    assert ranking.results == [(0, 0.9), (1, 0.2)] and ranking.tokens == 40
+
+
+@pytest.mark.anyio
+async def test_a_reranking_that_names_a_passage_never_sent_is_refused():
+    client, reranker = reranker_answering(ranked((0, 0.9), (7, 0.5)))
+    async with client:
+        with pytest.raises(EmbedError, match="named passages that weren't sent"):
+            await reranker.rerank("question", [STAR, DELETE], 2)
+
+
+@pytest.mark.anyio
+async def test_no_passages_means_no_call():
+    client, reranker = reranker_answering()
+    async with client:
+        assert (await reranker.rerank("question", [], 5)).results == []
+
+
+@pytest.mark.anyio
+async def test_rerank_3_puts_the_passage_that_answers_first(recorded_transport, recording):
+    """A recorded reply from the real API."""
+    from citemark.settings import get_settings
+
+    key = get_settings().voyage_api_key if recording else None
+    async with httpx2.AsyncClient(transport=recorded_transport) as client:
+        reranker = VoyageReranker(key.get_secret_value() if key else "replayed", client)
+        ranking = await reranker.rerank("how do I keep track of an important message", [DELETE, STAR], 2)
+    assert [index for index, _ in ranking.results] == [1, 0]
+    assert ranking.results[0][1] > ranking.results[1][1] and ranking.tokens > 0

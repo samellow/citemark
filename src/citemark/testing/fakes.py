@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import hashlib
+import re
 from collections.abc import Sequence
 
 from citemark.db.models import EMBEDDING_DIMENSIONS
-from citemark.embed import Embeddings, EmbedError
+from citemark.embed import Embeddings, EmbedError, Ranking
 from citemark.ingest.chunk import estimate_tokens
 
 
@@ -37,3 +38,23 @@ class FakeEmbedder:
 
     async def embed_query(self, text: str) -> Embeddings:
         return await self.embed_documents([text])
+
+
+def _words(text: str) -> set[str]:
+    return set(re.findall(r"[a-z0-9]+", text.lower()))
+
+
+class FakeReranker:
+    """Scores each passage by the share of the question's words it holds, for tests about the
+    order of the steps rather than the reranker's judgement. Ties keep the order passages came in."""
+
+    def __init__(self, model: str = "rerank-3") -> None:
+        self.model = model
+        self.calls: list[tuple[str, list[str]]] = []
+
+    async def rerank(self, query: str, documents: Sequence[str], top_k: int) -> Ranking:
+        self.calls.append((query, list(documents)))
+        wanted = _words(query)
+        scores = [(index, len(wanted & _words(text)) / max(1, len(wanted))) for index, text in enumerate(documents)]
+        scores.sort(key=lambda pair: -pair[1])
+        return Ranking(scores[:top_k], sum(estimate_tokens(query) + estimate_tokens(text) for text in documents))

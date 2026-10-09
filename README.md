@@ -2,7 +2,7 @@
 
 A support bot for SaaS help centers that ships with proof it works: a test report, run on the client's own help center, showing how often the bot answers correctly, shows the right source, and says so when the help center doesn't cover a question. Each client runs their own copy in their own hosting account. MIT-licensed.
 
-**Status: early.** The demo's 50 test questions were frozen on 2026-10-08, before any bot code exists, so the published results can't be fitted to them. The tag `zulip-v1-frozen` marks that commit. The bot can load a help center and keep it up to date, but it can't answer questions yet.
+**Status: early.** The demo's 50 test questions were frozen on 2026-10-08, before any bot code exists, so the published results can't be fitted to them. The tag `zulip-v1-frozen` marks that commit. The bot can load a help center, keep it up to date and find the passages that answer a question, but it can't write answers yet.
 
 ## What's here so far
 
@@ -22,7 +22,12 @@ A support bot for SaaS help centers that ships with proof it works: a test repor
   - Each section becomes a passage that starts with its headings and links to its anchor.
   - It's polite: robots.txt, at most 2 requests a second, and only the source's own pages. It never connects to a private or internal address, including after a redirect.
   - Re-indexing embeds only pages that changed, so an unchanged site costs nothing. A page that fails keeps its old passages, and a page only counts as removed after a crawl that reached every page.
-- `src/citemark/embed/`: embeddings, with Voyage's `voyage-4` behind a small interface.
+- `src/citemark/embed/`: embeddings and reranking, with Voyage's `voyage-4` and `rerank-3` behind small interfaces.
+- `src/citemark/retrieve/` and `citemark search "question"`: the passages the bot would be given for a question, with their scores.
+  - The question is searched two ways, by meaning and by its words. The two lists are merged by reciprocal rank fusion, and a reranker picks the best 5.
+  - A follow-up ("how do I turn that off?") is first rewritten to stand alone, using `prompts/rewrite.v1.md`.
+  - Full-context mode gathers every passage instead, and is refused for a model whose window can't hold them.
+  - The same passages always give the same results, so two test runs differ only in what changed.
 
 ## Running it locally
 

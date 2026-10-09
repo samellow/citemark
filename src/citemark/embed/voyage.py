@@ -1,4 +1,5 @@
-"""Voyage AI embeddings (PRD 3: `voyage-4`, 1024 dimensions), called through its REST API.
+"""Voyage AI (PRD 3): `voyage-4` embeddings at 1024 dimensions, and `rerank-3` reranking,
+called through its REST API.
 
 Through `httpx2` rather than Voyage's SDK, so the recorded replies in tests (QA plan 3.2)
 work as they do for Claude, and the image doesn't carry the SDK's dependencies (implementation
@@ -16,10 +17,14 @@ import anyio
 import httpx2
 
 from citemark.db.models import EMBEDDING_DIMENSIONS
-from citemark.embed import Embeddings, EmbedError
+from citemark.embed import Embeddings, EmbedError, Ranking
 
 API_URL = "https://api.voyageai.com/v1/embeddings"
+RERANK_URL = "https://api.voyageai.com/v1/rerank"
 MODEL = "voyage-4"
+# PRD Q3 chose rerank-2.5; on 2026-10-09 Voyage listed it as legacy and rerank-3 as its "highest
+# accuracy" model, at the same price ($0.05 per million tokens) and context (32K).
+RERANK_MODEL = "rerank-3"
 # Voyage takes up to 1,000 texts and 320K tokens a call for voyage-4. Calls are kept much
 # smaller, so an account on a low rate limit isn't sent a call it can never accept: a 128-passage
 # call was refused with 429 five times running on the first live crawl (2026-10-08). Small calls
@@ -39,6 +44,32 @@ def _retry_after(value: str | None) -> float | None:
         return min(MAX_RETRY_AFTER, max(0.0, float(value))) if value else None
     except ValueError:
         return None
+
+
+async def _post(client: httpx2.AsyncClient, url: str, body: dict, api_key: str, sleep) -> dict:
+    """One call to Voyage, tried again while it's busy (429) or failing (5xx)."""
+    headers = {"Authorization": f"Bearer {api_key}"}
+    for attempt in range(1, ATTEMPTS + 1):
+        last = attempt == ATTEMPTS
+        try:
+            response = await client.post(url, json=body, headers=headers, timeout=TIMEOUT)
+        except httpx2.TransportError as exc:
+            if last:
+                raise EmbedError(f"Voyage didn't answer after {ATTEMPTS} tries ({type(exc).__name__}).") from exc
+            await sleep(SERVER_WAITS[attempt - 1])
+            continue
+        if response.status_code == 429 or response.status_code >= 500:
+            if last:
+                raise EmbedError(f"Voyage answered with status {response.status_code} after {ATTEMPTS} tries.")
+            waits = RATE_LIMIT_WAITS if response.status_code == 429 else SERVER_WAITS
+            await sleep(_retry_after(response.headers.get("retry-after")) or waits[attempt - 1])
+            continue
+        if response.status_code in (401, 403):
+            raise EmbedError("Voyage refused the API key. Check VOYAGE_API_KEY.")
+        if response.status_code != 200:
+            raise EmbedError(f"Voyage answered with status {response.status_code}: {response.text[:200]}")
+        return response.json()
+    raise AssertionError("unreachable")
 
 
 class VoyageEmbedder:
@@ -68,28 +99,7 @@ class VoyageEmbedder:
             "output_dimension": self.dimensions,
             "encoding_format": "base64",
         }
-        headers = {"Authorization": f"Bearer {self._api_key}"}
-        for attempt in range(1, ATTEMPTS + 1):
-            last = attempt == ATTEMPTS
-            try:
-                response = await self._client.post(API_URL, json=body, headers=headers, timeout=TIMEOUT)
-            except httpx2.TransportError as exc:
-                if last:
-                    raise EmbedError(f"Voyage didn't answer after {ATTEMPTS} tries ({type(exc).__name__}).") from exc
-                await self._sleep(SERVER_WAITS[attempt - 1])
-                continue
-            if response.status_code == 429 or response.status_code >= 500:
-                if last:
-                    raise EmbedError(f"Voyage answered with status {response.status_code} after {ATTEMPTS} tries.")
-                waits = RATE_LIMIT_WAITS if response.status_code == 429 else SERVER_WAITS
-                await self._sleep(_retry_after(response.headers.get("retry-after")) or waits[attempt - 1])
-                continue
-            if response.status_code in (401, 403):
-                raise EmbedError("Voyage refused the API key. Check VOYAGE_API_KEY.")
-            if response.status_code != 200:
-                raise EmbedError(f"Voyage answered with status {response.status_code}: {response.text[:200]}")
-            return self._read(response.json(), len(texts))
-        raise AssertionError("unreachable")
+        return self._read(await _post(self._client, API_URL, body, self._api_key, self._sleep), len(texts))
 
     def _read(self, data: dict, count: int) -> Embeddings:
         items = sorted(data.get("data", []), key=lambda item: item["index"])
@@ -111,3 +121,23 @@ class VoyageEmbedder:
         if len(vector) != self.dimensions or not all(math.isfinite(value) for value in vector):
             raise EmbedError(f"Voyage returned an embedding that isn't {self.dimensions} numbers.")
         return vector
+
+
+class VoyageReranker:
+    """Reorders passages by how well each answers the question, and keeps the best `top_k`."""
+
+    def __init__(self, api_key: str, client: httpx2.AsyncClient, *, model: str = RERANK_MODEL, sleep=anyio.sleep):
+        self.model = model
+        self._api_key, self._client, self._sleep = api_key, client, sleep
+
+    async def rerank(self, query: str, documents: Sequence[str], top_k: int) -> Ranking:
+        if not documents:
+            return Ranking([], 0)
+        body = {"query": query, "documents": list(documents), "model": self.model, "top_k": min(top_k, len(documents))}
+        data = await _post(self._client, RERANK_URL, body, self._api_key, self._sleep)
+        results = [(int(item["index"]), float(item["relevance_score"])) for item in data.get("data", [])]
+        indexes = [index for index, _ in results]
+        if len(set(indexes)) != len(indexes) or not all(0 <= index < len(documents) for index in indexes):
+            raise EmbedError("Voyage's reranking named passages that weren't sent.")
+        results.sort(key=lambda pair: -pair[1])
+        return Ranking(results[:top_k], int(data.get("usage", {}).get("total_tokens", 0)))
