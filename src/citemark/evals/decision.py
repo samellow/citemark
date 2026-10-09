@@ -10,9 +10,11 @@ median, the middle of the three, and shows its range.
   only from the commit it started on (PRD Q17), so the recorded commit reproduces every answer.
 - **The grading queue:** a question the judge graded differently across the three runs goes to
   you. You grade each of its answers, since each run's answer is different text, and your grade
-  replaces the judge's on those answers only (PRD Q16). Until the queue is graded, the decision
-  is provisional: it counts the judge's verdicts on the answers still waiting, and the command
-  holds back the correct-answers line, whose range would hint at them.
+  replaces the judge's on those answers only (PRD Q16). A grade counts once it's locked, which
+  happens when its grading sheet is completed (PRD Q18), so a result can't be seen and then
+  graded toward. Until then the decision is provisional: it counts the judge's verdicts on the
+  answers still waiting, and the command holds back the correct-answers line, whose range would
+  hint at them.
 - **The budget** covers all three runs, a third each, so one run can't spend another's share.
   The runs go one after another, each 4 questions at a time.
 """
@@ -269,7 +271,7 @@ class QueueEntry:
     question: str  # the test question's ID
     run: int  # 1 to 3
     result_id: uuid.UUID
-    grade: str | None  # yours, once given
+    grade: str | None  # yours, once locked: a grade still open to change doesn't count yet
 
 
 @dataclass(frozen=True)
@@ -306,7 +308,7 @@ async def decision(session: AsyncSession, group: uuid.UUID) -> Decision:
         select(func.count()).select_from(TestQuestion).where(TestQuestion.test_set_id == runs[0].test_set_id)
     )
     rows = await session.execute(
-        select(TestResult, TestQuestion, HumanGrade.verdict)
+        select(TestResult, TestQuestion, HumanGrade.verdict, HumanGrade.locked_at)
         .join(TestQuestion, TestResult.test_question_id == TestQuestion.id)
         .outerjoin(HumanGrade, HumanGrade.test_result_id == TestResult.id)
         .where(TestResult.test_run_id.in_([run.id for run in runs]))
@@ -316,8 +318,9 @@ async def decision(session: AsyncSession, group: uuid.UUID) -> Decision:
     number = {run.id: position for position, run in enumerate(runs, 1)}
     by_run: dict[int, list[tuple[TestResult, TestQuestion, str | None]]] = defaultdict(list)
     verdicts: dict[str, list[str | None]] = defaultdict(list)
-    for result, question, grade in rows:
-        by_run[number[result.test_run_id]].append((result, question, grade))
+    for result, question, grade, locked_at in rows:
+        locked = grade if locked_at is not None else None  # only a locked grade counts
+        by_run[number[result.test_run_id]].append((result, question, locked))
         verdicts[question.ext_id].append(result.judge_verdict)
     for position in range(1, RUNS + 1):
         if len(by_run[position]) != total:

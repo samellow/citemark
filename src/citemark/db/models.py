@@ -349,6 +349,9 @@ class TestResult(_Row, Base):
 
 
 class HumanGrade(_Row, Base):
+    """Your grade on one answer. It locks when its grading sheet is completed, and the database
+    then refuses to change it (PRD Q18)."""
+
     __tablename__ = "human_grade"
     __table_args__ = (one_of("verdict", VERDICTS),)
 
@@ -356,6 +359,7 @@ class HumanGrade(_Row, Base):
     verdict: Mapped[str]
     note: Mapped[str] = mapped_column(server_default="")
     graded_at: Mapped[dt.datetime] = mapped_column(server_default=func.now())
+    locked_at: Mapped[dt.datetime | None]
 
 
 class Report(_Row, Base):

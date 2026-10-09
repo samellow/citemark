@@ -184,6 +184,7 @@ def test_the_command_lists_the_answers_waiting_without_the_judges_verdicts(capsy
     ]
     out = printed(capsys, queue, MEASURED)
     assert "Waiting for your grade: Q001 (runs 1, 2 and 3), Q007 (run 3)." in out
+    assert "Grade them with: citemark grade " in out
     assert "provisional" in out
     assert "incorrect" not in out
     # the correct-answers range would hint at how the judge split, so it waits too

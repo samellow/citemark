@@ -279,6 +279,7 @@ def _print_decision(found) -> None:
         waiting = {q: [e.run for e in found.waiting if e.question == q] for q in questions}
         if listing := ", ".join(f"{q} ({_runs_text(runs)})" for q, runs in waiting.items() if runs):
             typer.echo(f"  Waiting for your grade: {listing}. Until they're graded, the decision is provisional.")
+            typer.echo(f"  Grade them with: citemark grade {found.group}")
         else:
             typer.echo("  Every answer in the queue is graded, so your grades count.")
     typer.echo(f"  Spent: ${found.spent:.4f} at list prices, of a ${found.budget:.2f} budget.")
@@ -530,6 +531,138 @@ def decision_summary(
             return await deciding.decision(session, await deciding.find_group(session, found))
 
     _print_decision(_with_db(work))
+
+
+CHOICES = {"c": "correct", "correct": "correct", "i": "incorrect", "incorrect": "incorrect"}
+CHOICES |= {"s": "skip", "skip": "skip", "q": "quit", "quit": "quit"}
+
+
+def _choice(typed: str) -> str | None:
+    return CHOICES.get(typed.strip().lower())
+
+
+def _card(item, position: int, total: int) -> str:
+    """One answer as you grade it: what the judge read, and nothing it said."""
+    where = f", run {item.run}" if item.run else ""
+    lines = [f"\nAnswer {position} of {total}: {item.question}{where} ({item.qtype})", f"  Question: {item.asked}"]
+    if item.option:
+        lines.append(f"  Asked which one they meant, the customer chose: {item.option}")
+    lines.append("  Expected answer:")
+    lines += [f"    - {fact}" for fact in item.expected_answer]
+    if item.uncovered_part:
+        lines.append(f"  Not covered by the help center: {item.uncovered_part}")
+    lines.append("  Help-center quotes:")
+    lines += [f'    - "{source["quote"]}" ({source["url"]}, {source["section"]})' for source in item.sources]
+    lines.append("  The bot's answer:")
+    lines += [f"    {line}" if line else "" for line in item.answer.splitlines()]
+    if item.grade:
+        lines.append(f"  Your grade so far: {item.grade}" + (f" ({item.note})" if item.note else ""))
+    return "\n".join(lines)
+
+
+async def _grade_items(sessions, items, *, ask: Callable[[str], str], echo: Callable[[str], None]) -> int:
+    """Show each answer and record your grade as you give it, so stopping loses nothing.
+    Returns how many were graded."""
+    from citemark.evals import grading
+
+    given = 0
+    for position, item in enumerate(items, 1):
+        echo(_card(item, position, len(items)))
+        while (choice := _choice(ask("Correct or incorrect? c, i, or s to skip, q to stop"))) is None:
+            echo("  Type c, i, s or q.")
+        if choice == "quit":
+            break
+        if choice == "skip":
+            continue
+        typed = ask("Note (Enter keeps it, - removes it)" if item.note else "Note (Enter for none)").strip()
+        note = "" if typed == "-" else typed or item.note
+        async with sessions() as session, session.begin():
+            await grading.record(session, item.result_id, choice, note)
+        given += 1
+    return given
+
+
+def _print_agreement(found, graded) -> None:
+    which = "sampled answers" if graded.kind == "sample" else "answers"
+    met = "met" if found.meets_target else "not met"
+    typer.echo(
+        f"\nYou and the judge agreed on {found.agreed} of {found.graded} {which} ({found.percent}%, rounded down). "
+        f"The 90% target is {met}."
+    )
+    for item in found.disagreements:
+        typer.echo(f"  {item.question}: you said {item.yours}, the judge said {item.judges}. Its reason: {item.reason}")
+    if not found.meets_target:
+        typer.echo(
+            "Under 90%, the judge isn't trusted yet. Fix the rubric as a new version, then measure agreement again "
+            "on a fresh run's answers, not these: the fix was written while looking at them."
+        )
+
+
+@app.command("grade")
+def grade(
+    target: Annotated[str, typer.Argument(help="A run, or a decision run's ID to grade its queue.")],
+    sample: Annotated[
+        bool,
+        typer.Option(
+            "--sample",
+            help="Grade 10 of the run's answers, picked the same way every time: the re-check each answer model gets.",
+        ),
+    ] = False,
+    again: Annotated[
+        bool,
+        typer.Option("--again", help="Show answers you've graded too, to change a grade before the sheet is complete."),
+    ] = False,
+) -> None:
+    """Grade a run's answers yourself, blind to the judge, then see how often you agreed. Calls no API."""
+    from citemark.db.session import make_sessionmaker
+    from citemark.evals import decision as deciding
+    from citemark.evals import grading
+
+    try:
+        found = uuid.UUID(target)
+    except ValueError:
+        _fail(f"{target} isn't a run ID.")
+
+    def ask(text: str) -> str:
+        return typer.prompt(text, default="", show_default=False)
+
+    async def work(engine):
+        sessions = make_sessionmaker(engine)
+        async with sessions() as session:
+            graded = await grading.sheet(session, found, sample=sample)
+        todo = grading.to_grade(graded, again=again)
+        if todo:
+            typer.echo(
+                f"{len(todo)} to grade, of {len(graded.items)} on this sheet. Grade each against the rubric in "
+                f"prompts/{graded.rubric}.md, as the judge does. Its verdicts are shown once every answer is "
+                "graded, and the grades then lock."
+            )
+            await _grade_items(sessions, todo, ask=ask, echo=typer.echo)
+        async with sessions() as session, session.begin():
+            graded = await grading.sheet(session, found, sample=sample)
+            if graded.complete:
+                await grading.lock(session, graded)
+        if not graded.complete:
+            return graded, None, None
+        async with sessions() as session:
+            graded = await grading.sheet(session, found, sample=sample)
+            if graded.kind == "queue":
+                return graded, None, await deciding.decision(session, found)
+            return graded, await grading.agreement(session, graded), None
+
+    graded, agreed, decided = _with_db(work)
+    if not graded.complete:
+        flag = " --sample" if sample else ""
+        typer.echo(
+            f"\n{graded.graded} of {len(graded.items)} graded. The judge's verdicts are shown once every answer is "
+            f"graded. Carry on with: citemark grade {target}{flag}"
+        )
+        return
+    if decided is not None:
+        typer.echo("\nEvery answer in the queue is graded, and the grades are locked.")
+        _print_decision(decided)
+        return
+    _print_agreement(agreed, graded)
 
 
 @jobs_app.command("work")

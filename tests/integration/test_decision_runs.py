@@ -5,19 +5,28 @@ The scripted answerer and judge from the runner's tests make each case exact and
 that changes its verdict from run to run stands in for the real one's variation.
 """
 
-from collections import Counter
 from decimal import Decimal
 
 import pytest
-from scripted_run import QUESTIONS, SCRIPT, SHA, Scripted, frozen_set, no_wait, results, services, stocked
-from sqlalchemy import update
+from scripted_run import (
+    QUESTIONS,
+    SCRIPT,
+    SHA,
+    Scripted,
+    Varying,
+    finished,
+    frozen_set,
+    grouped,
+    no_wait,
+    results,
+    services,
+)
+from sqlalchemy import func, update
 
 from citemark.db.models import HumanGrade, TestResult, TestRun
-from citemark.evals import judge as judging
 from citemark.evals.decision import (
     DecisionError,
     Spread,
-    create_group,
     decision,
     find_group,
     finish_group,
@@ -25,51 +34,14 @@ from citemark.evals.decision import (
     mismatched,
 )
 from citemark.evals.runner import RunError, run_tests
-from citemark.retrieve import RetrievalConfig
 
 NOWHERE = "postgresql://nobody@localhost:1/none"  # a closed port
 
 
-class Varying:
-    """A judge whose verdict on a question changes from run to run: `incorrect` maps a
-    question's ID to the runs (1 to 3) in which its answer is graded incorrect."""
-
-    def __init__(self, incorrect: dict[str, set[int]]):
-        self.incorrect = {QUESTIONS[int(key[1:]) - 1]["question"]: runs for key, runs in incorrect.items()}
-        self.calls: Counter[str] = Counter()
-
-    async def __call__(self, **asked) -> judging.Verdict:
-        question = asked["question"].split("\n")[0]  # an ambiguous question carries the option chosen
-        self.calls[question] += 1
-        verdict = "incorrect" if self.calls[question] in self.incorrect.get(question, ()) else "correct"
-        return judging.Verdict(verdict, [], [], "Scripted.", 100, 50, {"verdict": verdict})
-
-
-async def grouped(session, path, *, budget="6", sha=SHA) -> list[TestRun]:
-    test_set = await stocked(session, path)
-    runs = await create_group(
-        session,
-        test_set,
-        mode="retrieval",
-        answerer=Scripted(SCRIPT),
-        config=RetrievalConfig(),
-        budget_usd=Decimal(budget),
-        sha=sha,
-    )
-    await session.commit()
-    return runs
-
-
-async def finished(session, sessions, path, judge) -> list[TestRun]:
-    runs = await grouped(session, path)
-    await finish_group(
-        runs[0].decision_group, sessions=sessions, services=services(Scripted(SCRIPT), judge=judge), sha=SHA, parallel=1
-    )
-    return runs
-
-
-async def grade(session, run: TestRun, question: str, verdict: str) -> None:
-    session.add(HumanGrade(test_result_id=(await results(session, run.id))[question].id, verdict=verdict))
+async def grade(session, run: TestRun, question: str, verdict: str, *, locked: bool = True) -> None:
+    """Your grade, locked as completing its sheet would lock it (PRD Q18)."""
+    found = (await results(session, run.id))[question]
+    session.add(HumanGrade(test_result_id=found.id, verdict=verdict, locked_at=func.now() if locked else None))
     await session.commit()
 
 
@@ -155,6 +127,16 @@ async def test_until_its_graded_the_judges_verdict_counts(session, sessions, tmp
     found = await decision(session, runs[0].decision_group)
     assert found.measures["correct_answers"] == Spread(median=2, low=2, high=3, total=3)
     assert [entry.run for entry in found.waiting] == [2, 3]
+
+
+@pytest.mark.anyio
+async def test_a_grade_counts_only_once_its_locked(session, sessions, tmp_path):
+    runs = await finished(session, sessions, frozen_set(tmp_path), Varying({"Q001": {2}}))
+    for run in runs:  # every answer graded, but the sheet never completed and locked
+        await grade(session, run, "Q001", "incorrect", locked=False)
+    found = await decision(session, runs[0].decision_group)
+    assert found.measures["correct_answers"] == Spread(median=3, low=2, high=3, total=3)  # still the judge's
+    assert [entry.run for entry in found.waiting] == [1, 2, 3] and found.provisional
 
 
 @pytest.mark.anyio

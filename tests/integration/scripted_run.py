@@ -3,6 +3,7 @@ decision runs: each case is exact and free. The questions are written for these 
 Zulip articles the frozen test set doesn't use."""
 
 import datetime as dt
+from collections import Counter
 from decimal import Decimal
 from pathlib import Path
 
@@ -15,6 +16,7 @@ from zulip_subset import add_zulip
 from citemark.db.models import Price, TestQuestion, TestResult, TestRun, TestSet
 from citemark.evals import judge as judging
 from citemark.evals import testset
+from citemark.evals.decision import create_group, finish_group
 from citemark.evals.runner import Services, create_run, load_test_set
 from citemark.models import CitationEvent, DecisionEvent, ModelCallFailed, TextEvent, UsageEvent
 from citemark.retrieve import RetrievalConfig
@@ -177,3 +179,41 @@ async def results(session, run_id) -> dict[str, TestResult]:
         .where(TestResult.test_run_id == run_id)
     )
     return {ext_id: result for ext_id, result in rows}
+
+
+class Varying:
+    """A judge whose verdict on a question changes from run to run: `incorrect` maps a
+    question's ID to the runs (1 to 3) in which its answer is graded incorrect."""
+
+    def __init__(self, incorrect: dict[str, set[int]]):
+        self.incorrect = {QUESTIONS[int(key[1:]) - 1]["question"]: runs for key, runs in incorrect.items()}
+        self.calls: Counter[str] = Counter()
+
+    async def __call__(self, **asked) -> judging.Verdict:
+        question = asked["question"].split("\n")[0]  # an ambiguous question carries the option chosen
+        self.calls[question] += 1
+        verdict = "incorrect" if self.calls[question] in self.incorrect.get(question, ()) else "correct"
+        return judging.Verdict(verdict, [], [], "Scripted.", 100, 50, {"verdict": verdict})
+
+
+async def grouped(session, path, *, budget="6", sha=SHA) -> list[TestRun]:
+    test_set = await stocked(session, path)
+    runs = await create_group(
+        session,
+        test_set,
+        mode="retrieval",
+        answerer=Scripted(SCRIPT),
+        config=RetrievalConfig(),
+        budget_usd=Decimal(budget),
+        sha=sha,
+    )
+    await session.commit()
+    return runs
+
+
+async def finished(session, sessions, path, judge) -> list[TestRun]:
+    runs = await grouped(session, path)
+    await finish_group(
+        runs[0].decision_group, sessions=sessions, services=services(Scripted(SCRIPT), judge=judge), sha=SHA, parallel=1
+    )
+    return runs
