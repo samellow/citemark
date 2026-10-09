@@ -53,9 +53,11 @@ def _fail(message: str) -> NoReturn:
 def _with_db[T](work: Callable[..., Awaitable[T]]) -> T:
     """Run `work(engine)` against the database, printing an ingestion or embedding error as one
     plain sentence."""
+    from citemark.costs import PriceMissing
     from citemark.db.session import make_engine
     from citemark.embed import EmbedError
     from citemark.ingest import IngestError
+    from citemark.models.registry import ModelError
     from citemark.retrieve import RetrievalError
 
     async def main() -> T:
@@ -67,8 +69,17 @@ def _with_db[T](work: Callable[..., Awaitable[T]]) -> T:
 
     try:
         return asyncio.run(main())
-    except (IngestError, EmbedError, RetrievalError) as exc:
+    except (IngestError, EmbedError, RetrievalError, ModelError, PriceMissing) as exc:
         _fail(str(exc))
+
+
+def _anthropic_key() -> str:
+    from citemark.settings import get_settings
+
+    key = get_settings().anthropic_api_key
+    if key is None:
+        _fail("ANTHROPIC_API_KEY isn't set, so no answer can be written. Add it to .env or the environment.")
+    return key.get_secret_value()
 
 
 def _voyage_key() -> str:
@@ -362,3 +373,54 @@ def search(
     typer.echo(
         f"Voyage counted {result.embed_tokens:,} tokens to embed the question and {result.rerank_tokens:,} to rerank."
     )
+
+
+@app.command("ask")
+def ask(
+    question: Annotated[str, typer.Argument(help="A question, as a customer would ask it.")],
+    company: Annotated[str, typer.Option(help="The product the help center is for, as the bot names it.")],
+    model: Annotated[str, typer.Option(help="The answer model.")] = "claude-haiku-5-5",
+) -> None:
+    """Answer a question as the bot would, with its sources and what it cost. Calls Claude and Voyage."""
+    import anthropic
+    import httpx2
+
+    from citemark.answer.pipeline import respond
+    from citemark.db.session import make_sessionmaker
+    from citemark.embed.voyage import VoyageEmbedder, VoyageReranker
+    from citemark.models.claude import ClaudeAnswerer
+    from citemark.retrieve import load_config
+
+    voyage, claude = _voyage_key(), _anthropic_key()
+
+    async def run(engine):
+        async with (
+            make_sessionmaker(engine)() as session,
+            httpx2.AsyncClient() as api,
+            anthropic.AsyncAnthropic(api_key=claude) as client,
+        ):
+            config = await load_config(session)
+            bot = ClaudeAnswerer(client, model, company=company)
+            reranker = VoyageReranker(voyage, api, model=config.reranker) if config.rerank else None
+            embedder = VoyageEmbedder(voyage, api)
+            return await respond(
+                session, question, model=bot, rewriter=client, embedder=embedder, reranker=reranker, config=config
+            )
+
+    result = _with_db(run)
+    reply = result.reply
+    typer.echo(f"[{reply.kind}{', swapped after text was shown' if reply.swapped else ''}]")
+    if reply.segments:
+        typer.echo("".join(s.text + "".join(f"[{marker}]" for marker in s.markers) for s in reply.segments))
+    else:
+        typer.echo(reply.text)
+    if reply.clarify_options:
+        typer.echo("Options: " + " / ".join(reply.clarify_options))
+    if reply.gap_line:
+        typer.echo(reply.gap_line)
+    for source in reply.sources:
+        typer.echo(f"[{source.marker}] {source.title}\n    {source.url}")
+    if reply.problems:
+        typer.echo("Broke the rules: " + "; ".join(reply.problems))
+    first = f"First word after {result.ttfw_ms / 1000:.2f} s, " if result.ttfw_ms is not None else ""
+    typer.echo(f"{first}{result.total_ms / 1000:.2f} s in all. Cost about ${result.cost_usd:.4f} at list prices.")

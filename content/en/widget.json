@@ -1,0 +1,9 @@
+{
+  "partial.gap": "The help center doesn't say {gap}.",
+  "clarify.question": "Which one do you mean?",
+  "decline.not_covered": "The help center doesn't cover that.",
+  "decline.off_topic": "I can only answer questions about {company}'s product.",
+  "small_talk.greeting": "Hi, what can I help you find?",
+  "small_talk.thanks": "You're welcome. Ask another question any time.",
+  "small_talk.goodbye": "Bye. The help center is here when you need it."
+}

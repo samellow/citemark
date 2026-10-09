@@ -65,6 +65,9 @@ FAILURE_TYPES = ("answered_should_decline", "declined_answerable", "retrieval_mi
 REPORT_KINDS = ("audit", "build", "monthly", "demo")
 JOB_STATUSES = ("queued", "running", "done", "failed", "cancelled")
 
+# A missing value stored as SQL NULL, not JSON null, so `IS NULL` checks hold (found in T8)
+NULLABLE_JSON = JSONB(none_as_null=True)
+
 EMPTY_LIST = sql("'[]'::jsonb")
 EMPTY_OBJECT = sql("'{}'::jsonb")
 ZERO = sql("0")
@@ -189,7 +192,7 @@ class Message(_Row, Base):
     role: Mapped[str]
     content: Mapped[str]
     kind: Mapped[str | None]
-    clarify_options: Mapped[list[str] | None] = mapped_column(JSONB)
+    clarify_options: Mapped[list[str] | None] = mapped_column(NULLABLE_JSON)
     gap_text: Mapped[str | None]
     # Text streamed before a late decline or clarifying question, then swapped out (PRD Q11)
     swapped: Mapped[bool] = mapped_column(server_default=FALSE)
@@ -256,7 +259,7 @@ class TestSet(_Row, Base):
     kind: Mapped[str] = mapped_column(server_default="accuracy")
     frozen_at: Mapped[dt.datetime | None]
     content_hash: Mapped[str | None]  # the YAML file's sha256, from its lock
-    threshold: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    threshold: Mapped[dict[str, Any] | None] = mapped_column(NULLABLE_JSON)
     threshold_set_by: Mapped[str | None]
     threshold_set_at: Mapped[dt.datetime | None]
     created_at: Mapped[dt.datetime] = mapped_column(server_default=func.now())
@@ -304,7 +307,7 @@ class TestRun(_Row, Base):
     mode: Mapped[str]
     model: Mapped[str]
     prompt_version: Mapped[str]
-    retrieval_config: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    retrieval_config: Mapped[dict[str, Any] | None] = mapped_column(NULLABLE_JSON)
     git_sha: Mapped[str]
     judge_model: Mapped[str]
     rubric_version: Mapped[str]
@@ -341,7 +344,7 @@ class TestResult(_Row, Base):
     decline_correct: Mapped[bool | None]
     judge_verdict: Mapped[str | None]
     judge_reason: Mapped[str | None]
-    judge_output: Mapped[dict[str, Any] | None] = mapped_column(JSONB)  # the judge's whole structured reply
+    judge_output: Mapped[dict[str, Any] | None] = mapped_column(NULLABLE_JSON)  # the judge's whole structured reply
     failure_type: Mapped[str | None]
     ttfw_ms: Mapped[int | None]
     cost_usd: Mapped[Decimal] = mapped_column(server_default=ZERO)
@@ -367,7 +370,8 @@ class Report(_Row, Base):
 
     kind: Mapped[str]
     test_run_ids: Mapped[list[uuid.UUID]] = mapped_column(ARRAY(Uuid()))
-    fix_plan: Mapped[dict[str, Any] | None] = mapped_column(JSONB)  # hour estimates written by hand, never computed
+    # Hour estimates written by hand, never computed
+    fix_plan: Mapped[dict[str, Any] | None] = mapped_column(NULLABLE_JSON)
     html_path: Mapped[str | None]
     created_at: Mapped[dt.datetime] = mapped_column(server_default=func.now())
 

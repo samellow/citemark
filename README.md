@@ -2,7 +2,7 @@
 
 A support bot for SaaS help centers that ships with proof it works: a test report, run on the client's own help center, showing how often the bot answers correctly, shows the right source, and says so when the help center doesn't cover a question. Each client runs their own copy in their own hosting account. MIT-licensed.
 
-**Status: early.** The demo's 50 test questions were frozen on 2026-10-08, before any bot code exists, so the published results can't be fitted to them. The tag `zulip-v1-frozen` marks that commit. The bot can load a help center, keep it up to date and find the passages that answer a question, but it can't write answers yet.
+**Status: early.** The demo's 50 test questions were frozen on 2026-10-08, before any bot code exists, so the published results can't be fitted to them. The tag `zulip-v1-frozen` marks that commit. The bot can load a help center, keep it up to date, find the passages that answer a question, and answer with sources or decline. It can't test itself yet: the test runner and the report come next.
 
 ## What's here so far
 
@@ -28,6 +28,10 @@ A support bot for SaaS help centers that ships with proof it works: a test repor
   - A follow-up ("how do I turn that off?") is first rewritten to stand alone, using `prompts/rewrite.v1.md`.
   - Full-context mode gathers every passage instead, and is refused for a model whose window can't hold them.
   - The same passages always give the same results, so two test runs differ only in what changed.
+- `src/citemark/answer/`, `src/citemark/models/` and `citemark ask "question" --company Zulip`: the bot's reply, with its sources and what it cost.
+  - Claude cites the passages itself. Every quote under an answer is copied from the help center by the API, not written by the model.
+  - The server decides what's shown. A decline, a clarifying question or small talk shows a fixed sentence, never the model's own words, and an answer with no source is shown as a decline.
+  - The instructions are `prompts/answer.v1.md` and `prompts/tools.v1.json`. Every call is priced from a dated price table, so an old report keeps its old prices.
 
 ## Running it locally
 
@@ -48,6 +52,7 @@ To load Zulip's live help center (needs `VOYAGE_API_KEY`; embedding it costs an 
 uv run citemark sources add start-page https://zulip.com/help/ --selector .sl-markdown-content
 uv run citemark sources index
 uv run citemark test check test-sets/zulip-v1.yaml --snapshot fixtures/zulip --against-db
+uv run citemark ask "Can I stop people from seeing when I'm typing?" --company Zulip   # also needs ANTHROPIC_API_KEY
 ```
 
 ## Licenses

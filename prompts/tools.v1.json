@@ -1,0 +1,55 @@
+[
+  {
+    "name": "decline",
+    "description": "Use instead of answering when the help-center passages don't answer the question (\"not_covered\"), or the question isn't about {company}'s product (\"off_topic\"). Call it before writing any text.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "reason": {"type": "string", "enum": ["not_covered", "off_topic"]}
+      },
+      "required": ["reason"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "ask_clarifying_question",
+    "description": "Use when the question could mean two or three different things that the passages cover differently. Give 2 or 3 options, each a short phrase from the passages, such as \"Your password\". Call it before writing any text.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {"type": "string", "maxLength": 40},
+          "minItems": 2,
+          "maxItems": 3
+        }
+      },
+      "required": ["options"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "report_gap",
+    "description": "Use after answering the part of a question the passages cover, to name what the help center doesn't say. Write a phrase that completes \"The help center doesn't say …\", such as \"whether deleted messages are included\".",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "missing": {"type": "string", "maxLength": 100}
+      },
+      "required": ["missing"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "small_talk",
+    "description": "Use when the message is only a greeting, a thank-you or a goodbye, with no question in it.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "kind": {"type": "string", "enum": ["greeting", "thanks", "goodbye"]}
+      },
+      "required": ["kind"],
+      "additionalProperties": false
+    }
+  }
+]

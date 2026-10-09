@@ -51,6 +51,7 @@ class RecordingTransport(httpx2.AsyncBaseTransport):
         self.record = record
         self.on_missing = on_missing
         self.upstream = upstream or (httpx2.AsyncHTTPTransport() if record else None)
+        self.used: list[Path] = []  # the recordings read or written, in order, so a test can inspect one
 
     def path_for(self, request: httpx2.Request, key: str) -> Path:
         name = request.url.path.strip("/").replace("/", "-") or "root"
@@ -77,6 +78,7 @@ class RecordingTransport(httpx2.AsyncBaseTransport):
             status, content_type, reply = response["status"], response["content_type"], "\n".join(response["body"])
         else:
             self.on_missing(f"No recorded reply for {request.method} {request.url.path} ({path.name}).")
+        self.used.append(path)
         return httpx2.Response(status, headers={"content-type": content_type}, content=reply.encode(), request=request)
 
     async def aclose(self) -> None:

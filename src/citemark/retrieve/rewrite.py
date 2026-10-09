@@ -12,12 +12,14 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Literal
 
 import anthropic
 import structlog
 
 from citemark import prompts
+from citemark.models import Turn
+
+__all__ = ["EXCHANGES", "MODEL", "PROMPT", "Rewritten", "Turn", "rewrite"]
 
 log = structlog.get_logger()
 
@@ -26,12 +28,6 @@ PROMPT = "rewrite.v1"
 EXCHANGES = 3  # a question and its answer make one
 MAX_TOKENS = 200
 SPEAKERS = {"user": "Customer", "assistant": "Support bot"}
-
-
-@dataclass(frozen=True)
-class Turn:
-    role: Literal["user", "assistant"]
-    text: str
 
 
 @dataclass(frozen=True)
