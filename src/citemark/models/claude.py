@@ -63,6 +63,35 @@ def _fill(template: str, **slots: str) -> str:
     return SLOT.sub(value, template)
 
 
+def _filled(prompt: str, tools: str, company: str, bot_name: str | None) -> tuple[str, list[dict[str, Any]]]:
+    """The system prompt and the tools, with their slots filled for one company."""
+    bot_name = bot_name or f"{company} Help"  # content spec 10
+    system = _fill(prompts.load(prompt), bot_name=bot_name, company=company)
+    described = prompts.load_tools(tools)
+    return system, [{**tool, "description": _fill(tool["description"], company=company)} for tool in described]
+
+
+def _descriptions(value: Any) -> list[str]:
+    if isinstance(value, dict):
+        own = [value["description"]] if isinstance(value.get("description"), str) else []
+        return own + [text for key, item in value.items() if key != "description" for text in _descriptions(item)]
+    if isinstance(value, list):
+        return [text for item in value for text in _descriptions(item)]
+    return []
+
+
+def instructions(prompt_version: str, company: str, bot_name: str | None = None) -> str | None:
+    """Everything the model is told for a run, filled in as the answerer fills it: the system
+    prompt and every description in the tools. None for a prompt version that isn't this
+    adapter's, such as a test's scripted model. A prompt file that's gone raises
+    FileNotFoundError. The abuse set checks that no reply repeats it."""
+    prompt, plus, tools = prompt_version.partition("+")
+    if not plus:
+        return None
+    system, filled = _filled(prompt, tools, company, bot_name)
+    return "\n".join([system, *_descriptions(filled)])
+
+
 def _search_results(passages: tuple[Passage, ...], *, cache: bool) -> list[dict[str, Any]]:
     blocks: list[dict[str, Any]] = [
         {
@@ -130,12 +159,8 @@ class ClaudeAnswerer:
         self.client = client
         self.model = model
         self.company = company
-        self.prompt_version = f"{PROMPT}+{TOOLS}"
-        bot_name = bot_name or f"{company} Help"  # content spec 10
-        self.system = _fill(prompts.load(PROMPT), bot_name=bot_name, company=company)
-        self.tools = [
-            {**tool, "description": _fill(tool["description"], company=company)} for tool in prompts.load_tools(TOOLS)
-        ]
+        self.prompt_version = f"{PROMPT}+{TOOLS}"  # `instructions` reads it back
+        self.system, self.tools = _filled(PROMPT, TOOLS, company, bot_name)
 
     def request(self, request: AnswerRequest) -> dict[str, Any]:
         """The first call's parameters. Removing a tool changes the cached prefix, which only

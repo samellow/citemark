@@ -293,9 +293,8 @@ class Decision:
         return bool(self.waiting)
 
 
-async def decision(session: AsyncSession, group: uuid.UUID) -> Decision:
-    """The group's medians and ranges, with your grades counted where the judge disagreed with
-    itself. Refused unless all three runs finished with identical settings."""
+async def finished_runs(session: AsyncSession, group: uuid.UUID) -> list[TestRun]:
+    """The group's runs, refused unless all three finished with identical settings."""
     runs = await group_runs(session, group)
     coherent(group, runs)
     if pending := unfinished(runs):
@@ -303,7 +302,13 @@ async def decision(session: AsyncSession, group: uuid.UUID) -> Decision:
             f"Run {runs.index(pending[0]) + 1} of {RUNS} hasn't finished. Finish the decision run with: "
             f"citemark test resume {pending[0].id}"
         )
+    return runs
 
+
+async def decision(session: AsyncSession, group: uuid.UUID) -> Decision:
+    """The group's medians and ranges, with your grades counted where the judge disagreed with
+    itself. Refused unless all three runs finished with identical settings."""
+    runs = await finished_runs(session, group)
     total = await session.scalar(
         select(func.count()).select_from(TestQuestion).where(TestQuestion.test_set_id == runs[0].test_set_id)
     )

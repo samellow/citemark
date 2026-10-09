@@ -4,6 +4,10 @@ A test set is a YAML file committed to the repo (PRD 4.3, 5.4). Freezing writes 
 lock file next to it holding the SHA-256 of the YAML's bytes; from then on an
 edited file is refused under the same version. The hash lives in its own file so
 that writing it can't change what it fingerprints.
+
+An abuse set (QA plan 4.3) is the same file with `kind: abuse`. Its questions carry the kind of
+misbehavior they try for, and strings the reply must never include. One that plants instructions
+in an article names the article's file, kept next to the YAML; the lock fingerprints it too.
 """
 
 from __future__ import annotations
@@ -43,6 +47,27 @@ class QuestionType(StrEnum):
     OFF_TOPIC = "off_topic"
 
 
+class SetKind(StrEnum):
+    ACCURACY = "accuracy"
+    ABUSE = "abuse"
+
+
+class AbuseKind(StrEnum):
+    """What an abuse question tries to make the bot do (QA plan 4.3)."""
+
+    INVENTS_POLICY = "invents_policy"
+    PLANTED_INSTRUCTION = "planted_instruction"
+    OFF_TOPIC = "off_topic"
+    ASKS_FOR_INSTRUCTIONS = "asks_for_instructions"
+    PERSONAL_DATA = "personal_data"
+    OTHER_LANGUAGE = "other_language"
+    ODD_INPUT = "odd_input"
+
+
+GATING = (AbuseKind.INVENTS_POLICY, AbuseKind.PLANTED_INSTRUCTION)  # the gate's two kinds (QA plan Q3)
+PLANTED_SUFFIX = ".planted.md"  # a planted article's file name ends with this, so its address marks it
+
+
 class _Strict(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -54,7 +79,7 @@ class ExpectedSource(_Strict):
 
 
 class Question(_Strict):
-    id: str = Field(pattern=r"^Q\d{3}$")
+    id: str = Field(pattern=r"^[QA]\d{3}$")  # Q on an accuracy set, A on an abuse set
     type: QuestionType
     question: str = Field(min_length=1)
     expected_answer: list[str] = []
@@ -64,6 +89,9 @@ class Question(_Strict):
     not_covered_terms: list[str] = []
     doc_gap: bool = False
     locked: bool = False  # wording fixed by another document, e.g. shown on the demo page
+    abuse_kind: AbuseKind | None = None  # abuse sets only
+    must_not_contain: list[str] = []  # abuse sets only: strings the reply must never include
+    planted_article: str | None = None  # abuse sets only: the planted article's file, next to the YAML
     notes: str = ""
 
 
@@ -83,6 +111,7 @@ class TestSetFile(_Strict):
 
     name: str
     version: int
+    kind: SetKind = SetKind.ACCURACY
     snapshot: SnapshotInfo | None = None
     drafting: Drafting | None = None
     questions: list[Question]
@@ -127,6 +156,12 @@ def lock_path(path: Path) -> Path:
     return path.with_suffix(".lock.json")
 
 
+def planted_articles(path: Path, test_set: TestSetFile) -> dict[str, Path]:
+    """The planted articles the set's questions name, by file name, each next to the YAML."""
+    names = sorted({q.planted_article for q in test_set.questions if q.planted_article})
+    return {name: path.parent / name for name in names}
+
+
 def read_lock(path: Path) -> dict | None:
     lock_file = lock_path(path)
     if not lock_file.exists():
@@ -135,11 +170,19 @@ def read_lock(path: Path) -> dict | None:
 
 
 def verify_unchanged(path: Path) -> dict | None:
-    """Return the lock if the set is frozen; raise if it changed since."""
+    """Return the lock if the set is frozen; raise if it, or an article it plants, changed since."""
     lock = read_lock(path)
-    if lock and lock["sha256"] != fingerprint(path):
+    if lock is None:
+        return None
+    changed = [] if lock["sha256"] == fingerprint(path) else [path.name]
+    for name, sha256 in lock.get("planted_articles", {}).items():
+        planted = path.parent / name
+        if not planted.is_file() or fingerprint(planted) != sha256:
+            changed.append(name)
+    if changed:
+        frozen = "it was" if changed == [path.name] else f"{path.name} was"
         raise TestSetChanged(
-            f"{path.name} changed after it was frozen on {lock['frozen_at'][:10]}. "
+            f"{' and '.join(changed)} changed after {frozen} frozen on {lock['frozen_at'][:10]}. "
             f"Put changes in version {lock['version'] + 1} instead."
         )
     return lock
@@ -172,5 +215,10 @@ def freeze(
         "draft_sha256": draft_sha256,
         "snapshot_manifest_sha256": snapshot_manifest_sha256,
     }
+    if test_set.kind == SetKind.ABUSE:
+        lock["kind"] = test_set.kind.value
+        kinds = Counter(q.abuse_kind.value for q in test_set.questions if q.abuse_kind)
+        lock["by_abuse_kind"] = dict(sorted(kinds.items()))
+        lock["planted_articles"] = {name: fingerprint(file) for name, file in planted_articles(path, test_set).items()}
     lock_path(path).write_text(json.dumps(lock, indent=2) + "\n", encoding="utf-8")
     return lock

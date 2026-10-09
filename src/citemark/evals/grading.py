@@ -12,6 +12,7 @@
   seeing the judge's reasons would lean toward it.
 - **Agreement** is counted on a run's sheet. A queue holds only answers the judge graded
   inconsistently, so agreement on it would say nothing about the judge in general.
+- **The abuse set** isn't graded: the judge doesn't grade it, and its rules are mechanical.
 """
 
 from __future__ import annotations
@@ -27,7 +28,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from citemark.db.models import HumanGrade, TestQuestion, TestResult, TestRun
-from citemark.evals.decision import decision
+from citemark.evals.abuse import is_abuse
+from citemark.evals.decision import decision, group_runs
 from citemark.evals.runner import RunError
 from citemark.evals.scoring import chosen_option
 
@@ -125,10 +127,16 @@ async def sheet(session: AsyncSession, target: uuid.UUID, *, sample: bool = Fals
     """A run's judged answers, or a sample of 10 of them, or a decision run's queue when
     `target` is a decision run's ID. A run of a decision run waits until its queue is graded."""
     run = await session.get(TestRun, target, populate_existing=True)
+    first = run if run is not None else (await group_runs(session, target))[0]  # refuses an unknown ID
+    if await is_abuse(session, first):
+        raise GradingError(
+            f"{target} is a run of the abuse set, which is scored mechanically without the judge, so there's "
+            "nothing to grade."
+        )
     if run is None:
         if sample:
             raise GradingError("A decision run's queue is graded whole, so --sample is for a single run.")
-        found = await decision(session, target)  # refuses an unknown ID or an unfinished group
+        found = await decision(session, target)  # refuses an unfinished group
         if not found.queue:
             raise GradingError(
                 f"The judge graded every question of decision run {target} the same way in all three runs, "

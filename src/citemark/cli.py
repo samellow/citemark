@@ -141,7 +141,7 @@ def check(
     """Check a test set against the saved help center. Exits 1 if anything must be fixed."""
     test_set = _load(file)
     help_center = HelpCenterSnapshot(snapshot)
-    findings = checks.run_checks(test_set, help_center, _expect(expect), max_per_article)
+    findings = checks.run_checks(test_set, help_center, _expect(expect), max_per_article, folder=file.parent)
     if against_db:
         from citemark.db.session import make_sessionmaker
         from citemark.evals.dbcheck import check_sources_in_db
@@ -158,6 +158,9 @@ def check(
     counts = Counter(q.type.value for q in test_set.questions)
     summary = ", ".join(f"{n} {qtype}" for qtype, n in sorted(counts.items()))
     typer.echo(f"{test_set.name} v{test_set.version}: {len(test_set.questions)} questions ({summary})")
+    if test_set.kind == testset.SetKind.ABUSE:
+        kinds = Counter(q.abuse_kind.value for q in test_set.questions if q.abuse_kind)
+        typer.echo(f"An abuse set, by kind: {', '.join(f'{n} {kind}' for kind, n in sorted(kinds.items()))}")
     blocking = _report(findings)
     if draft:
         flagged, edited = checks.review_counts(_load(draft, draft=True), test_set, help_center)
@@ -182,7 +185,8 @@ def freeze(
     """Freeze a test set. After this, its questions can't change under this version."""
     test_set = _load(file)
     help_center = HelpCenterSnapshot(snapshot)
-    blocking = [f for f in checks.run_checks(test_set, help_center, _expect(expect), max_per_article) if f.blocking]
+    found = checks.run_checks(test_set, help_center, _expect(expect), max_per_article, folder=file.parent)
+    blocking = [f for f in found if f.blocking]
     if blocking:
         _report(blocking)
         _fail("Not frozen. Fix these first; citemark test check shows them.")
@@ -203,7 +207,8 @@ def freeze(
     )
     if draft:
         typer.echo(f"Wording check flagged {flagged} in the draft; {edited} of {lock['questions']} changed in review.")
-    files = [file.name, testset.lock_path(file).name, *([draft.name] if draft else [])]
+    planted = list(testset.planted_articles(file, test_set))
+    files = [file.name, testset.lock_path(file).name, *planted, *([draft.name] if draft else [])]
     typer.echo(f"Commit {', '.join(files)} together.")
 
 
@@ -285,6 +290,59 @@ def _print_decision(found) -> None:
     typer.echo(f"  Spent: ${found.spent:.4f} at list prices, of a ${found.budget:.2f} budget.")
 
 
+def _kinds_text(measures) -> str:
+    from citemark.evals.abuse import KINDS
+
+    return ", ".join(f"{KINDS[kind]} {measure.passed} of {measure.total}" for kind, measure in measures.items())
+
+
+def _print_abuse_run(found, abused) -> None:
+    """One run of the abuse set (QA plan 4.3): each kind, and what each failure did."""
+    from citemark.evals.abuse import KINDS
+    from citemark.evals.testset import GATING
+
+    run = found.run
+    typer.echo(f"\nRun {run.id}: {run.model}, {run.mode.replace('_', ' ')}, {run.status}, on the abuse set.")
+    typer.echo(f"{found.finished} of {found.total} questions answered.")
+    measures = abused.by_kind()
+    gating = {kind: measure for kind, measure in measures.items() if kind in GATING}
+    typer.echo(f"  The gate's kinds, resisted in this run: {_kinds_text(gating) or 'none answered yet'}.")
+    if run.decision_group is None:
+        typer.echo("  The gate itself needs them resisted in all three runs of a decision run (--runs 3).")
+    if others := {kind: measure for kind, measure in measures.items() if kind not in GATING}:
+        typer.echo(f"  Reported only: {_kinds_text(others)}.")
+    for failed in abused.failures:
+        typer.echo(f"  {failed.question} ({KINDS[failed.kind]}): {'; '.join(failed.problems)}")
+    typer.echo(f"  Spent: ${run.cost_usd:.4f} at list prices, of a ${run.budget_usd:.2f} budget.")
+
+
+def _print_abuse_decision(found) -> None:
+    """The abuse set's gate on a decision run: the two gating kinds resisted in every run."""
+    from citemark.evals.abuse import KINDS
+    from citemark.evals.testset import GATING
+
+    first = found.runs[0]
+    typer.echo(
+        f"\nDecision run {found.group}: {len(found.runs)} runs of {first.model}, {first.mode.replace('_', ' ')}, "
+        f"commit {first.git_sha[:12]}, on the abuse set."
+    )
+    verdict = "Passed." if found.gate_passed else "Not passed, so a release waits until it is."
+    typer.echo(
+        f"  The gate: it resisted {found.passed} of {found.total} questions designed to make it invent a policy or "
+        f"promise, or obey planted instructions, in every run. {verdict}"
+    )
+    if others := {kind: measure for kind, measure in found.by_kind().items() if kind not in GATING}:
+        typer.echo(f"  Reported only, resisted in every run: {_kinds_text(others)}.")
+    for question in found.questions:
+        said: dict[str, list[int]] = {}
+        for number, problems in enumerate(question.problems, 1):
+            for problem in problems:
+                said.setdefault(problem, []).append(number)
+        for problem, numbers in said.items():
+            typer.echo(f"  {question.question} ({KINDS[question.kind]}), {_runs_text(numbers)}: {problem}")
+    typer.echo(f"  Spent: ${found.spent:.4f} at list prices, of a ${found.budget:.2f} budget.")
+
+
 def _run_tests(
     file: Path | None,
     run_id: uuid.UUID | None,
@@ -299,7 +357,7 @@ def _run_tests(
 ) -> None:
     """Start a run of `file`, or three sharing a decision group, or resume `run_id` with the rest
     of its decision run. Prints each result, then the summary. Exits 1 when a run failed or
-    reached its budget, so a script can tell."""
+    reached its budget, or the abuse set's gate isn't passed, so a script can tell."""
     import functools
     from decimal import Decimal
 
@@ -309,6 +367,7 @@ def _run_tests(
     from citemark.db.models import TestRun
     from citemark.db.session import make_sessionmaker
     from citemark.embed.voyage import VoyageEmbedder, VoyageReranker
+    from citemark.evals import abuse as abusing
     from citemark.evals import decision as deciding
     from citemark.evals import judge as judging
     from citemark.evals import runner
@@ -324,13 +383,23 @@ def _run_tests(
             _fail(str(exc))
     voyage, claude = _voyage_key(), _anthropic_key()
 
+    abuse_set = False  # known once the set or the run is read
+
     def show(question_id: str, result) -> None:
-        typer.echo(f"  {question_id}  {result.kind:<20} {result.failure_type or 'passed'}")
+        if abuse_set:  # scored in the summary, which reads the question's rules
+            typer.echo(f"  {question_id}  {result.kind}")
+        else:
+            typer.echo(f"  {question_id}  {result.kind:<20} {result.failure_type or 'passed'}")
 
     def announce(number: int, run) -> None:
         typer.echo(f"Run {number} of {deciding.RUNS} ({run.id}):")
 
+    async def ended(session, run_id: uuid.UUID):
+        found = await runner.summary(session, run_id)
+        return found, await abusing.abuse_run(session, run_id) if abuse_set else None
+
     async def work(engine):
+        nonlocal abuse_set
         sessions = make_sessionmaker(engine)
         async with httpx2.AsyncClient() as api, anthropic.AsyncAnthropic(api_key=claude) as client:
 
@@ -347,6 +416,9 @@ def _run_tests(
             if run_id is None:
                 async with sessions() as session, session.begin():  # the set's copy is kept either way
                     test_set = await runner.load_test_set(session, file)
+                async with sessions() as session, session.begin():
+                    await runner.check_index(session, test_set.id)  # before the estimate; each run checks again
+                    abuse_set = test_set.kind == "abuse"
                     config = await load_config(session)
                     chosen = services(mode.value, model, company, config)
                     prepared = await runner.prepare(
@@ -400,6 +472,7 @@ def _run_tests(
                     found = await session.get(TestRun, run_id)
                     if found is None:
                         raise runner.RunError(f"There's no test run {run_id}.")
+                    abuse_set = await abusing.is_abuse(session, found)
                 config = RetrievalConfig.model_validate(found.retrieval_config or {})
                 chosen = services(found.mode, found.model, found.company, config)
                 started, group = run_id, found.decision_group
@@ -410,8 +483,8 @@ def _run_tests(
                     started, sessions=sessions, services=chosen, on_result=show, force=force, sha=sha
                 )
                 async with sessions() as session:
-                    return await runner.summary(session, started), None, None
-            ended = await deciding.finish_group(
+                    return *await ended(session, started), None, None
+            outcomes = await deciding.finish_group(
                 group,
                 sessions=sessions,
                 services=chosen,
@@ -421,17 +494,24 @@ def _run_tests(
                 on_result=show,
             )
             async with sessions() as session:
-                if ended and (stopped := ended[-1])[1].status != "done":
+                if outcomes and (stopped := outcomes[-1])[1].status != "done":
                     numbered = await deciding.group_runs(session, group)
                     position = [run.id for run in numbered].index(stopped[0].id) + 1
-                    return await runner.summary(session, stopped[0].id), None, position
-                return None, await deciding.decision(session, group), None
+                    return *await ended(session, stopped[0].id), None, position
+                if abuse_set:
+                    return None, None, await abusing.abuse_decision(session, group), None
+                return None, None, await deciding.decision(session, group), None
 
-    found, decided, position = _with_db(work)
+    found, abused, decided, position = _with_db(work)
     if decided is not None:
-        _print_decision(decided)
+        if not abuse_set:
+            _print_decision(decided)
+            return
+        _print_abuse_decision(decided)
+        if not decided.gate_passed:
+            raise typer.Exit(1)  # a release waits until it passes
         return
-    _print_summary(found)
+    _print_abuse_run(found, abused) if abused is not None else _print_summary(found)
     which = f"Run {position} of {deciding.RUNS}" if position else "The run"
     if found.run.status == "failed":
         whole = "the decision run" if position else "it"
@@ -497,6 +577,7 @@ def resume_tests(
 def rescore(run_id: Annotated[str, typer.Argument(help="The run to score again.")]) -> None:
     """Recompute a run's scores from its stored results. Nothing is asked again; the judge's verdicts stand."""
     from citemark.db.session import make_sessionmaker
+    from citemark.evals import abuse as abusing
     from citemark.evals import runner
 
     try:
@@ -508,17 +589,22 @@ def rescore(run_id: Annotated[str, typer.Argument(help="The run to score again."
         async with make_sessionmaker(engine)() as session, session.begin():
             await runner.rescore(session, found)
         async with make_sessionmaker(engine)() as session:
-            return await runner.summary(session, found)
+            summary = await runner.summary(session, found)
+            abused = await abusing.abuse_run(session, found) if await abusing.is_abuse(session, summary.run) else None
+            return summary, abused
 
-    _print_summary(_with_db(work))
+    summary, abused = _with_db(work)
+    _print_abuse_run(summary, abused) if abused is not None else _print_summary(summary)
 
 
 @test_app.command("decision")
 def decision_summary(
     run_id: Annotated[str, typer.Argument(help="The decision run, or any of its three runs.")],
 ) -> None:
-    """Show a decision run's medians and ranges, and which answers wait for your grade."""
+    """Show a decision run's medians and ranges, and which answers wait for your grade. On the
+    abuse set, show the gate, and exit 1 if it isn't passed."""
     from citemark.db.session import make_sessionmaker
+    from citemark.evals import abuse as abusing
     from citemark.evals import decision as deciding
 
     try:
@@ -528,9 +614,15 @@ def decision_summary(
 
     async def work(engine):
         async with make_sessionmaker(engine)() as session:
-            return await deciding.decision(session, await deciding.find_group(session, found))
+            group = await deciding.find_group(session, found)
+            if await abusing.is_abuse(session, (await deciding.group_runs(session, group))[0]):
+                return _print_abuse_decision, await abusing.abuse_decision(session, group)
+            return _print_decision, await deciding.decision(session, group)
 
-    _print_decision(_with_db(work))
+    show, decided = _with_db(work)
+    show(decided)
+    if show is _print_abuse_decision and not decided.gate_passed:
+        raise typer.Exit(1)
 
 
 CHOICES = {"c": "correct", "correct": "correct", "i": "incorrect", "incorrect": "incorrect"}

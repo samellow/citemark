@@ -16,6 +16,7 @@
 
 The judge grades answers only (`evals.judge`). Everything else is scored mechanically
 (`evals.scoring`) from what each result stores, so `rescore` gives the same scores every time.
+The abuse set isn't judged at all: its rules are mechanical (`evals.abuse`).
 """
 
 from __future__ import annotations
@@ -40,7 +41,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from citemark.answer import Reply
 from citemark.answer.pipeline import Answered, passages_from_articles, respond
 from citemark.costs import price
-from citemark.db.models import TestQuestion, TestResult, TestRun, TestSet
+from citemark.db.models import Document, TestQuestion, TestResult, TestRun, TestSet
 from citemark.embed import Embedder, EmbedError, Reranker
 from citemark.evals import judge as judging
 from citemark.evals import testset
@@ -55,6 +56,8 @@ from citemark.evals.scoring import (
     summarize,
 )
 from citemark.evals.voice import voice_problems
+from citemark.ingest.files import extract_file
+from citemark.ingest.pipeline import UPLOAD_PREFIX, content_hash
 from citemark.models import AnswerModel, AnswerRequest, Turn
 from citemark.models.claude import MAX_TOKENS
 from citemark.models.registry import require_fit
@@ -134,7 +137,7 @@ async def load_test_set(session: AsyncSession, path: Path) -> TestSet:
                 f"fingerprint {(found.content_hash or '')[:8]}. Put changes in version {loaded.version + 1} instead."
             )
         return found
-    test_set = TestSet(name=loaded.name, version=loaded.version, content_hash=lock["sha256"])
+    test_set = TestSet(name=loaded.name, version=loaded.version, kind=loaded.kind.value, content_hash=lock["sha256"])
     session.add(test_set)
     await session.flush()
     session.add_all(
@@ -150,6 +153,10 @@ async def load_test_set(session: AsyncSession, path: Path) -> TestSet:
             not_covered_terms=question.not_covered_terms,
             doc_gap=question.doc_gap,
             locked=question.locked,
+            abuse_kind=question.abuse_kind.value if question.abuse_kind else None,
+            must_not_contain=question.must_not_contain,
+            planted_article=question.planted_article,
+            planted_hash=planted_hash(path, question.planted_article) if question.planted_article else None,
             notes=question.notes,
         )
         for question in loaded.questions
@@ -158,6 +165,59 @@ async def load_test_set(session: AsyncSession, path: Path) -> TestSet:
     test_set.frozen_at = dt.datetime.fromisoformat(lock["frozen_at"])  # from here the database refuses changes
     await session.flush()
     return test_set
+
+
+def planted_hash(path: Path, name: str) -> str:
+    """The content hash a planted article next to the set at `path` is indexed under."""
+    return content_hash(extract_file(name, (path.parent / name).read_bytes()))
+
+
+async def check_index(session: AsyncSession, test_set_id: uuid.UUID) -> None:
+    """Refuse a database whose index would skew the set (QA plan 4.3). Checked as every run starts
+    or resumes, before anything is called.
+
+    An abuse set's planted articles must be indexed there as they were frozen, and no other
+    planted article may be, or the attack wouldn't be the frozen one. An accuracy set must never
+    meet a planted article, so they live in a separate database, built from the same help center."""
+    kind = await session.scalar(select(TestSet.kind).where(TestSet.id == test_set_id))
+    rows = await session.execute(
+        select(Document.url, Document.content_hash).where(
+            Document.status == "active", Document.url.like(f"{UPLOAD_PREFIX}%{testset.PLANTED_SUFFIX}")
+        )
+    )
+    indexed: dict[str, set[str | None]] = {}
+    for url, digest in rows:
+        indexed.setdefault(url.removeprefix(UPLOAD_PREFIX), set()).add(digest)
+    if kind != testset.SetKind.ABUSE:
+        if indexed:
+            raise RunError(
+                f"This database holds {min(indexed)}, an article planted for the abuse set, so search could give "
+                "it to the bot. Run accuracy sets against a database without it."
+            )
+        return
+    planted = await session.execute(
+        select(TestQuestion.planted_article, TestQuestion.planted_hash)
+        .where(TestQuestion.test_set_id == test_set_id, TestQuestion.planted_article.is_not(None))
+        .distinct()
+    )
+    wanted: dict[str, str | None] = {name: digest for name, digest in planted}
+    for name, digest in sorted(wanted.items()):
+        if name not in indexed:
+            raise RunError(
+                f"{name} isn't indexed in this database, so the questions it plants instructions for would never "
+                f"meet them. Upload it, from beside the set's file, to the abuse set's own database: "
+                f"citemark sources upload {name}"
+            )
+        if indexed[name] != {digest}:  # search finds every active copy
+            raise RunError(
+                f"The copy of {name} indexed here isn't the one the set was frozen with. Upload it again, from "
+                f"beside the set's file: citemark sources upload {name}"
+            )
+    if others := sorted(set(indexed) - set(wanted)):
+        raise RunError(
+            f"This database also holds {others[0]}, planted for another set, so search could give it to the bot. "
+            "Build this set's database again from the accuracy one, with only its own planted articles."
+        )
 
 
 # --- Preparing: the passages, the window check and the estimate ---
@@ -222,7 +282,7 @@ async def prepare(
         estimate = answer
         if question.type == "ambiguous":
             estimate += follow_up
-        if question.type in ANSWER_EXPECTED:
+        if question.type in ANSWER_EXPECTED and question.abuse_kind is None:
             estimate += judged
         estimates[question.id] = estimate
     if articles is not None and questions:  # the first question writes the help center to the cache
@@ -416,8 +476,8 @@ async def _ask(
 
     first, final, option = await _retrying(answers, attempts=attempts, sleep=sleep, what=f"{question.ext_id}'s answer")
     answered = Asked(first, final, option, None, Decimal(0))
-    if question.type not in ANSWER_EXPECTED or final.reply.kind not in JUDGED:
-        return answered
+    if question.abuse_kind is not None or question.type not in ANSWER_EXPECTED or final.reply.kind not in JUDGED:
+        return answered  # the abuse set is scored mechanically
     if question.type == "ambiguous" and option is None:
         return answered  # it answered without asking which meaning: wrong, whatever it said
 
@@ -453,6 +513,11 @@ async def _ask(
     return Asked(first, final, option, verdict, await judge_cost(verdict.input_tokens, verdict.output_tokens))
 
 
+def _failure(question: TestQuestion, scores: Scores) -> str | None:
+    """The failure type, which is an accuracy measure: an abuse question's result has none."""
+    return None if question.abuse_kind is not None else scores.failure_type
+
+
 def _result(run_id: uuid.UUID, mode: str, question: TestQuestion, asked: Asked) -> TestResult:
     """The question's stored result. Its cost is the bot's alone, which is what a conversation
     costs a client; the judge's is added to the run's total, with money spent on failed attempts."""
@@ -484,7 +549,7 @@ def _result(run_id: uuid.UUID, mode: str, question: TestQuestion, asked: Asked) 
         judge_verdict=verdict.verdict if verdict else None,
         judge_reason=verdict.reason if verdict else None,
         judge_output=verdict.output if verdict else None,
-        failure_type=scores.failure_type,
+        failure_type=_failure(question, scores),
         ttfw_ms=asked.first.ttfw_ms,
         cost_usd=_stored(asked.bot_cost),
     )
@@ -529,6 +594,7 @@ async def run_tests(
                 f"Run {run_id} was started with {run.model}, for {run.company}, on prompt {run.prompt_version}. "
                 "Resume it with the same settings."
             )
+        await check_index(session, run.test_set_id)
         mode = run.mode
         config = RetrievalConfig.model_validate(run.retrieval_config or {})
         prepared = await prepare(
@@ -672,7 +738,7 @@ async def rescore(session: AsyncSession, run_id: uuid.UUID) -> dict[str, Scores]
         result.retrieval_hit = scores.retrieval_hit
         result.citation_correct = scores.citation_correct
         result.decline_correct = scores.decline_correct
-        result.failure_type = scores.failure_type
+        result.failure_type = _failure(question, scores)
         scored[question.ext_id] = scores
     await session.flush()
     return scored

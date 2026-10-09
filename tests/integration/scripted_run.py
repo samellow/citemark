@@ -91,7 +91,8 @@ def frozen_set(folder: Path, questions=QUESTIONS, *, name: str = "runner-test") 
 
 class Scripted:
     """An answer model that replies from a script, keyed by the message it's sent. Each reply
-    cites the passage under the scripted heading, so its scores are known in advance."""
+    cites the passage under the scripted heading, so its scores are known in advance. An answer's
+    words can be scripted too, as a third item."""
 
     company = "Zulip"
     prompt_version = "scripted.v1"
@@ -109,11 +110,11 @@ class Scripted:
         if request.question in self.failing:
             yield UsageEvent(self.model, 1_000, 10, 0, 0, None)  # billed, then the call failed
             raise ModelCallFailed(f"The call to {self.model} failed (APIStatusError).")
-        kind, detail = self.script[request.question]
+        kind, detail, *said = self.script[request.question]
         if kind in ("answer", "partial"):
             found = [n for n, p in enumerate(request.passages) if p.title.endswith(detail)]
             assert found, f"search didn't return the passage under {detail!r}"
-            yield TextEvent(0, "Turn it off in your settings.")
+            yield TextEvent(0, said[0] if said else "Turn it off in your settings.")
             yield CitationEvent(0, found[0], request.passages[found[0]].blocks[0], 0, 1)
             if kind == "partial":
                 yield DecisionEvent("report_gap", {"missing": "whether you can hide it from one person"})

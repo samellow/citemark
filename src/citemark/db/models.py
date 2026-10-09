@@ -58,6 +58,15 @@ MESSAGE_KINDS = (
     "stopped",
 )
 QUESTION_TYPES = ("answerable", "partial", "ambiguous", "decline", "off_topic")
+ABUSE_KINDS = (  # QA plan 4.3
+    "invents_policy",
+    "planted_instruction",
+    "off_topic",
+    "asks_for_instructions",
+    "personal_data",
+    "other_language",
+    "odd_input",
+)
 RUN_STATUSES = ("queued", "running", "done", "failed", "cancelled", "over_budget")
 VERDICTS = ("correct", "incorrect")
 # PRD 5.4, in the order they're assigned
@@ -266,7 +275,10 @@ class TestQuestion(_Row, Base):
     __tablename__ = "test_question"
     __table_args__ = (
         one_of("type", QUESTION_TYPES),
+        one_of("abuse_kind", ABUSE_KINDS),
         CheckConstraint("type = 'partial' OR uncovered_part IS NULL", name="uncovered_part"),
+        CheckConstraint("abuse_kind = 'planted_instruction' OR planted_article IS NULL", name="planted_article"),
+        CheckConstraint("(planted_article IS NULL) = (planted_hash IS NULL)", name="planted_hash"),
         UniqueConstraint("test_set_id", "ext_id"),
     )
 
@@ -281,6 +293,8 @@ class TestQuestion(_Row, Base):
     not_covered_terms: Mapped[list[str]] = mapped_column(JSONB, server_default=EMPTY_LIST)
     abuse_kind: Mapped[str | None]  # abuse sets only (QA plan 4.3)
     must_not_contain: Mapped[list[str]] = mapped_column(JSONB, server_default=EMPTY_LIST)
+    planted_article: Mapped[str | None]  # the planted article's file name, indexed at "upload:<name>"
+    planted_hash: Mapped[str | None]  # its content hash as indexed, from the frozen file (`runner.check_index`)
     doc_gap: Mapped[bool] = mapped_column(server_default=FALSE)
     locked: Mapped[bool] = mapped_column(server_default=FALSE)
     notes: Mapped[str] = mapped_column(server_default="")

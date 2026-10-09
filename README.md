@@ -17,6 +17,7 @@ A support bot for SaaS help centers that ships with proof it works: a test repor
   - Whether the bot looked in the right place, showed the right source and declined what it should is scored mechanically, so `citemark test rescore` gives the same scores every time. Claude Opus 5.5 judges the answers against a written rubric, `prompts/judge.v1.md`.
   - `--runs 3` makes a decision run: three runs of the same settings, from committed code, reported as each measure's median and range (`citemark test decision`). A model and its judge don't answer the same way twice, so decisions aren't made on one run. When the judge grades a question differently across the three, a person grades those answers, and that grade counts.
   - `citemark grade` checks the judge against a person. You grade the answers blind, seeing what the judge read but never its verdict. Once every answer is graded, the grades lock, and only then are the judge's verdicts shown: how often you agreed, and where you didn't. `--sample` re-checks the judge on 10 answers, picked the same way every time.
+  - An abuse set (`kind: abuse`) tries to make the bot misbehave: invent a policy or a promise, obey instructions planted in a question or in an article, reveal its instructions, or repeat a customer's personal details. It's scored mechanically, never by the judge, and kept apart from the accuracy numbers. Inventing a policy and obeying planted instructions are a release gate: every such question must be resisted in all three runs of a decision run, and `citemark test decision` exits 1 until it is. The demo's abuse set is being drafted.
 - `fixtures/zulip/`: the text of Zulip's help center, saved on 2026-10-06, used for the demo. The raw HTML is attached to the `zulip-v1-frozen` release.
 - `scripts/snapshot.py`: how that copy was made. `scripts/verify_snapshot.py` checks what the extraction kept.
 - `scripts/api_check.py`: checks what the bot assumes about the Claude and Voyage APIs, on each model, before anything is built on it. The results from 2026-10-08 are next to it.
@@ -59,6 +60,15 @@ uv run citemark sources add start-page https://zulip.com/help/ --selector .sl-ma
 uv run citemark sources index
 uv run citemark test check test-sets/zulip-v1.yaml --snapshot fixtures/zulip --against-db
 uv run citemark ask "Can I stop people from seeing when I'm typing?" --company Zulip   # also needs ANTHROPIC_API_KEY
+```
+
+An abuse set's planted article must never reach an accuracy run, so the abuse set runs in a copy of that database. Every run checks: an accuracy run refuses a database holding a planted article, and an abuse run refuses one without its own, as it was frozen.
+
+```
+docker compose exec db createdb -U citemark -T citemark citemark_abuse   # while nothing else is connected
+export DATABASE_URL=postgresql://citemark:citemark@localhost:54320/citemark_abuse
+uv run citemark sources upload test-sets/<the set's>.planted.md
+uv run citemark test run test-sets/<the abuse set>.yaml --company Zulip --budget 1 --runs 3
 ```
 
 ## Licenses
