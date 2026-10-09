@@ -1,8 +1,9 @@
 """The strings test (QA promise 9): every visible string comes from content/en/*.json.
 
-The first strings file, widget.json, arrived with the answering rules (T8).
-For now it checks each file's shape and how slots are filled; the check of locked strings
-against the content spec joins it with the design foundations (T13).
+The first strings file, widget.json, arrived with the answering rules (T8). This checks each
+file's shape, how slots are filled, and that every locked string a file holds is word for word
+the content spec's. The spec isn't in this repository, so its locked rows are copied into
+tests/fixtures/locked-strings.json (T13).
 """
 
 import json
@@ -13,6 +14,7 @@ import pytest
 from citemark import strings
 
 CONTENT = Path(__file__).parents[2] / "content" / "en"
+LOCKED = json.loads((Path(__file__).parents[1] / "fixtures" / "locked-strings.json").read_text(encoding="utf-8"))
 
 
 def icu_balanced(text: str) -> bool:
@@ -55,3 +57,17 @@ def test_a_missing_slot_is_an_error_not_a_gap():
 def test_a_value_is_used_as_written_even_with_braces():
     """A gap phrase is the model's words, so braces in it aren't slots."""
     assert strings.text("widget", "partial.gap", gap="the {x} option") == "The help center doesn't say the {x} option."
+
+
+def test_every_locked_string_a_file_holds_is_word_for_word():
+    """A locked string (content spec 3) may be missing until its component is built, never changed."""
+    checked, changed = [], []
+    for file, locked in LOCKED["strings"].items():
+        held = strings.load(file)
+        for key, text in locked.items():
+            if key in held:
+                checked.append(key)
+                if held[key] != text:
+                    changed.append(f"{file}:{key}")
+    assert changed == []
+    assert len(checked) >= 7  # widget.json holds 7 of the 20 so far: they can't go unchecked

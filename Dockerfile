@@ -10,6 +10,9 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY README.md LICENSE NOTICE alembic.ini ./
 COPY prompts ./prompts
 COPY content ./content
+# What reports and pages render with. The design sources and the gallery stay in the repository.
+COPY static ./static
+COPY design/glyphs ./design/glyphs
 COPY src ./src
 RUN uv sync --frozen --no-dev
 

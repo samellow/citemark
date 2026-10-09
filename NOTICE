@@ -11,3 +11,9 @@ Version 2.0 (fixtures/zulip/LICENSE-APACHE-2.0.txt). Zulip's notice reads:
 Changes made: only the main content of each published page was kept, converted
 to Markdown, with tab labels and Note and Tip callouts kept as plain text.
 Nothing else was edited. Source: https://github.com/zulip/zulip
+
+static/fonts/ holds IBM Plex Sans, IBM Plex Sans Condensed and IBM Plex Mono,
+unmodified, from IBM's npm packages. They're licensed under the SIL Open Font
+License, Version 1.1 (static/fonts/OFL.txt):
+
+    Copyright © 2017 IBM Corp. with Reserved Font Name "Plex"

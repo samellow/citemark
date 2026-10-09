@@ -1,0 +1,15 @@
+<section aria-labelledby="roles">
+<h2 class="cm-type-heading-md" id="roles">Type roles</h2>
+<dl class="cm-gallery-roles">
+{% for role in ["display-xl", "heading-lg", "heading-md", "heading-sm", "label", "body", "body-strong", "body-sm", "caption", "data-lg", "data", "data-sm"] %}
+<div>
+<dt class="cm-gallery-meta"><code>.cm-type-{{ role }}</code></dt>
+<dd class="cm-type-{{ role }}">{{ specimens[role] }}</dd>
+</div>
+{% endfor %}
+</dl>
+</section>
+<section aria-labelledby="focus">
+<h2 class="cm-type-heading-md" id="focus">Links and the focus ring</h2>
+<p>Tab to <a href="#focus">this link</a> to see the 2px focus ring, 2px from its edge.</p>
+</section>

@@ -5,5 +5,14 @@
   "decline.off_topic": "I can only answer questions about {company}'s product.",
   "small_talk.greeting": "Hi, what can I help you find?",
   "small_talk.thanks": "You're welcome. Ask another question any time.",
-  "small_talk.goodbye": "Bye. The help center is here when you need it."
+  "small_talk.goodbye": "Bye. The help center is here when you need it.",
+  "composer.label": "Your question",
+  "answer.marker_a11y": "Source {n}",
+  "handoff.email_label": "Your email",
+  "handoff.email_help": "The support team gets your question and this conversation, and replies to this address.",
+  "handoff.email_invalid": "Enter an email address, like name@example.com.",
+  "handoff.created_a11y": "Ticket {ticket_id} created.",
+  "handoff.offer": "Send this to our support team",
+  "handoff.send": "Send",
+  "feedback.helpful": "Helpful"
 }

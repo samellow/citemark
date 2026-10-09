@@ -1,0 +1,24 @@
+# The type roles and the focus ring. Print is checked by printing (T15), not on a page.
+component: BaseStylesheet
+page: base
+states:
+  light:
+    theme: light
+    with:
+      specimens: &specimens
+        display-xl: Zulip help center
+        heading-lg: Typing notifications
+        heading-md: Disable sending typing notifications
+        heading-sm: Personal settings
+        label: Looked in the right place
+        body: You can configure Zulip to not send typing notifications to the people you're messaging.
+        body-strong: Account & privacy
+        body-sm: Toggle the settings in the Privacy section.
+        caption: Saved from Zulip's help center on 2026-10-06.
+        data-lg: 38 of 40
+        data: 95% · $0.048
+        data-sm: Q017
+  dark:
+    theme: dark
+    with:
+      specimens: *specimens

@@ -1,0 +1,9 @@
+component: CitationMarker
+macro: cite
+states:
+  tinted:
+    before: Turn off typing notifications under Personal settings, then Account & privacy.
+    with: {n: 1, href: "#source-1", label: {string: "report:evidence.marker_a11y", slots: {n: "1"}}}
+  active:
+    before: Turn off typing notifications under Personal settings, then Account & privacy.
+    with: {n: 1, href: "#source-1", active: true, label: {string: "report:evidence.marker_a11y", slots: {n: "1"}}}

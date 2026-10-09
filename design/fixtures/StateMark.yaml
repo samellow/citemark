@@ -1,0 +1,8 @@
+component: StateMark
+macro: state_mark
+states:
+  pass: {with: {state: pass, label: {string: "report:state.pass"}}}
+  fail: {with: {state: fail, label: {string: "report:state.fail"}}}
+  warn: {with: {state: warn, label: {string: "report:state.warn"}}}
+  declined: {with: {state: declined, label: {string: "report:state.declined"}}}
+  own_label: {with: {state: pass, label: {string: "widget:handoff.created_a11y", slots: {ticket_id: "48213"}}}}

@@ -1,0 +1,8 @@
+# Each state's arguments to the primitive's macro. A value written as {string: file:key} comes
+# from content/en/; anything else is sample data, from the Zulip demo or the made-up Acme Chat.
+component: Wordmark
+macro: wordmark
+states:
+  sm: {with: {size: sm}}
+  md: {with: {size: md}}
+  lg: {with: {size: lg}}

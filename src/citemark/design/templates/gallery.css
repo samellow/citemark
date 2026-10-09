@@ -1,0 +1,32 @@
+/* The gallery's own layout. Components bring their styles from citemark.css. */
+body { padding: var(--space-6); max-width: 72rem; margin: 0 auto; }
+.cm-gallery-head { display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-6); }
+.cm-gallery-meta, .cm-gallery-lede { color: var(--text-muted); font-size: var(--type-body-sm-size); line-height: var(--type-body-sm-line); }
+.cm-gallery-lede { max-width: 68ch; }
+.cm-gallery-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-core);
+}
+.cm-gallery-stage > .cm-field { width: min(100%, 28rem); }
+.cm-gallery-index { display: flex; flex-direction: column; gap: var(--space-12); }
+.cm-gallery-table { width: 100%; border-collapse: collapse; background: var(--surface); }
+.cm-gallery-table th, .cm-gallery-table td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.cm-gallery-table thead th { font-family: var(--font-display); font-size: var(--type-label-size); letter-spacing: var(--type-label-tracking); text-transform: uppercase; color: var(--text-muted); }
+.cm-gallery-states { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+.cm-gallery-unbuilt { color: var(--text-muted); }
+.cm-gallery-swatch { display: inline-block; width: var(--space-8); height: var(--space-6); vertical-align: middle; border: 1px solid var(--line-strong); border-radius: var(--radius-marker); }
+.cm-gallery-glyphs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+.cm-gallery-glyph { display: inline-flex; align-items: center; justify-content: center; padding: var(--space-2); border-radius: var(--radius-marker); }
+.cm-gallery-glyph-lg svg { width: var(--space-12); height: var(--space-12); }
+.cm-gallery-roles { display: flex; flex-direction: column; gap: var(--space-4); }
+.cm-gallery-roles div { display: flex; flex-direction: column; gap: var(--space-1); }
+code { font-family: var(--font-mono); font-size: 0.9em; }
+.cm-gallery-stage > section { display: flex; flex-direction: column; gap: var(--space-4); width: 100%; }
+.cm-gallery-table th[scope="row"] code { white-space: nowrap; }
+.cm-gallery-glyphs li { display: flex; align-items: center; gap: var(--space-3); }

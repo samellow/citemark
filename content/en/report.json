@@ -1,0 +1,7 @@
+{
+  "state.pass": "Pass",
+  "state.fail": "Fail",
+  "state.warn": "Warn",
+  "state.declined": "Declined",
+  "evidence.marker_a11y": "Source {n}"
+}

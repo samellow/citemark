@@ -1,0 +1,7 @@
+component: Button
+macro: button
+states:
+  primary: {with: {variant: primary, label: {string: "admin:signin.submit"}}}
+  quiet: {with: {variant: quiet, label: {string: "widget:feedback.helpful"}}}
+  accent: {with: {variant: accent, label: {string: "widget:handoff.offer"}}}
+  disabled: {with: {variant: quiet, disabled: true, label: {string: "widget:handoff.send"}}}

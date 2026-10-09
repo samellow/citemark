@@ -1,0 +1,173 @@
+/*
+ * Citemark's base styles and shared primitives (UI kit 2, rule 4): the fonts, a light reset, the
+ * type roles' behavior, the focus ring, and Wordmark, CitationMarker, StateMark, Button and Field.
+ * Load tokens.css first. Every color, size, radius and duration comes from a token (UI kit 7,
+ * rule 3). Seeded from the design-system artifact's bundle.css, with its sm- classes renamed cm-.
+ */
+
+/* --- Fonts: IBM Plex, self-hosted under the SIL Open Font License (fonts/OFL.txt) --- */
+
+@font-face { font-family: "IBM Plex Sans Condensed"; font-weight: 600; font-style: normal; font-display: swap; src: url("fonts/IBMPlexSansCondensed-SemiBold.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 400; font-style: normal; font-display: swap; src: url("fonts/IBMPlexSans-Regular.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 600; font-style: normal; font-display: swap; src: url("fonts/IBMPlexSans-SemiBold.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url("fonts/IBMPlexMono-Regular.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-weight: 500; font-style: normal; font-display: swap; src: url("fonts/IBMPlexMono-Medium.woff2") format("woff2"); }
+
+/* --- Base --- */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--type-body-family);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  font-weight: var(--type-body-weight);
+}
+h1, h2, h3, h4, p, ol, ul, dl, dd, figure { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+svg { flex: none; }
+a { color: var(--ink); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.cm-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The type roles' classes are in tokens.css; these add what a role does beyond its size */
+.cm-type-label { text-transform: uppercase; color: var(--text-muted); }
+.cm-type-data-lg, .cm-type-data, .cm-type-data-sm { font-variant-numeric: tabular-nums; }
+
+/* --- Wordmark: "Citemark" in the display face, then the citation mark in ink --- */
+
+.cm-wordmark {
+  font-family: var(--font-display);
+  font-weight: var(--type-heading-lg-weight);
+  letter-spacing: -0.01em;
+  color: var(--text);
+  white-space: nowrap;
+}
+.cm-wordmark-sm { font-size: var(--type-body-size); }
+.cm-wordmark-md { font-size: var(--type-heading-md-size); }
+.cm-wordmark-lg { font-size: var(--type-display-xl-size); }
+.cm-wordmark-mark { color: var(--ink); font-size: 0.55em; margin-left: 0.08em; line-height: 0; }
+
+/* --- CitationMarker: tinted on Citemark surfaces (the widget's outlined one is in widget.css) --- */
+
+.cm-cite {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 0.3em;
+  margin: 0 0.15em;
+  border: 1px solid transparent;
+  border-radius: var(--radius-marker);
+  background: var(--ink-soft);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--type-widget-marker-size);
+  font-weight: var(--type-widget-marker-weight);
+  line-height: 1;
+  text-decoration: none;
+  vertical-align: super;
+  transition: background var(--duration-state), color var(--duration-state);
+}
+.cm-cite:hover, .cm-cite.is-active { background: var(--ink); color: var(--on-ink); }
+
+/* --- StateMark: a state's glyph and word on its tint, never color alone --- */
+
+.cm-glyph { flex: none; }
+.cm-state {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--space-1) * 1.5);
+  padding: calc(var(--space-1) / 2) var(--space-2) calc(var(--space-1) / 2) calc(var(--space-1) * 1.5);
+  border-radius: var(--radius-marker);
+  font-family: var(--font-sans);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+  font-weight: var(--type-body-strong-weight);
+}
+.cm-state-pass { color: var(--pass); background: var(--pass-soft); }
+.cm-state-fail { color: var(--fail); background: var(--fail-soft); }
+.cm-state-warn { color: var(--warn); background: var(--warn-soft); }
+.cm-state-declined { color: var(--declined); background: var(--declined-soft); }
+
+/* --- Button: quiet by default; primary in ink; accent in the widget's accent --- */
+
+.cm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--size-target);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-core);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--type-widget-body-size); /* 15px, as the artifact's Button */
+  font-weight: var(--type-body-strong-weight);
+  cursor: pointer;
+  transition: background var(--duration-state), border-color var(--duration-state);
+}
+.cm-btn:hover { background: var(--surface-sunken); }
+.cm-btn-primary { background: var(--ink); border-color: var(--ink); color: var(--on-ink); }
+.cm-btn-primary:hover { background: var(--ink); filter: brightness(1.1); }
+.cm-btn-accent {
+  background: var(--widget-accent);
+  border-color: var(--widget-accent);
+  color: var(--on-widget-accent);
+  border-radius: calc(var(--radius-widget) * 0.67);
+  font-family: var(--font-widget);
+}
+.cm-btn-accent:hover { background: var(--widget-accent); filter: brightness(1.1); }
+.cm-btn:disabled, .cm-btn:disabled:hover {
+  background: var(--surface);
+  border-color: var(--line-strong);
+  color: var(--text-muted);
+  filter: none;
+  cursor: not-allowed;
+}
+
+/* --- Field: a visible label, the control, then help and the error under it --- */
+
+.cm-field { display: flex; flex-direction: column; gap: var(--space-1); }
+.cm-field-label {
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+  font-weight: var(--type-body-strong-weight);
+}
+.cm-input {
+  width: 100%;
+  min-height: var(--size-target);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-core);
+  background: var(--surface-sunken);
+  color: var(--text);
+}
+textarea.cm-input { padding: var(--space-2) var(--space-3); min-height: calc(var(--size-target) * 2.5); resize: vertical; }
+.cm-input[aria-invalid="true"] { border-color: var(--fail); }
+.cm-field-help, .cm-field-error {
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+}
+.cm-field-help { color: var(--text-muted); }
+.cm-field-error { display: flex; align-items: flex-start; gap: var(--space-2); color: var(--fail); }
+.cm-field-error .cm-glyph { margin-top: calc(var(--space-1) / 2); }
+
+/* --- Print: Citemark pages print in light (tokens.css), on white, without motion --- */
+
+@media print {
+  body { background: var(--surface); }
+  .cm-cite { transition: none; }
+}

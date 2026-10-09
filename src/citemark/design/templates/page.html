@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" data-theme="{{ theme }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ component.name }}: {{ state }}, {{ theme }} · Citemark gallery</title>
+<link rel="stylesheet" href="{{ root }}static/tokens.css">
+<link rel="stylesheet" href="{{ root }}static/citemark.css">
+<link rel="stylesheet" href="{{ root }}gallery.css">
+</head>
+<body>
+<header class="cm-gallery-head">
+<p class="cm-gallery-meta"><a href="{{ root }}index.html">Citemark gallery</a></p>
+<h1 class="cm-type-heading-lg">{{ component.name }}: {{ state }}</h1>
+<p class="cm-gallery-meta">{{ theme | capitalize }} theme · rendered by {{ rendered_by }} · phase {{ component.phase }} · specified in {{ component.spec }}{% if other %} · <a href="{{ other.href }}">See it in the {{ other.theme }} theme</a>{% endif %}</p>
+</header>
+<main class="cm-gallery-stage">
+{% if before %}
+<p>{{ before }}{{ body }}</p>
+{% else %}
+{{ body }}
+{% endif %}
+</main>
+</body>
+</html>

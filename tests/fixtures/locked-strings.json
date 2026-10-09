@@ -1,0 +1,27 @@
+{
+  "source": "Content spec section 3: every row marked Locked, copied word for word on 2026-10-09",
+  "strings": {
+    "widget": {
+      "header.title": "{bot_name} · AI assistant",
+      "header.subtitle": "Answers come from the {company} help center.",
+      "first_message": "I'm an AI assistant. I answer from the {company} help center and show where each answer comes from.",
+      "answer.searching": "Searching the help center…",
+      "partial.gap": "The help center doesn't say {gap}.",
+      "clarify.question": "Which one do you mean?",
+      "decline.not_covered": "The help center doesn't cover that.",
+      "decline.off_topic": "I can only answer questions about {company}'s product.",
+      "small_talk.greeting": "Hi, what can I help you find?",
+      "feedback.helpful": "Helpful",
+      "feedback.not_helpful": "Not helpful",
+      "feedback.reason_question": "What was wrong?",
+      "feedback.reasons": "Wrong · Missing information · Hard to understand",
+      "feedback.thanks": "Thanks, this helps us improve the answers.",
+      "handoff.offer": "Send this to our support team",
+      "handoff.sending": "Creating your ticket…",
+      "handoff.confirmed": "Ticket {ticket_id} created. The team will reply to {email}.",
+      "handoff.failed": "We couldn't create the ticket. Email {support_email} instead.",
+      "error.network": "Something went wrong on our side. Try again, or send this to our support team.",
+      "error.rate_limit": "Too many questions in a short time. Wait a minute and try again."
+    }
+  }
+}

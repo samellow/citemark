@@ -1,0 +1,558 @@
+# Every component of Citemark's four surfaces (UI kit 5): the one hand-kept part of the build
+# status. Each lists its renderers (J Jinja, R React, P Preact, L the loader), the roadmap phase
+# that first needs it, its states, the strings it shows (file:key, from content/en/), where it's
+# specified, and the design-system artifact's prototype of it, if any.
+#
+# A component is specified here before any code (UI kit 7, rule 1). Its gallery pages come from
+# design/fixtures/, one per state. String keys of components not built yet follow the content
+# spec, and may move when the component is built. "Prototype ... (stale)" means the artifact's
+# preview predates a later decision: build from the spec, not from it.
+
+components:
+  # --- Foundations (UI kit 5.1) ---
+  - name: Tokens
+    layer: foundation
+    renderers: [All]
+    phase: "1"
+    states: [light, dark]
+    strings: []
+    spec: UI kit 3; design system 3
+    prototype: tokens.json (current)
+  - name: BaseStylesheet
+    layer: foundation
+    renderers: [CSS]
+    phase: "1"
+    states: [light, dark, print]
+    strings: []
+    spec: UI kit 5.1; design system 3.2, 6.7
+    prototype: bundle.css (seed)
+  - name: Fonts
+    layer: foundation
+    renderers: [CSS]
+    phase: "1"
+    states: []
+    strings: []
+    spec: UI kit 3
+    prototype: null
+  - name: Glyphs
+    layer: foundation
+    renderers: [J, R, P, L]
+    phase: "1-2"
+    states: [pass, fail, warn, declined, chat, close, send, stop, minimize, expand, previous, next, new_tab]
+    strings: []
+    spec: UI kit 3 (13 glyphs, 8 drawn in the artifact)
+    prototype: 8 of 13 drawn
+  - name: Gallery
+    layer: foundation
+    renderers: [All]
+    phase: "1"
+    states: []
+    strings: []
+    spec: UI kit 4
+    prototype: null
+
+  # --- Shared primitives (UI kit 5.2) ---
+  - name: Wordmark
+    layer: primitive
+    renderers: [J, R]
+    phase: "1"
+    states: [sm, md, lg]
+    strings: []  # the name is the logo, set in type, not copy
+    spec: UI kit 5.2; design system 3
+    prototype: Wordmark (current)
+  - name: CitationMarker
+    layer: primitive
+    renderers: [J, P]
+    phase: "1"
+    states: [tinted, outlined, active]
+    strings: [report:evidence.marker_a11y, widget:answer.marker_a11y]
+    spec: UI kit 5.2; design system 3, 6.1
+    prototype: CitationMarker (current)
+  - name: StateMark
+    layer: primitive
+    renderers: [J, R]
+    phase: "1"
+    states: [pass, fail, warn, declined, own_label]
+    strings: [report:state.pass, report:state.fail, report:state.warn, report:state.declined]
+    spec: UI kit 5.2; design system 3.1
+    prototype: StateMark (current)
+  - name: Button
+    layer: primitive
+    renderers: [J, R, P]
+    phase: "1"
+    states: [primary, quiet, accent, disabled]
+    strings: []  # each label comes from the caller
+    spec: UI kit 5.2
+    prototype: Button (current)
+  - name: Field
+    layer: primitive
+    renderers: [J, R, P]
+    phase: "1"
+    states: [text, email, password, long_text, with_help, with_error]
+    strings: []  # each label, help and error comes from the caller
+    spec: UI kit 5.2
+    prototype: styles only, inside Handoff
+  - name: Copyable
+    layer: primitive
+    renderers: [R, P]
+    phase: "2"
+    states: [idle, copied]
+    strings: [widget:handoff.copy, widget:handoff.copied]
+    spec: UI kit 5.2; design system 6.3
+    prototype: styles only, inside Handoff
+
+  # --- Report (UI kit 5.3; Jinja, Phase 1) ---
+  - name: CertificateHeader
+    layer: report
+    renderers: [J]
+    phase: "1"
+    states: [audit, build, demo]
+    strings: [report:title, report:header.prepared_by, report:header.for, report:header.questions, report:header.date, report:header.model]
+    spec: PRD 8.1; content spec 5.1
+    prototype: null
+  - name: VerdictLine
+    layer: report
+    renderers: [J]
+    phase: "1"
+    states: [pass, not_pass, baseline]
+    strings: [report:verdict.pass, report:verdict.not_pass, report:verdict.baseline]
+    spec: PRD 8.1 (Q7); content spec 5.1
+    prototype: VerdictLine (stale)
+  - name: MeasureStrip
+    layer: report
+    renderers: [J]
+    phase: "1"
+    states: [met, missed, warn, not_measured, lower_is_better, time_and_cost, count_links, decision_range]
+    strings: [report:measure.range, report:measure.range_same, report:state.warn_help]
+    spec: PRD 8.1; content spec 5.2 (Q4); QA plan Q1
+    prototype: MeasureRow (stale)
+  - name: EvidenceRecord
+    layer: report
+    renderers: [J]
+    phase: "1"
+    states: [full, compact, answered, declined, clarified, partial, retrieval_miss, went_wrong, without_result]
+    strings: [report:trace.heading, report:trace.intro, report:trace.step1, report:trace.step2, report:trace.step3, report:trace.step4, report:trace.step5, report:trace.gap_step2, report:trace.decline_step3, report:trace.went_wrong, report:evidence.expected_answer, report:evidence.bot_answer, report:evidence.expected_source, report:evidence.shown_source, report:evidence.marker_a11y]
+    spec: PRD 8.1; content spec 5.3, 5.5; UI kit 2 (rule 2)
+    prototype: null
+  - name: QuestionEntry
+    layer: report
+    renderers: [J]
+    phase: "1"
+    states: [passed_folded, failed_open, anchor]
+    strings: [report:questions.folded_passes]
+    spec: PRD 8.1; content spec 5.5
+    prototype: null
+  - name: QuestionFilter
+    layer: report
+    renderers: [J]
+    phase: "1"
+    states: [all, failed, by_measure, without_javascript]
+    strings: [report:questions.filter]
+    spec: PRD 8.1; content spec 5.5
+    prototype: null
+  - name: FixPlanGroup
+    layer: report
+    renderers: [J]
+    phase: "1"
+    states: [failure_groups, owners, nothing_to_fix, heading_not_pass, heading_pass, heading_baseline]
+    strings: [report:fix.heading.not_pass, report:fix.heading.pass, report:fix.heading.baseline, report:fix.none, report:fix.owner.builder, report:fix.owner.client, report:fix.owner.either]
+    spec: PRD 8.1; content spec 5.4; design system 7 (Q5)
+    prototype: FixPlanGroup (stale)
+  - name: ComparisonTable
+    layer: report
+    renderers: [J]
+    phase: "1"
+    states: [runs_2_to_5, full_context_na]
+    strings: [report:compare.heading, report:compare.mode.retrieval, report:compare.mode.full_context, report:compare.not_measured]
+    spec: PRD 8.1; content spec 5.5
+    prototype: null
+  - name: MethodBlock
+    layer: report
+    renderers: [J]
+    phase: "1"
+    states: [demo_authorship, client_authorship]
+    strings: [report:method.heading, report:method.questions, report:method.grading, report:method.quotes, report:method.abuse, report:method.runs, report:method.cost, report:method.authorship.demo, report:method.authorship.client]
+    spec: PRD 8.1; content spec 5.5
+    prototype: null
+  - name: SignedBlock
+    layer: report
+    renderers: [J]
+    phase: "1"
+    states: [pass_mark_agreed, none_agreed]
+    strings: [report:signed.agreed, report:signed.none, report:signed.prepared]
+    spec: PRD 8.1; content spec 5.5
+    prototype: null
+  - name: PrintLayer
+    layer: report
+    renderers: [J]
+    phase: "1"
+    states: [print]
+    strings: [report:print.footer]
+    spec: PRD 8.1; content spec 5.5; design system 7 (Q6)
+    prototype: null
+
+  # --- Demo page (UI kit 5.4; Jinja) ---
+  - name: DemoTopBar
+    layer: demo
+    renderers: [J]
+    phase: "1"
+    states: [always_visible]
+    strings: [demo:top.label, demo:top.prepared_by]
+    spec: PRD 8.2; content spec 6.1
+    prototype: null
+  - name: Hero
+    layer: demo
+    renderers: [J]
+    phase: "1"
+    states: [with_results, run_not_done]
+    strings: [demo:hero.headline, demo:hero.subhead, demo:hero.verdict, demo:hero.measures, demo:hero.cta, demo:hero.cta_note, demo:hero.cta_secondary]
+    spec: PRD 8.2; content spec 6.2
+    prototype: null
+  - name: WidgetSlot
+    layer: demo
+    renderers: [J]
+    phase: "1-2"
+    states: [ask_box_and_recorded_exchange, inline_widget]
+    strings: [widget:inline.recorded_label, widget:inline.suggestions_label]
+    spec: PRD 8.2; content spec 3.7, 6.3
+    prototype: null
+  - name: AskBox
+    layer: demo
+    renderers: [J]
+    phase: "1"
+    states: [empty, waiting, answer, decline, error, rate_limited]
+    strings: [widget:composer.label, widget:composer.placeholder, widget:composer.send, widget:answer.searching, widget:error.network, demo:demo.rate_limit]
+    spec: PRD 8.2 (D1); content spec 3.2, 6.6
+    prototype: null
+  - name: StorySection
+    layer: demo
+    renderers: [J]
+    phase: "2"
+    states: [numbered, left_out]
+    strings: []
+    spec: PRD 8.2; content spec 6.4
+    prototype: null
+  - name: OfferBlock
+    layer: demo
+    renderers: [J]
+    phase: "1"
+    states: []
+    strings: [demo:offer.heading, demo:offer.body, demo:offer.data, demo:offer.cta]
+    spec: PRD 8.2; content spec 6.5
+    prototype: null
+  - name: DemoFooter
+    layer: demo
+    renderers: [J]
+    phase: "1"
+    states: []
+    strings: [demo:footer.label, demo:footer.license]
+    spec: PRD 8.2; content spec 6.6
+    prototype: null
+
+  # --- Widget (UI kit 5.5; Preact, Phase 2; the launcher is the loader's) ---
+  - name: Launcher
+    layer: widget
+    renderers: [L]
+    phase: "2"
+    states: [closed, open, old_browser]
+    strings: [widget:launcher.label, widget:fallback.link]
+    spec: PRD 5.7, 8.3; content spec 3.1, 3.5
+    prototype: Launcher (current)
+  - name: Sheet
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [open_45, expanded_85, minimized_band, phone, inline]
+    strings: []
+    spec: PRD 8.3 (Q9), 5.7
+    prototype: WidgetPanel (stale)
+  - name: SheetHeader
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: []
+    strings: [widget:header.title, widget:header.subtitle, widget:header.minimize, widget:header.expand, widget:header.collapse, widget:header.close]
+    spec: PRD 8.3 (Q9); content spec 3.1
+    prototype: WidgetHeader (stale)
+  - name: Band
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [step_n_of_m, latest_answer]
+    strings: [widget:band.step, widget:band.latest, widget:band.back, widget:band.open_a11y]
+    spec: PRD 8.3; content spec 3.5
+    prototype: null
+  - name: EmptyState
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: []
+    strings: [widget:first_message, widget:empty.examples_label, widget:empty.examples]
+    spec: PRD 8.3; content spec 3.1, 3.6
+    prototype: inside WidgetPanel (stale)
+  - name: RecordedTurns
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [label, two_turns, suggestions]
+    strings: [widget:inline.recorded_label, widget:inline.suggestions_label]
+    spec: PRD 8.3; content spec 3.7
+    prototype: null
+  - name: Composer
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [empty, typing, over_900, sending_with_stop]
+    strings: [widget:composer.label, widget:composer.placeholder, widget:composer.send, widget:composer.too_long, widget:answer.stop]
+    spec: PRD 8.3; content spec 3.2
+    prototype: inside WidgetPanel (stale)
+  - name: Answer
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [searching, streaming, done, stopped]
+    strings: [widget:answer.searching, widget:answer.stop, widget:answer.stopped, widget:answer.ready_a11y, widget:small_talk.greeting, widget:small_talk.thanks, widget:small_talk.goodbye]
+    spec: PRD 8.3; content spec 3.2, 3.3; design system 6.1
+    prototype: Answer (stale)
+  - name: SourceList
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [collapsed, quote_on_hover_or_focus, quote_expanded]
+    strings: [widget:answer.sources_label, widget:answer.source_link, widget:answer.source_link_a11y, widget:answer.quote_label]
+    spec: PRD 8.3; content spec 3.2; design system 6.1
+    prototype: inside Answer (stale)
+  - name: Decline
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [not_covered, off_topic, partial]
+    strings: [widget:decline.not_covered, widget:decline.off_topic, widget:partial.gap, widget:handoff.offer]
+    spec: content spec 3.3; design system 6.1a, 6.2
+    prototype: Decline (current)
+  - name: Clarify
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [two_choices, three_choices, chosen]
+    strings: [widget:clarify.question]
+    spec: content spec 3.3; design system 6.1b
+    prototype: Clarify (current)
+  - name: Feedback
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [idle, asking_why, thanks]
+    strings: [widget:feedback.helpful, widget:feedback.not_helpful, widget:feedback.reason_question, widget:feedback.reasons, widget:feedback.thanks]
+    spec: content spec 3.4; design system 6.4
+    prototype: Feedback (current)
+  - name: Handoff
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [offer, email, invalid_email, sending, confirmed, failed, demo]
+    strings: [widget:handoff.offer, widget:handoff.email_label, widget:handoff.email_help, widget:handoff.email_invalid, widget:handoff.send, widget:handoff.sending, widget:handoff.confirmed, widget:handoff.failed, widget:handoff.copy, demo:demo.handoff_email, demo:demo.handoff_note]
+    spec: PRD 8.2, 8.3; content spec 3.4, 6.6; design system 6.3
+    prototype: Handoff (stale)
+  - name: TicketSegment
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [shown_until_closed]
+    strings: [widget:handoff.confirmed_segment]
+    spec: PRD 8.3; content spec 3.4
+    prototype: null
+  - name: Notice
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [network_error, rate_limit, spend_cap, conversation_limit, demo_limits]
+    strings: [widget:error.network, widget:error.rate_limit, widget:error.spend_cap, widget:error.conversation_limit, widget:error.conversation_limit_action, demo:demo.rate_limit, demo:demo.spend_cap]
+    spec: PRD 8.3; content spec 3.5, 6.6; design system 6.5
+    prototype: null
+  - name: Announcer
+    layer: widget
+    renderers: [P]
+    phase: "2"
+    states: [answer_ready, ticket_created]
+    strings: [widget:answer.ready_a11y, widget:handoff.created_a11y]
+    spec: PRD 8.3; content spec 3.2, 3.4
+    prototype: null
+
+  # --- Admin page (UI kit 5.6; React, Phases 2-3) ---
+  - name: AdminTopBar
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [member, owner]
+    strings: []
+    spec: PRD 8.4
+    prototype: null
+  - name: TabNav
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [current_page, with_count]
+    strings: [admin:tabs, admin:tabs.new_count]
+    spec: PRD 8.4; content spec 7.2
+    prototype: null
+  - name: SinceLine
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [items, nothing_new, first_visit]
+    strings: [admin:since.line, admin:since.flagged, admin:since.failed_jobs, admin:since.report, admin:since.failed_handoffs, admin:since.nothing, admin:since.first_visit]
+    spec: PRD 8.4; content spec 7.2, 7.8
+    prototype: null
+  - name: WeeklyPanel
+    layer: admin
+    renderers: [R]
+    phase: "3"
+    states: [tasks_open, ticking_off, done_for_the_week, hidden, calendar_download]
+    strings: [admin:weekly.title, admin:weekly.task1, admin:weekly.task2, admin:weekly.task3, admin:weekly.done, admin:weekly.dismiss, admin:weekly.calendar, admin:weekly.calendar_help, admin:calendar.title, admin:calendar.description]
+    spec: PRD 8.4; content spec 7.8; onboarding plan 5
+    prototype: null
+  - name: PageHeader
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [with_main_action, owner_only_action]
+    strings: [admin:owner_only]
+    spec: PRD 8.4; content spec 7.2
+    prototype: null
+  - name: ListView
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [rows, search, filters, empty, nothing_matches]
+    strings: []  # each page passes its own empty and filtered-empty text
+    spec: PRD 8.4
+    prototype: null
+  - name: DetailView
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [back_to_the_list, own_link]
+    strings: [admin:back]
+    spec: PRD 8.4; content spec 7.2
+    prototype: null
+  - name: TechnicalMargin
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [closed, open, phone, remembered]
+    strings: [admin:margin.show]
+    spec: PRD 8.4; content spec 7.2
+    prototype: null
+  - name: JobRow
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [queued, running, done, failed, stopped_at_budget]
+    strings: [admin:reindex.queued, admin:reindex.running, admin:reindex.done, admin:reindex.failed, admin:tests.running, admin:tests.over_budget]
+    spec: PRD 8.4 (Q10); content spec 7.4, 7.6
+    prototype: ProgressLine (stale)
+  - name: SourceRow
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [up_to_date, reading, failed_group]
+    strings: [admin:docs.status.ok, admin:docs.status.reading, admin:docs.status.failed_group, admin:docs.fail.404, admin:docs.fail.login, admin:docs.fail.empty]
+    spec: PRD 8.4; content spec 7.3
+    prototype: null
+  - name: ConversationRow
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [seven_outcomes]
+    strings: [admin:conv.outcomes]
+    spec: PRD 8.4; content spec 7.5
+    prototype: null
+  - name: RecordFrame
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [loading, loaded, failed_to_load]
+    strings: []
+    spec: PRD 8.4; UI kit 2 (rule 2)
+    prototype: null
+  - name: ThemeForm
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [bot_name, accent_with_contrast_notice, radius, side, theme]
+    strings: [admin:widget.heading, admin:widget.bot_name, admin:widget.accent, admin:widget.contrast_fixed]
+    spec: PRD 5.7, 8.4; content spec 7.3; design system 4
+    prototype: null
+  - name: WidgetPreview
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: []
+    strings: [admin:widget.preview]
+    spec: PRD 8.4; content spec 7.3; UI kit 2 (rule 2)
+    prototype: null
+  - name: OriginsList
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [empty, one_or_more, invalid_address]
+    strings: [admin:widget.origins, admin:widget.origins_help]
+    spec: PRD 8.4; content spec 7.3
+    prototype: null
+  - name: HandoffSettings
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [not_configured, test_passed, test_failed]
+    strings: [admin:handoff.heading, admin:handoff.zendesk, admin:handoff.webhook, admin:handoff.fallback_email, admin:handoff.test, admin:handoff.test_ok, admin:handoff.test_failed]
+    spec: PRD 8.4; content spec 7.3
+    prototype: null
+  - name: RunTestForm
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [member, estimate, running, stopped_at_budget]
+    strings: [admin:tests.action, admin:tests.form.version, admin:tests.form.mode, admin:tests.form.model, admin:tests.form.budget, admin:tests.estimate, admin:tests.run, admin:tests.member]
+    spec: PRD 8.4; content spec 7.6
+    prototype: null
+  - name: GradingSheet
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [grading, finished_with_agreement]
+    strings: [admin:grading.heading, admin:grading.help]
+    spec: PRD 5.4, 8.4; content spec 7.6
+    prototype: null
+  - name: FlaggedItem
+    layer: admin
+    renderers: [R]
+    phase: "3"
+    states: [new, dismissed, personal_details_masked, accepted]
+    strings: [admin:flagged.origin, admin:flagged.dismiss, admin:flagged.accept, admin:flagged.rewrite_help, admin:flagged.fields, admin:flagged.save, admin:flagged.accepted]
+    spec: PRD 8.4; content spec 7.7
+    prototype: null
+  - name: ConfirmDialog
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [delete_a_conversation]
+    strings: [admin:conv.delete, admin:conv.delete_confirm, admin:conv.delete_keep]
+    spec: PRD 8.4; content spec 7.5
+    prototype: null
+  - name: AuthForms
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: [sign_in, wrong_password, set_password, expired_invite, reset, reset_used, reset_done, signed_out_after_14_days]
+    strings: [admin:signin.heading, admin:signin.email, admin:signin.password, admin:signin.submit, admin:signin.error, admin:signin.forgot, admin:invite.heading, admin:invite.help, admin:invite.expired, admin:reset.heading, admin:reset.used, admin:reset.done, admin:session.expired]
+    spec: PRD 8.4; content spec 7.1
+    prototype: null
+  - name: SaveError
+    layer: admin
+    renderers: [R]
+    phase: "2"
+    states: []
+    strings: [admin:save_failed]
+    spec: PRD 8.4; content spec 7.2
+    prototype: null

@@ -1,0 +1,33 @@
+{% import "primitives.html" as ui %}
+<section aria-labelledby="colors">
+<h2 class="cm-type-heading-md" id="colors">Colors in the {{ theme }} theme</h2>
+<table class="cm-gallery-table">
+<thead><tr><th scope="col">Token</th><th scope="col">Value</th><th scope="col">Use</th></tr></thead>
+<tbody>
+{% for name, value in colors.items() %}
+<tr>
+<th scope="row"><span class="cm-gallery-swatch" style="background: var(--{{ name }})"></span> <code>--{{ name }}</code></th>
+<td class="cm-type-data">{{ value[theme] }}</td>
+<td class="cm-type-body-sm">{{ usage[name] }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</section>
+<section aria-labelledby="contrast">
+<h2 class="cm-type-heading-md" id="contrast">The 25 contrast pairs</h2>
+<table class="cm-gallery-table">
+<thead><tr><th scope="col">Foreground</th><th scope="col">Background</th><th scope="col">Ratio</th><th scope="col">At least</th><th scope="col">Result</th></tr></thead>
+<tbody>
+{% for pair in pairs if pair.theme == theme %}
+<tr>
+<td><code>--{{ pair.foreground }}</code></td>
+<td><code>--{{ pair.background }}</code></td>
+<td class="cm-type-data">{{ "%.2f" | format(pair.ratio) }}:1</td>
+<td class="cm-type-data">{{ "%.1f" | format(pair.minimum) }}:1</td>
+<td>{{ ui.state_mark(state="pass" if pair.passes else "fail", label=t("report", "state.pass" if pair.passes else "state.fail")) }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</section>

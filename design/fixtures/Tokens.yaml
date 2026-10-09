@@ -1,0 +1,6 @@
+# Each theme's colors, and the 25 contrast pairs checked in it.
+component: Tokens
+page: tokens
+states:
+  light: {theme: light}
+  dark: {theme: dark}

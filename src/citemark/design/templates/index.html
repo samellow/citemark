@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Citemark gallery</title>
+<link rel="stylesheet" href="{{ root }}static/tokens.css">
+<link rel="stylesheet" href="{{ root }}static/citemark.css">
+<link rel="stylesheet" href="{{ root }}gallery.css">
+</head>
+<body>
+<header class="cm-gallery-head">
+{% import "primitives.html" as ui %}
+<p>{{ ui.wordmark(size="md") }}</p>
+<h1 class="cm-type-heading-lg">Gallery</h1>
+<p class="cm-gallery-lede">One page for each state of each component the kit renders, in the light and the dark theme, built from <code>design/fixtures/</code>. {{ pages | length }} pages for {{ paged | length }} of the {{ components | length }} components in <code>design/components.yaml</code>. The others are specified and not built yet.</p>
+</header>
+<main class="cm-gallery-index">
+{% for layer, title in [("foundation", "Foundations"), ("primitive", "Shared primitives"), ("report", "Report"), ("demo", "Demo page"), ("widget", "Widget"), ("admin", "Admin page")] %}
+<section aria-labelledby="layer-{{ layer }}">
+<h2 class="cm-type-heading-md" id="layer-{{ layer }}">{{ title }}</h2>
+<table class="cm-gallery-table">
+<thead><tr><th scope="col">Component</th><th scope="col">Phase</th><th scope="col">Rendered by</th><th scope="col">States</th></tr></thead>
+<tbody>
+{% for component in components if component.layer == layer %}
+<tr>
+<th scope="row">{{ component.name }}</th>
+<td class="cm-type-data">{{ component.phase }}</td>
+<td>{% for renderer in component.renderers %}{{ rendered_by[renderer] }}{{ ", " if not loop.last }}{% endfor %}</td>
+<td>
+{% set shown = pages | selectattr("component", "equalto", component.name) | list %}
+{% if not component.states %}No states{% endif %}
+<ul class="cm-gallery-states">
+{% for state in component.states %}
+{% set mine = shown | selectattr("state", "equalto", state) | list %}
+<li>{% if mine %}{% for page in mine %}<a href="{{ root }}{{ page.path }}">{{ state }}, {{ page.theme }}</a>{{ " · " if not loop.last }}{% endfor %}{% else %}<span class="cm-gallery-unbuilt">{{ state }}</span>{% endif %}</li>
+{% endfor %}
+</ul>
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</section>
+{% endfor %}
+</main>
+</body>
+</html>

@@ -10,3 +10,11 @@ fixtures/zulip/raw.tar.gz
 
 # Local settings, including API keys
 .env
+
+# The component gallery, built by citemark gallery
+build/
+
+# The browser checks' packages and results
+e2e/node_modules/
+e2e/test-results/
+e2e/playwright-report/

@@ -26,6 +26,8 @@ sources_app = typer.Typer(
     help="Where answers come from: add a help center, index it, upload files.", no_args_is_help=True
 )
 app.add_typer(sources_app, name="sources")
+design_app = typer.Typer(help="The design tokens: checked for contrast, then written as CSS.", no_args_is_help=True)
+app.add_typer(design_app, name="design")
 
 
 FileArg = Annotated[Path, typer.Argument(help="The test-set YAML file.", exists=True, dir_okay=False)]
@@ -775,6 +777,58 @@ class Kind(StrEnum):
     START_PAGE = "start-page"
     SITEMAP = "sitemap"
     URL = "url"
+
+
+@design_app.command("build")
+def design_build(
+    check: Annotated[
+        bool, typer.Option("--check", help="Write nothing: exit 1 if static/tokens.css is out of date.")
+    ] = False,
+) -> None:
+    """Check the 25 contrast pairs in both themes, then write static/tokens.css from design/tokens.json."""
+    from citemark.design import tokens
+
+    try:
+        design = tokens.load()
+        failing = [pair for pair in tokens.pairs(design) if not pair.passes]
+    except tokens.TokenError as exc:
+        _fail(str(exc))
+    for pair in failing:
+        typer.echo(
+            f"  {pair.theme}: {pair.foreground} on {pair.background} is {pair.ratio:.2f}:1, below {pair.minimum:.1f}:1",
+            err=True,
+        )
+    if failing:
+        _fail(f"{len(failing)} contrast {'pair falls' if len(failing) == 1 else 'pairs fall'} short of WCAG AA.")
+    if check:
+        if tokens.stale():
+            _fail("static/tokens.css doesn't match design/tokens.json. Write it with: citemark design build")
+        typer.echo("The 25 contrast pairs pass in both themes, and static/tokens.css is up to date.")
+        return
+    changed = tokens.build()
+    typer.echo(
+        "The 25 contrast pairs pass in both themes. "
+        + ("Wrote static/tokens.css." if changed else "static/tokens.css was already up to date.")
+    )
+
+
+@app.command("gallery")
+def gallery(
+    out: Annotated[Path, typer.Option(help="The folder to build it in. Rebuilding empties it.")] = Path(
+        "build/gallery"
+    ),
+) -> None:
+    """Build the component gallery: one page per component, state and theme, from design/fixtures/."""
+    from citemark.design import gallery as galleries
+    from citemark.design.manifest import ManifestError
+    from citemark.report.render import RenderError
+
+    try:
+        pages = galleries.build(out)
+    except (galleries.GalleryError, ManifestError, RenderError) as exc:
+        _fail(str(exc))
+    components = len({page.component for page in pages})
+    typer.echo(f"Built {len(pages)} pages for {components} components in {out}. Open {out / 'index.html'}.")
 
 
 @sources_app.command("add")

@@ -1,0 +1,48 @@
+{#-
+  The shared primitives (UI kit 5.2), as Jinja renders them. Seven primitives are also drawn by
+  the React and Preact renderers, and a markup contract test will hold the copies identical
+  (UI kit 2, rule 3). No text lives here: every label is passed in, from a strings file.
+-#}
+
+{#- Wordmark: the name set in type, then the citation mark. The name is the logo, not copy. -#}
+{% macro wordmark(size="md") -%}
+{% if size not in ("sm", "md", "lg") %}{{ refuse("A wordmark is sm, md or lg, not " ~ size ~ ".") }}{% endif %}
+<span class="cm-wordmark cm-wordmark-{{ size }}" role="img" aria-label="Citemark"><span aria-hidden="true">Citemark</span><sup class="cm-wordmark-mark" aria-hidden="true">1</sup></span>
+{%- endmacro %}
+
+{#- CitationMarker: the numbered link after a cited claim, tinted on Citemark surfaces. -#}
+{% macro cite(n, label, href, active=false) -%}
+{% if not href.startswith(("#", "https://", "http://")) %}{{ refuse("A marker links to #… or to an http(s) page, not " ~ href ~ ".") }}{% endif %}
+<a class="cm-cite{{ ' is-active' if active }}" href="{{ href }}" aria-label="{{ label }}">{{ n }}</a>
+{%- endmacro %}
+
+{#- StateMark: a state's glyph and word, so color is never the only signal. -#}
+{% macro state_mark(state, label) -%}
+{% if state not in ("pass", "fail", "warn", "declined") %}{{ refuse("A state mark is pass, fail, warn or declined, not " ~ state ~ ".") }}{% endif %}
+<span class="cm-state cm-state-{{ state }}">{{ glyph(state) }}<span>{{ label }}</span></span>
+{%- endmacro %}
+
+{#- Button: quiet unless it's the page's main action (primary) or the widget's (accent). -#}
+{% macro button(label, variant="quiet", type="button", disabled=false) -%}
+{% if variant not in ("primary", "quiet", "accent") %}{{ refuse("A button is primary, quiet or accent, not " ~ variant ~ ".") }}{% endif %}
+{% if type not in ("button", "submit") %}{{ refuse("A button's type is button or submit, not " ~ type ~ ".") }}{% endif %}
+<button type="{{ type }}" class="cm-btn cm-btn-{{ variant }}"{{ " disabled" if disabled }}>{{ label }}</button>
+{%- endmacro %}
+
+{#- Field: a visible label, the control, then its help and its error, both read with it. -#}
+{% macro field(id, label, kind="text", help=none, error=none, value=none, autocomplete=none, required=false) -%}
+{% if kind not in ("text", "email", "password", "long_text") %}{{ refuse("A field is text, email, password or long_text, not " ~ kind ~ ".") }}{% endif %}
+{% if not id or id.split() != [id] %}{{ refuse("A field's id is one word, since its label and help point at it, not " ~ id ~ ".") }}{% endif %}
+{% set described = ([id ~ "-help"] if help else []) + ([id ~ "-error"] if error else []) %}
+{% set attributes %}{% if described %} aria-describedby="{{ described | join(' ') }}"{% endif %}{% if error %} aria-invalid="true"{% endif %}{% if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}{% if required %} required{% endif %}{% endset %}
+<div class="cm-field">
+<label class="cm-field-label" for="{{ id }}">{{ label }}</label>
+{% if kind == "long_text" %}
+<textarea class="cm-input" id="{{ id }}" name="{{ id }}"{{ attributes }}>{{ value or "" }}</textarea>
+{% else %}
+<input class="cm-input" id="{{ id }}" name="{{ id }}" type="{{ kind }}"{% if value %} value="{{ value }}"{% endif %}{{ attributes }}>
+{% endif %}
+{% if help %}<p class="cm-field-help" id="{{ id }}-help">{{ help }}</p>{% endif %}
+{% if error %}<p class="cm-field-error" id="{{ id }}-error">{{ glyph("fail") }}<span>{{ error }}</span></p>{% endif %}
+</div>
+{%- endmacro %}

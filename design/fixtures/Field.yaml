@@ -1,0 +1,28 @@
+component: Field
+macro: field
+states:
+  text: {with: {id: question, kind: text, label: {string: "widget:composer.label"}}}
+  email: {with: {id: email, kind: email, autocomplete: email, label: {string: "widget:handoff.email_label"}}}
+  password: {with: {id: password, kind: password, autocomplete: current-password, label: {string: "admin:signin.password"}}}
+  long_text:
+    with:
+      id: question
+      kind: long_text
+      label: {string: "widget:composer.label"}
+      value: Is there a way to stop people from seeing when I'm typing?
+  with_help:
+    with:
+      id: email
+      kind: email
+      autocomplete: email
+      label: {string: "widget:handoff.email_label"}
+      help: {string: "widget:handoff.email_help"}
+  with_error:
+    with:
+      id: email
+      kind: email
+      autocomplete: email
+      value: jo@
+      label: {string: "widget:handoff.email_label"}
+      help: {string: "widget:handoff.email_help"}
+      error: {string: "widget:handoff.email_invalid"}

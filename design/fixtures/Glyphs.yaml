@@ -1,0 +1,8 @@
+# The four state glyphs drawn so far (UI kit 3). The other nine join with the widget.
+component: Glyphs
+page: glyph
+states:
+  pass: {with: {name: pass}}
+  fail: {with: {name: fail}}
+  warn: {with: {name: warn}}
+  declined: {with: {name: declined}}
