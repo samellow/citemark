@@ -450,11 +450,13 @@ async def test_a_measure_with_no_questions_is_refused(session, sessions, tmp_pat
 @pytest.mark.anyio
 async def test_a_price_change_while_the_runs_ran_is_refused(session, failing):
     path, runs = failing
-    earlier = dt.datetime.now(dt.UTC) - dt.timedelta(days=3)
+    # Fixed dates, after the set froze and before the seeded prices (Oct 9), so the change is this
+    # test's own whatever day it runs, and the earliest change in the runs is the one named
+    earlier = dt.datetime(2026, 9, 1, tzinfo=dt.UTC)
     await session.execute(update(TestRun).where(TestRun.id == runs[0].id).values(started_at=earlier))
-    session.add(Price(model=HAIKU, input_per_mtok=2, effective_from=TODAY - dt.timedelta(days=1)))
+    session.add(Price(model=HAIKU, input_per_mtok=2, effective_from=dt.date(2026, 9, 2)))
     await session.commit()
-    with pytest.raises(ReportError, match="Prices changed on"):
+    with pytest.raises(ReportError, match="Prices changed on Sep 2, 2026,"):
         await built(session, asked(path, runs, fix_plan=WRONG))
 
 
