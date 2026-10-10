@@ -30,12 +30,38 @@ class Settings(BaseSettings):
     webhook_url: str | None = None
     webhook_secret: SecretStr | None = None
     admin_reset_token: SecretStr | None = None  # set only during a password recovery (PRD 5.9)
+    # The visitor's address, as the host's proxy passes it: CF-Connecting-IP on Render. Unset, the
+    # connection's own address is used, which behind a proxy is the proxy's (T16, T18).
+    client_ip_header: str | None = None
+    # The public demo page (PRD 8.2), served at / when demo_company is set
+    demo_company: str | None = None  # the product the help center is for, as the bot names it
+    demo_model: str = "claude-haiku-5-5"  # until the test picks the cheapest that met every target
+    demo_audit_url: str | None = None  # the audit listing on Upwork, or the profile until it's approved
+    demo_audit_price: str | None = None  # as the listing shows it, such as $300
+    demo_results: str | None = None  # the published results file, once the decision runs exist (T20)
 
-    @field_validator("abuse_database_url", "builder_name", mode="before")
+    @field_validator(
+        "abuse_database_url",
+        "builder_name",
+        "client_ip_header",
+        "demo_company",
+        "demo_audit_url",
+        "demo_audit_price",
+        "demo_results",
+        mode="before",
+    )
     @classmethod
     def _blank_is_unset(cls, value: str | None) -> str | None:
         """A line copied from .env.example with nothing after the = is a setting not given."""
         return (value.strip() or None) if isinstance(value, str) else value
+
+    @field_validator("demo_audit_url")
+    @classmethod
+    def _https(cls, url: str | None) -> str | None:
+        """The audit button leaves the page for this address, so only a secure web page will do."""
+        if url is not None and not url.startswith("https://"):
+            raise ValueError("DEMO_AUDIT_URL must be an https:// address, the audit listing on Upwork.")
+        return url
 
     @field_validator("database_url", "abuse_database_url")
     @classmethod

@@ -48,6 +48,13 @@ class Reply:
     problems: tuple[str, ...] = ()  # where the model broke the rules: logged, and counted in test runs
 
     @property
+    def stored_segments(self) -> list[dict[str, object]] | None:
+        """The answer's stretches as the database keeps them, or None when it isn't an answer."""
+        if self.kind not in ("answer", "partial"):
+            return None
+        return [{"text": segment.text, "markers": list(segment.markers)} for segment in self.segments]
+
+    @property
     def gap_line(self) -> str | None:
         return strings.text("widget", "partial.gap", gap=self.gap) if self.gap else None
 

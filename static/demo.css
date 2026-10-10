@@ -1,0 +1,178 @@
+/*
+ * The public demo page (PRD 8.2), Phase 1: load tokens.css, citemark.css and record.css first.
+ * Every color, size and radius comes from a token. It follows the visitor's light or dark setting.
+ *
+ * Top to bottom: the label bar, the first screen, the offer, the footer. On the first screen the
+ * bot's slot sits beside the headline and the proof from 1024px, and right after the headline
+ * below it, as PRD 8.2 orders the phone: label bar, headline, bot, verdict, button.
+ */
+
+.cm-demo-page { background: var(--ground); }
+a.cm-btn { text-decoration: none; }
+
+/* --- DemoTopBar: always on the first screen, label included --- */
+
+.cm-topbar { border-bottom: 1px solid var(--line); background: var(--surface); }
+.cm-topbar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-6);
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-6);
+}
+.cm-topbar-brand { display: flex; align-items: baseline; gap: var(--space-3); white-space: nowrap; }
+.cm-topbar-by { color: var(--text-muted); font-size: var(--type-body-sm-size); line-height: var(--type-body-sm-line); }
+.cm-topbar-label {
+  flex: 1 1 24rem;
+  max-width: 48rem;
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+  text-align: right;
+}
+
+/* --- The page --- */
+
+.cm-demo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-16);
+}
+.cm-demo-banner {
+  padding: var(--space-2) var(--space-6);
+  background: var(--warn-soft);
+  color: var(--warn);
+  font-weight: var(--type-body-strong-weight);
+  text-align: center;
+}
+
+/* --- The first screen --- */
+
+.cm-first { display: grid; gap: var(--space-8); align-items: start; }
+.cm-hero-intro { display: flex; flex-direction: column; gap: var(--space-4); }
+.cm-hero-headline {
+  font-family: var(--type-display-xl-family);
+  font-size: var(--type-heading-lg-size);
+  line-height: var(--type-heading-lg-line);
+  font-weight: var(--type-display-xl-weight);
+  letter-spacing: -0.01em;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+.cm-hero-subhead { max-width: 46ch; color: var(--text-muted); }
+
+.cm-hero-proof { display: flex; flex-direction: column; gap: var(--space-4); }
+.cm-hero-verdict { font-weight: var(--type-body-strong-weight); }
+.cm-hero-measures { margin: 0; padding: 0; list-style: none; border-bottom: 1px solid var(--line); }
+.cm-hero-measure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content max-content;
+  align-items: baseline;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--line);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+}
+.cm-hero-measure-count { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cm-hero-cta { margin-top: var(--space-2); }
+.cm-hero-cta-note, .cm-hero-report { font-size: var(--type-body-sm-size); line-height: var(--type-body-sm-line); }
+.cm-hero-cta-note { color: var(--text-muted); }
+
+@media (min-width: 1024px) {
+  .cm-first {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas: "intro slot" "proof slot";
+    grid-template-rows: auto 1fr;
+    column-gap: var(--space-12);
+  }
+  .cm-hero-intro { grid-area: intro; }
+  .cm-slot { grid-area: slot; }
+  .cm-hero-proof { grid-area: proof; }
+  .cm-hero-headline { font-size: var(--type-display-xl-size); line-height: var(--type-display-xl-line); }
+}
+
+/* --- WidgetSlot: the bot, framed as one panel --- */
+
+.cm-slot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-core);
+  background: var(--surface);
+}
+.cm-slot-label {
+  font-family: var(--type-label-family);
+  font-size: var(--type-label-size);
+  line-height: var(--type-label-line);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.cm-turns { display: flex; flex-direction: column; gap: var(--space-6); margin: 0; padding: 0; list-style: none; }
+.cm-turn { display: flex; flex-direction: column; gap: var(--space-2); }
+.cm-turn:focus { outline: none; }
+.cm-turn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: var(--space-2); }
+.cm-turn-question {
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-core);
+  background: var(--ink-soft);
+  font-weight: var(--type-body-strong-weight);
+}
+.cm-turn-error { display: flex; align-items: flex-start; gap: var(--space-2); color: var(--fail); }
+.cm-slot .cm-step { grid-template-columns: 8rem minmax(0, 1fr); gap: var(--space-4); }
+
+.cm-suggestions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.cm-suggestions .cm-btn, .cm-options .cm-btn { text-align: left; }
+.cm-options:has(.cm-btn) { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: 0; list-style: none; }
+
+/* --- AskBox: the conversation, a status line, then the question box --- */
+
+.cm-ask { display: flex; flex-direction: column; gap: var(--space-4); }
+.cm-asked { padding-top: var(--space-4); border-top: 1px solid var(--line); }
+.cm-ask-status:not(:empty) {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-core);
+  background: var(--warn-soft);
+  color: var(--text);
+}
+.cm-ask-status:focus { outline: none; }
+.cm-ask-form { display: flex; flex-direction: column; gap: var(--space-3); }
+.cm-ask-form > .cm-btn { align-self: flex-end; }
+[data-ask-box][aria-busy="true"] .cm-ask-status { background: var(--ink-soft); }
+
+@media (max-width: 719px) {
+  .cm-topbar-label { text-align: left; }
+  .cm-demo { padding: var(--space-6) var(--space-4) var(--space-12); gap: var(--space-12); }
+  .cm-slot { padding: var(--space-4); }
+  .cm-slot .cm-step { grid-template-columns: minmax(0, 1fr); gap: var(--space-1); }
+  .cm-hero-measure { grid-template-columns: max-content max-content; justify-content: start; row-gap: var(--space-1); }
+  .cm-hero-measure-name { grid-column: 1 / -1; }
+}
+
+/* --- OfferBlock and DemoFooter --- */
+
+.cm-offer { display: flex; flex-direction: column; gap: var(--space-4); max-width: 70ch; }
+.cm-offer-data { color: var(--text-muted); font-size: var(--type-body-sm-size); line-height: var(--type-body-sm-line); }
+.cm-demo-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: var(--space-6);
+  border-top: 1px solid var(--line);
+  color: var(--text-muted);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+}

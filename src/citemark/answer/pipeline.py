@@ -209,18 +209,22 @@ async def save_exchange(
     session: AsyncSession, conversation_id: uuid.UUID, question: str, answered: Answered
 ) -> Message:
     """The visitor's message and the bot's reply, with its sources, what search found and what
-    it all cost. Each keeps its own time, so the two stay in order."""
+    it all cost. Each keeps its own time, and the reply names the question it answers."""
     reply = answered.reply
     calls = reply.calls
     rewritten = answered.rewritten
-    session.add(Message(conversation_id=conversation_id, role="user", content=question, created_at=answered.asked_at))
+    asked = Message(conversation_id=conversation_id, role="user", content=question, created_at=answered.asked_at)
+    session.add(asked)
+    await session.flush()  # the question's ID, for the reply to name
     answer = Message(
         conversation_id=conversation_id,
+        reply_to=asked.id,
         role="assistant",
         content=reply.text,
         kind=reply.kind,
         clarify_options=list(reply.clarify_options) if reply.clarify_options else None,
         gap_text=reply.gap,
+        segments=reply.stored_segments,
         swapped=reply.swapped,
         input_tokens=sum(call.input_tokens for call in calls) + rewritten.input_tokens,
         output_tokens=sum(call.output_tokens for call in calls) + rewritten.output_tokens,

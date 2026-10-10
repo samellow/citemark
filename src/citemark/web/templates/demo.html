@@ -1,0 +1,36 @@
+<!doctype html>
+{#-
+  The public demo page (PRD 8.2), Phase 1: the top bar with the label, the first screen (the
+  headline, the bot's slot, then what the test found and the audit button), the offer and the
+  footer. On a phone the slot comes right after the headline; wider, it sits beside the rest.
+  `static` is where the stylesheets and the script are: "/static/" served, a relative path in the
+  gallery. `banner` labels a made-up sample.
+-#}
+{% from "demo_parts.html" import top_bar, hero_intro, hero_proof, slot, offer, footer %}
+<html lang="{{ page.lang }}"{% if theme %} data-theme="{{ theme }}"{% endif %}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }}</title>
+<meta name="description" content="{{ page.description }}">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="{{ static }}tokens.css">
+<link rel="stylesheet" href="{{ static }}citemark.css">
+<link rel="stylesheet" href="{{ static }}record.css">
+<link rel="stylesheet" href="{{ static }}demo.css">
+<script src="{{ static }}demo.js" defer></script>
+</head>
+<body class="cm-demo-page">
+{{ top_bar(page) }}
+<main class="cm-demo">
+{% if banner %}<p class="cm-demo-banner">{{ banner }}</p>{% endif %}
+<div class="cm-first">
+{{ hero_intro(page.hero) }}
+{{ slot(page.slot, page.labels, form, max_question) }}
+{{ hero_proof(page.hero) }}
+</div>
+{% if page.offer %}{{ offer(page.offer) }}{% endif %}
+</main>
+{{ footer(page) }}
+</body>
+</html>

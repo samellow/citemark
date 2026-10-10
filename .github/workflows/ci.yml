@@ -116,3 +116,12 @@ jobs:
           html = build.render(sample.report());
           assert html.count('data:font/woff2;base64,') == 5 and html.count('<script>') == 1, 'not self-contained';
           assert 'cm-record-full' in html and 'cm-measure-value' in html, 'a stylesheet is missing'"
+      - name: The demo page renders in the image, and the app serves its stylesheet and script
+        run: >-
+          docker run --rm -e DATABASE_URL=postgresql://unused@localhost/unused --entrypoint python citemark:ci -c
+          "import asyncio, httpx2; from citemark.web import page, sample; from citemark.web.app import create_app;
+          assert 'cm-topbar-label' in page.render(sample.demo()), 'the page lost its label';
+          app = create_app();
+          get = lambda path: asyncio.run(httpx2.AsyncClient(transport=httpx2.ASGITransport(app=app), base_url='http://image').get(path));
+          codes = [get(path).status_code for path in ('/static/demo.css', '/static/demo.js', '/healthz')];
+          assert codes == [200, 200, 200], codes"

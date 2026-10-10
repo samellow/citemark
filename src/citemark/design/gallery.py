@@ -41,6 +41,12 @@ MARKER = ".citemark-gallery"  # marks a folder this builds, so a rebuild never e
 THEMES = ("light", "dark")
 RENDERED_BY = {"J": "Jinja", "R": "React", "P": "Preact", "L": "the loader", "CSS": "CSS", "All": "every renderer"}
 SAMPLE = "Sample report: made-up Acme Chat content, to show the layout. No test run is behind these numbers."
+SAMPLE_DEMO = (
+    "Sample demo page: made-up Acme Chat content, to show the layout. No test run or live answer is behind it."
+)
+FRAGMENT = "demo/ask-answered.fragment.html"  # the ask box after one answer, as the server sends it to demo.js
+REFUSED = "demo/ask-refused.fragment.html"  # and after the hour's limit refused a question, kept to send again
+REFUSED_DRAFT = "How do I export my messages?"  # made up
 
 
 class GalleryError(Exception):
@@ -177,17 +183,48 @@ def build(out: Path, *, fixtures: Path = FIXTURES, manifest_path: Path = manifes
         path = f"report/sample--{theme}.html" if theme else "report/sample.html"
         (out / path).write_text(reports.render(sample.report(), theme=theme, banner=SAMPLE), encoding="utf-8")
         samples.append(Page(path, "Report", "sample", theme or ""))
+    demos = _demo_pages(out)
     paged = {page.component for page in pages}
     index = env.get_template("index.html").render(
         components=list(components.values()),
         pages=pages,
         paged=paged,
         samples=samples,
+        demos=demos,
         rendered_by=RENDERED_BY,
         root="",
     )
     (out / "index.html").write_text(index, encoding="utf-8")
     index_page = {"path": "index.html", "component": "", "state": "", "theme": "light"}
-    listing = [asdict(page) for page in pages + samples] + [index_page]
+    listing = [asdict(page) for page in pages + samples + demos] + [index_page]
     (out / "pages.json").write_text(json.dumps(listing, indent=2) + "\n", encoding="utf-8")
+    return pages
+
+
+def _demo_pages(out: Path) -> list[Page]:
+    """The demo page, labeled as made up: as served, with the sample report's results and an empty
+    ask box; mid-conversation and refused by the hour's limit, in each theme; and before any run,
+    refused by the day's cap, in each theme. Then the ask box alone after one answer, which the
+    browser checks hand to demo.js as the server would."""
+    from citemark.web import page as demo_page
+    from citemark.web import sample as demo_sample
+
+    (out / "demo").mkdir()
+    capped = demo_page.ask_box(company=demo_sample.COMPANY, notice=demo_page.spend_capped(None))
+    states = [("demo/sample.html", "with results", None, demo_sample.demo())]
+    states += [
+        (f"demo/sample--{t}.html", "mid-conversation", t, demo_sample.demo(ask=demo_sample.asked())) for t in THEMES
+    ]
+    states += [(f"demo/no-run--{t}.html", "run not done", t, demo_sample.demo(run=False, ask=capped)) for t in THEMES]
+    pages = []
+    for path, state, theme, built in states:
+        html = demo_page.render(built, static="../static/", theme=theme, banner=SAMPLE_DEMO)
+        (out / path).write_text(html, encoding="utf-8")
+        pages.append(Page(path, "Demo page", state, theme or ""))
+    answered = demo_page.ask_box(
+        company=demo_sample.COMPANY, turns=demo_sample.conversation()[1:2], conversation="sample"
+    )
+    (out / FRAGMENT).write_text(demo_page.render_ask(answered), encoding="utf-8")
+    refused = demo_page.ask_box(company=demo_sample.COMPANY, notice=demo_page.rate_limited(12), draft=REFUSED_DRAFT)
+    (out / REFUSED).write_text(demo_page.render_ask(refused), encoding="utf-8")
     return pages

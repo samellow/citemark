@@ -17,7 +17,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any, NoReturn
 
-from jinja2 import Environment, PackageLoader, StrictUndefined
+from jinja2 import ChoiceLoader, Environment, PackageLoader, StrictUndefined
 from markupsafe import Markup, escape
 
 from citemark import strings
@@ -61,7 +61,7 @@ def refuse(message: str) -> NoReturn:
 @cache
 def environment() -> Environment:
     env = Environment(
-        loader=PackageLoader("citemark.report", "templates"),
+        loader=ChoiceLoader([PackageLoader(package, "templates") for package in ("citemark.report", "citemark.web")]),
         autoescape=True,
         undefined=StrictUndefined,
         trim_blocks=True,

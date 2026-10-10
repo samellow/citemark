@@ -2,7 +2,7 @@
 
 A support bot for SaaS help centers that ships with proof it works: a test report, run on the client's own help center, showing how often the bot answers correctly, shows the right source, and says so when the help center doesn't cover a question. Each client runs their own copy in their own hosting account. MIT-licensed.
 
-**Status: early.** The demo's 50 test questions were frozen on 2026-10-08, before any bot code exists, so the published results can't be fitted to them. The tag `zulip-v1-frozen` marks that commit. The bot can load a help center, keep it up to date, find the passages that answer a question, answer with sources or decline, and run its own test set, scored and judged, three times over when a decision rests on it. The report that publishes those results comes next.
+**Status: early.** The demo's 50 test questions were frozen on 2026-10-08, before any bot code exists, so the published results can't be fitted to them. The tag `zulip-v1-frozen` marks that commit. The bot can load a help center, keep it up to date, find the passages that answer a question, answer with sources or decline, and run its own test set, scored and judged, three times over when a decision rests on it. The report that publishes those results and the demo page that serves the bot are built; the decision runs that fill them come next.
 
 ## What's here so far
 
@@ -23,6 +23,11 @@ A support bot for SaaS help centers that ships with proof it works: a test repor
   - Numbers round against the bot, and a measure's state comes from its exact value, so a shown number never looks better than it was.
   - It refuses to build rather than claim what it can't show: without the frozen test set the runs used, the judge's agreement with a person's grading, an estimate for each group of failures, or who agreed the pass mark and when.
   - Every word is in `content/en/report.json`, and the gallery shows a sample report with made-up content.
+- `src/citemark/web/` and `citemark serve`: the public demo page and its ask box, one FastAPI app with the job worker running inside it.
+  - The unofficial-demo label sits at the top of every page. Until the decision runs are published (`DEMO_RESULTS`), the page leaves out everything that would say the bot was tested: the counts, the recorded exchange, the suggested questions and the report link.
+  - Answers come from the same pipeline as the test runs, each shown as its evidence: where the bot looked, what it quoted, what it answered. The ask box works without JavaScript.
+  - Each visitor may ask 10 questions an hour, counted in memory under a salted hash of their address, never stored. Behind a host's proxy, `CLIENT_IP_HEADER` names the header the proxy puts the address in (CF-Connecting-IP on Render). A daily spend cap, $1 unless `citemark demo spend-cap` sets another, stops answers for the rest of the day.
+  - No cookies and no analytics scripts: page views, audit-button clicks (through `/go/audit`), suggested-question taps and report opens are counted per day and per pitch variant (`?v=`), never per person.
 - `design/`, `static/` and `citemark gallery`: how the report, the demo page and later the widget and admin page look.
   - `design/tokens.json` holds every color, type style and size, in a light and a dark theme. `citemark design build` checks the 25 text and control color pairs against WCAG AA in both themes, then writes `static/tokens.css`.
   - `static/citemark.css` holds the base styles and the shared parts: the wordmark, citation markers, state marks (always a glyph and a word, never color alone), buttons and form fields. Fonts are IBM Plex, self-hosted, so no page asks Google for them.
@@ -87,6 +92,13 @@ To build a report, set the pass mark agreed with the client, then name what the 
 uv run citemark test threshold test-sets/<the set>.yaml --agreed-by "<their name>" --on 2026-10-20 \
   --targets correct_answers=90,right_source=90,correct_declines=95,wrongly_declined=5,right_place=95
 uv run citemark report build reports/<client>.yaml --out reports/<client>.html
+```
+
+To serve the demo page, set `DEMO_COMPANY`, `BUILDER_NAME`, `DEMO_AUDIT_URL` and both API keys in `.env`. Its answers call Claude and Voyage, within the limits above.
+
+```
+uv run citemark serve              # http://127.0.0.1:8000; a host passes --host 0.0.0.0 and sets PORT
+uv run citemark demo spend-cap     # the cap and today's spend; add an amount, such as 2.00, to change it
 ```
 
 ## Licenses

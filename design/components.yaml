@@ -197,7 +197,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [always_visible]
-    strings: [demo:top.label, demo:top.prepared_by]
+    strings: [demo:top.label, demo:top.prepared_by, demo:meta.title, demo:meta.description, demo:meta.title_no_run, demo:meta.description_no_run]
     spec: PRD 8.2; content spec 6.1
     prototype: null
   - name: Hero
@@ -205,7 +205,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [with_results, run_not_done]
-    strings: [demo:hero.headline, demo:hero.subhead, demo:hero.verdict, demo:hero.measures, demo:hero.cta, demo:hero.cta_note, demo:hero.cta_secondary]
+    strings: [demo:hero.headline, demo:hero.subhead, demo:hero.verdict, demo:hero.measure.correct_answers, demo:hero.measure.right_source, demo:hero.measure.correct_declines, demo:hero.measure.wrongly_declined, demo:hero.measure.right_place, demo:hero.cta, demo:hero.cta_note, demo:hero.cta_secondary]
     spec: PRD 8.2; content spec 6.2
     prototype: null
   - name: WidgetSlot
@@ -221,7 +221,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [empty, waiting, answer, decline, error, rate_limited]
-    strings: [widget:composer.label, widget:composer.placeholder, widget:composer.send, widget:answer.searching, widget:error.network, demo:demo.rate_limit]
+    strings: [widget:composer.label, widget:composer.placeholder, widget:composer.send, widget:answer.searching, demo:demo.error, demo:demo.rate_limit, demo:demo.spend_cap, demo:demo.spend_cap_no_run]
     spec: PRD 8.2 (D1); content spec 3.2, 6.6
     prototype: null
   - name: StorySection

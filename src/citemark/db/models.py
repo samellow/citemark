@@ -189,6 +189,8 @@ class Message(_Row, Base):
         CheckConstraint("(role = 'user') = (kind IS NULL)", name="kind_role"),
         CheckConstraint("kind = 'clarify' OR clarify_options IS NULL", name="clarify_options"),
         CheckConstraint("kind = 'partial' OR gap_text IS NULL", name="gap_text"),
+        CheckConstraint("kind IN ('answer', 'partial') OR segments IS NULL", name="segments"),
+        CheckConstraint("role = 'assistant' OR reply_to IS NULL", name="reply_to"),
     )
 
     conversation_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("conversation.id", ondelete="CASCADE"), index=True)
@@ -197,6 +199,10 @@ class Message(_Row, Base):
     kind: Mapped[str | None]
     clarify_options: Mapped[list[str] | None] = mapped_column(NULLABLE_JSON)
     gap_text: Mapped[str | None]
+    # The answer in stretches, each with the markers of its sources: [{"text": …, "markers": [1]}]
+    segments: Mapped[list[dict[str, Any]] | None] = mapped_column(NULLABLE_JSON)
+    # The question a reply answers. Both are saved once the answer is done, so time alone can't pair them
+    reply_to: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("message.id", ondelete="CASCADE"))
     # Text streamed before a late decline or clarifying question, then swapped out (PRD Q11)
     swapped: Mapped[bool] = mapped_column(server_default=FALSE)
     input_tokens: Mapped[int] = mapped_column(server_default=ZERO)
@@ -208,7 +214,7 @@ class Message(_Row, Base):
     cost_usd: Mapped[Decimal] = mapped_column(server_default=ZERO)
     ttfw_ms: Mapped[int | None]
     total_ms: Mapped[int | None]
-    created_at: Mapped[dt.datetime] = mapped_column(server_default=func.now())
+    created_at: Mapped[dt.datetime] = mapped_column(server_default=func.now(), index=True)  # today's spend
 
 
 class Citation(_Row, Base):
@@ -418,6 +424,27 @@ class Job(_Row, Base):
     locked_at: Mapped[dt.datetime | None]
     created_at: Mapped[dt.datetime] = mapped_column(server_default=func.now())
     finished_at: Mapped[dt.datetime | None]
+
+
+COUNTED_EVENTS = ("page_view", "audit_click", "suggestion_tap", "report_open")
+VARIANTS = ("", "accuracy", "build")  # the pitch a proposal link carried (?v=), or none
+
+
+class DailyCount(Base):
+    """How often something happened on one day, for one pitch variant (onboarding plan 7). Counts
+    only: never who, from where, or in what order."""
+
+    __tablename__ = "daily_count"
+    __table_args__ = (
+        one_of("event", COUNTED_EVENTS),
+        one_of("variant", VARIANTS),
+        CheckConstraint("count >= 0", name="count"),
+    )
+
+    day: Mapped[dt.date] = mapped_column(primary_key=True)
+    event: Mapped[str] = mapped_column(primary_key=True)
+    variant: Mapped[str] = mapped_column(primary_key=True)
+    count: Mapped[int] = mapped_column(server_default=ZERO)
 
 
 class Setting(Base):

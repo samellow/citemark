@@ -75,7 +75,21 @@ def test_every_fixture_state_gets_a_page_in_each_theme_unless_it_is_a_theme(buil
     assert all((out / page.path).is_file() for page in pages)
     listed = json.loads((out / "pages.json").read_text(encoding="utf-8"))
     samples = ["report/sample.html", "report/sample--light.html", "report/sample--dark.html"]
-    assert [entry["path"] for entry in listed] == [page.path for page in pages] + samples + ["index.html"]
+    demos = ["demo/sample.html", "demo/sample--light.html", "demo/sample--dark.html"]
+    demos += ["demo/no-run--light.html", "demo/no-run--dark.html"]
+    assert [entry["path"] for entry in listed] == [page.path for page in pages] + samples + demos + ["index.html"]
+
+
+def test_the_demo_page_is_labeled_made_up_in_every_state_and_its_fragment_isnt_a_page(built):
+    """The ask box's fragment is what demo.js swaps in, not a page, so axe doesn't open it alone."""
+    out, _ = built
+    listed = {entry["path"] for entry in json.loads((out / "pages.json").read_text(encoding="utf-8"))}
+    for path in sorted(p for p in listed if p.startswith("demo/")):
+        text = (out / path).read_text(encoding="utf-8")
+        assert text.index(gallery.SAMPLE_DEMO) < text.index('class="cm-first"'), path
+        assert 'href="../static/demo.css"' in text
+    fragment = (out / gallery.FRAGMENT).read_text(encoding="utf-8")
+    assert gallery.FRAGMENT not in listed and fragment.startswith('<div class="cm-ask" data-ask-box>')
 
 
 def test_the_sample_report_is_labeled_a_sample_as_sent_and_in_both_themes(built):

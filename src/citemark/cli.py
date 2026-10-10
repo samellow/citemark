@@ -30,6 +30,8 @@ design_app = typer.Typer(help="The design tokens: checked for contrast, then wri
 app.add_typer(design_app, name="design")
 report_app = typer.Typer(help="Accuracy reports: one file each, built from decision runs.", no_args_is_help=True)
 app.add_typer(report_app, name="report")
+demo_app = typer.Typer(help="The public demo page: its ask box's daily spend cap.", no_args_is_help=True)
+app.add_typer(demo_app, name="demo")
 
 
 FileArg = Annotated[Path, typer.Argument(help="The test-set YAML file.", exists=True, dir_okay=False)]
@@ -1145,3 +1147,69 @@ def ask(
         typer.echo("Broke the rules: " + "; ".join(reply.problems))
     first = f"First word after {result.ttfw_ms / 1000:.2f} s, " if result.ttfw_ms is not None else ""
     typer.echo(f"{first}{result.total_ms / 1000:.2f} s in all. Cost about ${result.cost_usd:.4f} at list prices.")
+
+
+@app.command("serve")
+def serve(
+    host: Annotated[str, typer.Option(envvar="HOST", help="The address to listen on: 0.0.0.0 in a container.")] = (
+        "127.0.0.1"
+    ),
+    port: Annotated[int, typer.Option(envvar="PORT", help="The port. Hosts such as Render set PORT.")] = 8000,
+    worker: Annotated[bool, typer.Option(help="Run the job worker in the same process (PRD Q1).")] = True,
+) -> None:
+    """Serve the web app: the demo page and its ask box once DEMO_COMPANY is set. Its answers call
+    Claude and Voyage, within the ask box's limits."""
+    import uvicorn
+
+    from citemark import log
+    from citemark.settings import get_settings
+    from citemark.web.app import SetupError, create_app, preflight
+
+    settings = get_settings()
+    try:
+        preflight(settings)
+    except SetupError as exc:
+        _fail(str(exc))
+    log.configure()
+    # The proxy's headers are read by the ask box's limiter alone, and no request is logged with
+    # its address (PRD 5.11)
+    uvicorn.run(
+        create_app(settings=settings, worker=worker),
+        host=host,
+        port=port,
+        proxy_headers=False,
+        server_header=False,
+        access_log=False,
+    )
+
+
+@demo_app.command("spend-cap")
+def demo_spend_cap(
+    amount: Annotated[
+        str | None, typer.Argument(help="Dollars a day, such as 2.00. Leave it out to see the cap and today's spend.")
+    ] = None,
+) -> None:
+    """Show or set the ask box's daily spend cap ($1 unless set), and what's been spent today (UTC)."""
+    from decimal import Decimal, InvalidOperation
+
+    from citemark.db.session import make_sessionmaker
+    from citemark.web.limits import set_spend_cap, spend_cap, spent_today, utc_today
+
+    new = None
+    if amount is not None:
+        try:
+            new = Decimal(amount.removeprefix("$"))
+        except InvalidOperation:
+            _fail(f"{amount} isn't an amount in dollars, such as 2.00.")
+        if not new.is_finite() or new < 0:
+            _fail(f"{amount} isn't an amount in dollars, such as 2.00.")
+
+    async def run(engine):
+        async with make_sessionmaker(engine)() as session:
+            if new is not None:
+                await set_spend_cap(session, new, by="citemark demo spend-cap")
+                await session.commit()
+            return await spend_cap(session), await spent_today(session, utc_today())
+
+    cap, spent = _with_db(run)
+    typer.echo(f"The ask box's cap is ${cap:.2f} a day. Spent today (UTC): ${spent:.4f}.")

@@ -400,9 +400,7 @@ def _citations(answered: Answered) -> list[dict[str, Any]]:
 
 
 def _segments(reply: Reply) -> list[dict[str, Any]] | None:
-    if reply.kind not in JUDGED:
-        return None
-    return [{"text": segment.text, "markers": list(segment.markers)} for segment in reply.segments]
+    return reply.stored_segments  # the judged kinds are the answers: answer and partial
 
 
 def _stored(cost: Decimal) -> Decimal:

@@ -4,8 +4,11 @@
   report's traced question (full) and for every question in its list (compact), and later for the
   ask page and the admin's conversations (UI kit 2, rule 2), so it puts classes, never styles, on
   what it draws. Every word is passed in: `L` holds the report's fixed labels.
+
+  A live answer isn't graded, so `graded=false` leaves out the result (step 5) and where it went
+  wrong. `choose`, a form's id, makes a clarifying question's options buttons that ask again.
 -#}
-{% from "primitives.html" import cite, state_mark %}
+{% from "primitives.html" import button, cite, state_mark %}
 
 {#- A help-center section's title, linked to it when it has a web address. -#}
 {% macro linked(title, url) -%}
@@ -22,9 +25,9 @@
 <p class="cm-answer">{% for part in r.answer %}{{ part.text }}{% for quote in part.markers %}{{ cite(quote.marker, quote.label, "#" ~ quote.id) }}{% endfor %}{% endfor %}</p>
 {%- endmacro %}
 
-{% macro record(r, L, full=false) -%}
-<div class="cm-record{{ ' cm-record-full' if full }}{{ ' is-failed' if not r.passed }}">
-{% if r.went_wrong %}<p class="cm-record-wrong">{{ glyph("fail") }}<span>{{ r.went_wrong }}</span></p>{% endif %}
+{% macro record(r, L, full=false, graded=true, choose=none) -%}
+<div class="cm-record{{ ' cm-record-full' if full }}{{ ' is-failed' if graded and not r.passed }}">
+{% if graded and r.went_wrong %}<p class="cm-record-wrong">{{ glyph("fail") }}<span>{{ r.went_wrong }}</span></p>{% endif %}
 <ol class="cm-steps">
 {% if full %}
 <li class="cm-step" value="1">
@@ -68,7 +71,7 @@
 {% if r.clarify_question %}
 <p>{{ r.clarify_question }}</p>
 <ul class="cm-options">
-{% for option in r.options %}<li>{{ option }}</li>{% endfor %}
+{% for option in r.options %}<li>{% if choose %}{{ button(option, "quiet", "submit", name="option", value=option, form=choose) }}{% else %}{{ option }}{% endif %}</li>{% endfor %}
 </ul>
 {% if r.chosen %}<p class="cm-chosen">{{ r.chosen }}</p>{% endif %}
 {% endif %}
@@ -76,6 +79,7 @@
 {% if r.gap_line %}<p class="cm-gap">{{ r.gap_line }}</p>{% endif %}
 </div>
 </li>
+{% if graded %}
 <li class="cm-step" value="5">
 {{ step_label(L["trace.step5"], full) }}
 <div class="cm-step-body">
@@ -96,6 +100,7 @@
 {% endif %}
 </div>
 </li>
+{% endif %}
 </ol>
 </div>
 {%- endmacro %}
