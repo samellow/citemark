@@ -1,0 +1,144 @@
+{#-
+  The report's components (UI kit 5.3), each drawn from `report/view.py`'s content: nothing here
+  decides a word or a number. VerdictLine and MeasureStrip are also embedded, as HTML, by the
+  admin's Tests page (UI kit 5.3), so these put classes, never styles, on what they draw.
+-#}
+{% from "primitives.html" import wordmark, state_mark %}
+
+{#- CertificateHeader: the mark, the report's name, who it's for and what it covers. -#}
+{% macro certificate_header(h) -%}
+<header class="cm-cert">
+<div class="cm-cert-top">
+{{ wordmark("md") }}
+<p class="cm-cert-date cm-type-data">{{ h.date }}</p>
+</div>
+<h1 class="cm-cert-title cm-type-heading-lg">{{ h.title }}</h1>
+<p class="cm-cert-for">{{ h.for_line }}</p>
+<ul class="cm-cert-meta">
+<li>{{ h.prepared_by }}</li>
+<li>{{ h.questions }}</li>
+<li>{{ h.model }}</li>
+</ul>
+</header>
+{%- endmacro %}
+
+{#- VerdictLine: pass, not pass or baseline, in one sentence, before any detail. -#}
+{% macro verdict_line(v) -%}
+<section class="cm-verdict cm-verdict-{{ v.state }}">
+<p class="cm-verdict-text">{{ glyph({"pass": "pass", "not_pass": "fail", "baseline": "declined"}[v.state]) }}<span>{{ v.sentence | rich }}</span></p>
+</section>
+{%- endmacro %}
+
+{#- MeasureStrip: each measure's name and meaning, its count, target and state. A row without data
+    says why, and a count links to the questions that failed it. -#}
+{% macro measure_strip(rows, L) -%}
+<ul class="cm-measures">
+{% for row in rows %}
+<li class="cm-measure cm-measure-{{ row.key }}">
+<div class="cm-measure-name">
+<p class="cm-measure-label">{{ row.name }}</p>
+{% if row.definition %}<p class="cm-measure-def">{{ row.definition }}</p>{% endif %}
+</div>
+{% if row.missing %}
+<p class="cm-measure-missing">{{ row.missing }}</p>
+{% else %}
+<div class="cm-measure-count">
+<p class="cm-measure-value">{% if row.link %}<a href="{{ row.link }}">{{ row.count }}</a>{% else %}{{ row.count }}{% endif %}</p>
+{% if row.spread %}<p class="cm-measure-spread">{{ row.spread }}</p>{% endif %}
+</div>
+<p class="cm-measure-target">{{ row.target or "" }}</p>
+<div class="cm-measure-state">
+{% if row.state %}{{ state_mark(row.state, L["state." ~ row.state]) }}{% endif %}
+{% if row.state == "warn" %}<p class="cm-measure-help">{{ L["state.warn_help"] }}</p>{% endif %}
+</div>
+{% endif %}
+</li>
+{% endfor %}
+</ul>
+{%- endmacro %}
+
+{#- FixPlanGroup: a failure type, how many questions it affected, what fixing it involves, who
+    does it and your estimate, then a link to each question. -#}
+{% macro fix_plan(plan) -%}
+<section class="cm-fix" aria-labelledby="fix-h">
+<h2 class="cm-type-heading-md" id="fix-h">{{ plan.heading }}</h2>
+{% if plan.none %}
+<p class="cm-fix-none">{{ glyph("pass") }}<span>{{ plan.none }}</span></p>
+{% else %}
+<ol class="cm-fix-groups">
+{% for group in plan.groups %}
+<li class="cm-fix-group cm-fix-{{ group.key }}">
+<div class="cm-fix-head">
+<h3 class="cm-type-heading-sm">{{ group.title }}</h3>
+<p class="cm-fix-count">{{ group.count }}</p>
+</div>
+<p>{{ group.what }}</p>
+<p class="cm-fix-owner">{{ group.owner }}</p>
+<ul class="cm-fix-questions">
+{% for question in group.questions %}<li><a href="#{{ question }}">{{ question }}</a></li>{% endfor %}
+</ul>
+</li>
+{% endfor %}
+</ol>
+{% endif %}
+</section>
+{%- endmacro %}
+
+{#- QuestionFilter: hidden until the report's one script shows it, since only it can filter. -#}
+{% macro question_filter(filters, L) -%}
+<div class="cm-filter" role="group" aria-label="{{ L['questions.filter.label'] }}" data-filter hidden>
+<span class="cm-filter-label" aria-hidden="true">{{ L["questions.filter.label"] }}</span>
+<button type="button" class="cm-btn" data-show="all" aria-pressed="true">{{ L["questions.filter.all"] }}</button>
+<button type="button" class="cm-btn" data-show="failed" aria-pressed="false">{{ L["questions.filter.failed"] }}</button>
+{% for key, name in filters %}
+<button type="button" class="cm-btn" data-show="{{ key }}" aria-pressed="false">{{ name }}</button>
+{% endfor %}
+</div>
+{%- endmacro %}
+
+{#- ComparisonTable: setups as columns on the same scale. The table scrolls sideways on a narrow
+    screen, so its region takes the heading's name and the keyboard can reach it. -#}
+{% macro comparison_table(c, L) -%}
+<div class="cm-compare">
+<h2 class="cm-type-heading-md" id="compare-h">{{ L["compare.heading"] }}</h2>
+<div class="cm-compare-scroll" role="region" aria-labelledby="compare-h" tabindex="0">
+<table class="cm-compare-table">
+<thead>
+<tr>
+<td></td>
+{% for column in c.columns %}
+<th scope="col"><span class="cm-compare-model">{{ column.model }}</span><span class="cm-compare-mode">{{ column.mode }}</span><span class="cm-compare-date">{{ column.date }}</span></th>
+{% endfor %}
+</tr>
+</thead>
+<tbody>
+{% for key, name in c.rows %}
+<tr>
+<th scope="row">{{ name }}</th>
+{% for column in c.columns %}<td>{{ column.cells[key] }}</td>{% endfor %}
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+{%- endmacro %}
+
+{#- MethodBlock: how the test was done, then each setup's version, commit and run IDs. -#}
+{% macro method_block(m, L) -%}
+<section class="cm-method" aria-labelledby="method-h">
+<h2 class="cm-type-heading-md" id="method-h">{{ L["method.heading"] }}</h2>
+{% for paragraph in m.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}
+<ul class="cm-method-setups">
+{% for setup in m.setups %}<li>{{ setup }}</li>{% endfor %}
+</ul>
+</section>
+{%- endmacro %}
+
+{#- SignedBlock: who agreed the pass mark and when, and who prepared the report. -#}
+{% macro signed_block(pass_mark, prepared) -%}
+<footer class="cm-signed">
+<p class="cm-signed-mark">{{ pass_mark }}</p>
+<p class="cm-signed-by">{{ prepared }}</p>
+</footer>
+{%- endmacro %}

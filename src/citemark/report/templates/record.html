@@ -1,0 +1,113 @@
+{#-
+  EvidenceRecord (UI kit 5.3; PRD 8.1): one answer in five numbered steps. The question, where the
+  bot looked, what it quoted, what it answered, and the result. Rendered from the same data for the
+  report's traced question (full) and for every question in its list (compact), and later for the
+  ask page and the admin's conversations (UI kit 2, rule 2), so it puts classes, never styles, on
+  what it draws. Every word is passed in: `L` holds the report's fixed labels.
+-#}
+{% from "primitives.html" import cite, state_mark %}
+
+{#- A help-center section's title, linked to it when it has a web address. -#}
+{% macro linked(title, url) -%}
+{% if url %}<a href="{{ url }}">{{ title }}</a>{% else %}{{ title }}{% endif %}
+{%- endmacro %}
+
+{% macro step_label(text, full) -%}
+{% if full %}<p class="cm-step-label">{{ text | rich }}</p>{% else %}<p class="cm-step-label">{{ text | bold_part }}</p>{% endif %}
+{%- endmacro %}
+
+{#- The answer, each stretch followed by the markers of the quotes it rests on. One line, so the
+    template's own spacing doesn't reach the answer, whose line breaks are kept. -#}
+{% macro answer_text(r) -%}
+<p class="cm-answer">{% for part in r.answer %}{{ part.text }}{% for quote in part.markers %}{{ cite(quote.marker, quote.label, "#" ~ quote.id) }}{% endfor %}{% endfor %}</p>
+{%- endmacro %}
+
+{% macro record(r, L, full=false) -%}
+<div class="cm-record{{ ' cm-record-full' if full }}{{ ' is-failed' if not r.passed }}">
+{% if r.went_wrong %}<p class="cm-record-wrong">{{ glyph("fail") }}<span>{{ r.went_wrong }}</span></p>{% endif %}
+<ol class="cm-steps">
+{% if full %}
+<li class="cm-step" value="1">
+{{ step_label(L["trace.step1"], full) }}
+<div class="cm-step-body">
+<p class="cm-step-question">{{ r.question }}</p>
+</div>
+</li>
+{% endif %}
+<li class="cm-step{{ ' is-wrong' if r.step == 2 }}" value="2">
+{{ step_label(L["trace.step2"], full) }}
+<div class="cm-step-body">
+{% if r.full_context %}
+<p class="cm-step-note">{{ r.looked_note }}</p>
+{% else %}
+<ol class="cm-looked">
+{% for passage in r.looked %}
+<li{% if passage.expected %} class="is-expected"{% endif %}>{{ linked(passage.title, passage.url) }}{% if passage.expected %} <span class="cm-tag">{{ L["evidence.expected_source"] }}</span>{% endif %}</li>
+{% endfor %}
+</ol>
+{% if r.missed %}<p class="cm-break">{{ glyph("fail") }}<span>{{ L["trace.gap_step2"] }}</span></p>{% endif %}
+{% endif %}
+</div>
+</li>
+<li class="cm-step{{ ' is-wrong' if r.step == 3 }}" value="3">
+{{ step_label(L["trace.step3"], full) }}
+<div class="cm-step-body">
+{% for quote in r.quotes %}
+<figure class="cm-quote" id="{{ quote.id }}">
+<blockquote><span class="cm-quote-marker" aria-hidden="true">{{ quote.marker }}</span>{{ quote.text }}</blockquote>
+<figcaption><span class="cm-visually-hidden">{{ quote.label }}. </span>{{ L["evidence.shown_source"] }}: {{ linked(quote.title, quote.url) }}</figcaption>
+</figure>
+{% else %}
+<p class="cm-step-note">{{ r.quote_note }}</p>
+{% endfor %}
+</div>
+</li>
+<li class="cm-step{{ ' is-wrong' if r.step == 4 }}" value="4">
+{{ step_label(L["trace.step4"], full) }}
+<div class="cm-step-body">
+{% if r.clarify_question %}
+<p>{{ r.clarify_question }}</p>
+<ul class="cm-options">
+{% for option in r.options %}<li>{{ option }}</li>{% endfor %}
+</ul>
+{% if r.chosen %}<p class="cm-chosen">{{ r.chosen }}</p>{% endif %}
+{% endif %}
+{% if r.answer %}{{ answer_text(r) }}{% endif %}
+{% if r.gap_line %}<p class="cm-gap">{{ r.gap_line }}</p>{% endif %}
+</div>
+</li>
+<li class="cm-step" value="5">
+{{ step_label(L["trace.step5"], full) }}
+<div class="cm-step-body">
+<p>{{ state_mark("pass", L["state.pass"]) if r.passed else state_mark("fail", L["state.fail"]) }}</p>
+{% if r.expected_answer %}
+<p class="cm-sub">{{ L["evidence.expected_answer"] }}</p>
+<ul class="cm-facts">
+{% for fact in r.expected_answer %}<li>{{ fact }}</li>{% endfor %}
+</ul>
+{% endif %}
+{% if r.expected_sources %}
+<p class="cm-sub">{{ L["evidence.expected_source"] }}</p>
+<ul class="cm-expected">
+{% for source in r.expected_sources %}
+<li>{{ linked(source.section, source.url) }}<blockquote>{{ source.quote }}</blockquote></li>
+{% endfor %}
+</ul>
+{% endif %}
+</div>
+</li>
+</ol>
+</div>
+{%- endmacro %}
+
+{#- QuestionEntry: the question as its heading (step 1), then steps 2 to 5. Failed ones are listed
+    open; passed ones go in a fold. Its ID is its anchor, so a count or an email can link to it. -#}
+{% macro entry(e, L) -%}
+<article class="cm-entry{{ ' is-failed' if not e.record.passed }}" id="{{ e.record.question_id }}" data-entry data-state="{{ 'pass' if e.record.passed else 'fail' }}" data-failed="{{ e.failed_measures | join(' ') }}" aria-labelledby="{{ e.record.question_id }}-h">
+<header class="cm-entry-head">
+<h3 class="cm-entry-title" id="{{ e.record.question_id }}-h"><a class="cm-entry-id" href="#{{ e.record.question_id }}">{{ e.record.question_id }}</a> <span>{{ e.record.question }}</span></h3>
+{% if e.runs_line %}<p class="cm-entry-runs">{{ e.runs_line }}</p>{% endif %}
+</header>
+{{ record(e.record, L) }}
+</article>
+{%- endmacro %}

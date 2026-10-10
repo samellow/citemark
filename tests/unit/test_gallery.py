@@ -74,7 +74,17 @@ def test_every_fixture_state_gets_a_page_in_each_theme_unless_it_is_a_theme(buil
     assert len(pages) == expected
     assert all((out / page.path).is_file() for page in pages)
     listed = json.loads((out / "pages.json").read_text(encoding="utf-8"))
-    assert [entry["path"] for entry in listed] == [page.path for page in pages] + ["index.html"]
+    samples = ["report/sample--light.html", "report/sample--dark.html"]
+    assert [entry["path"] for entry in listed] == [page.path for page in pages] + samples + ["index.html"]
+
+
+def test_the_sample_report_is_labeled_a_sample_in_both_themes(built):
+    """Its numbers are made up, so each page says so before anything else (PRD 8.1)."""
+    out, _ = built
+    for theme in gallery.THEMES:
+        html = (out / f"report/sample--{theme}.html").read_text(encoding="utf-8")
+        assert f'data-theme="{theme}"' in html
+        assert html.index(gallery.SAMPLE) < html.index('class="cm-cert"')
 
 
 def test_each_page_is_a_whole_document_in_its_theme(built):
@@ -190,3 +200,19 @@ def test_every_font_the_stylesheet_names_is_there_and_every_page_font_is_named()
     css = (KIT / "static/citemark.css").read_text(encoding="utf-8")
     named = set(re.findall(r'url\("fonts/([^"]+)"\)', css))
     assert named == {path.name for path in FONTS.glob("*.woff2")}
+
+
+def test_the_report_components_list_every_report_string_and_only_real_ones():
+    """The manifest names each string a report component shows (UI kit 4), so a key renamed or
+    added in report.json can't drift from the components that use it."""
+    listed = set()
+    for component in COMPONENTS.values():
+        if component.layer != "report":  # other layers' strings arrive with their components
+            listed |= {key.partition(":")[2] for key in component.strings if key.startswith("report:")}
+            continue
+        for key in component.strings:
+            file, _, name = key.partition(":")
+            assert name in strings.load(file), f"{component.name} lists {key}, which isn't in {file}.json"
+            if file == "report":
+                listed.add(name)
+    assert set(strings.load("report")) - listed == set()

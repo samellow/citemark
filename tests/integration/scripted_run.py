@@ -144,12 +144,12 @@ def services(answerer, *, judge=correct, client=None) -> Services:
     return Services(answerer, client or failing_client(), FakeEmbedder(), FakeReranker(), judge)
 
 
-async def stocked(session, path: Path, *, price_per_mtok="1") -> TestSet:
+async def stocked(session, path: Path, *, price_per_mtok="1", model: str = SCRIPTED) -> TestSet:
     """The Zulip passages, a price for the scripted model, and the test set at `path`."""
     await add_zulip(session)
     session.add(
         Price(
-            model=SCRIPTED,
+            model=model,
             input_per_mtok=Decimal(price_per_mtok),
             output_per_mtok=Decimal("10"),
             effective_from=dt.date(2026, 1, 1),
@@ -197,13 +197,14 @@ class Varying:
         return judging.Verdict(verdict, [], [], "Scripted.", 100, 50, {"verdict": verdict})
 
 
-async def grouped(session, path, *, budget="6", sha=SHA) -> list[TestRun]:
-    test_set = await stocked(session, path)
+async def grouped(session, path, *, budget="6", sha=SHA, answerer=None, mode="retrieval") -> list[TestRun]:
+    answerer = answerer or Scripted(SCRIPT)
+    test_set = await stocked(session, path, model=answerer.model)
     runs = await create_group(
         session,
         test_set,
-        mode="retrieval",
-        answerer=Scripted(SCRIPT),
+        mode=mode,
+        answerer=answerer,
         config=RetrievalConfig(),
         budget_usd=Decimal(budget),
         sha=sha,

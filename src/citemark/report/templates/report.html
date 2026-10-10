@@ -1,0 +1,53 @@
+<!doctype html>
+{#-
+  The report (PRD 8.1): one file that opens offline, reads without JavaScript and prints in light.
+  Top to bottom: the certificate, the verdict, the measures, one question traced, the fix plan,
+  every question, the setups side by side, and the method with the signed block. Its styles, fonts
+  and one script come inlined, from `report.build`.
+-#}
+{% from "parts.html" import certificate_header, verdict_line, measure_strip, fix_plan, question_filter, comparison_table, method_block, signed_block %}
+{% from "record.html" import record, entry %}
+<html lang="{{ report.lang }}"{% if theme %} data-theme="{{ theme }}"{% endif %}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ report.header.title }} · {{ report.header.for_line }}</title>
+<style>{{ css }}</style>
+</head>
+<body class="cm-report-page">
+<main class="cm-report">
+{% if banner %}<p class="cm-report-banner">{{ banner }}</p>{% endif %}
+{{ certificate_header(report.header) }}
+<div class="cm-summary">
+{{ verdict_line(report.verdict) }}
+{{ measure_strip(report.measures, report.labels) }}
+</div>
+
+<section class="cm-trace" aria-labelledby="trace-h">
+<h2 class="cm-type-heading-md" id="trace-h">{{ report.labels["trace.heading"] }}</h2>
+<p class="cm-trace-intro">{{ report.labels["trace.intro"] }}</p>
+{{ record(report.trace, report.labels, full=true) }}
+</section>
+
+{{ fix_plan(report.fix_plan) }}
+
+<section class="cm-questions" aria-labelledby="questions-h" data-questions>
+<h2 class="cm-type-heading-md" id="questions-h">{{ report.labels["questions.heading"] }}</h2>
+{% for key, name in report.filters %}<span class="cm-anchor" id="show-{{ key }}"></span>{% endfor %}
+{{ question_filter(report.filters, report.labels) }}
+{% for found in report.failed %}{{ entry(found, report.labels) }}{% endfor %}
+{% if report.passed %}
+<details class="cm-passes">
+<summary>{{ report.folded }}</summary>
+{% for found in report.passed %}{{ entry(found, report.labels) }}{% endfor %}
+</details>
+{% endif %}
+</section>
+
+{% if report.comparison %}{{ comparison_table(report.comparison, report.labels) }}{% endif %}
+{{ method_block(report.method, report.labels) }}
+{{ signed_block(report.pass_mark, report.prepared) }}
+</main>
+<script>{{ script }}</script>
+</body>
+</html>

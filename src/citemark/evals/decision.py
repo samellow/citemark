@@ -49,7 +49,7 @@ from citemark.evals.runner import (
     run_tests,
     summary_row,
 )
-from citemark.evals.scoring import Measure, summarize
+from citemark.evals.scoring import MEASURES, Measure, summarize
 from citemark.models import AnswerModel
 from citemark.retrieve import RetrievalConfig
 
@@ -66,7 +66,6 @@ SETTINGS = (
     "judge_model",
     "rubric_version",
 )
-MEASURES = ("correct_answers", "right_source", "correct_declines", "wrongly_declined", "right_place")
 
 OnRun = Callable[[int, TestRun], None]
 

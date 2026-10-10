@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -165,29 +165,41 @@ class Summary:
     swapped: int
 
 
-def _count(rows: Sequence[Row], among: Callable[[Row], bool], passed: Callable[[Row], bool]) -> Measure:
-    chosen = [row for row in rows if among(row)]
-    return Measure(sum(1 for row in chosen if passed(row)), len(chosen))
+MEASURES = ("correct_answers", "right_source", "correct_declines", "wrongly_declined", "right_place")
+LOWER_IS_BETTER = ("wrongly_declined",)  # its count is of the times it went wrong
+
+
+def counted(row: Row, *, mode: str) -> dict[str, bool]:
+    """The measures one result counts in, each with whether it went the bot's way there. The
+    report marks each question with these, and `summarize` adds them up, so the two agree."""
+    found: dict[str, bool] = {}
+    if row["type"] in ANSWER_EXPECTED:
+        found["correct_answers"] = row["judge_verdict"] == "correct" and row["clarified"] is not False
+        found["right_source"] = row["citation_correct"] is True
+        if mode != "full_context":
+            found["right_place"] = row["retrieval_hit"] is True
+    if row["type"] in SHOULD_DECLINE:
+        found["correct_declines"] = row["decline_correct"] is True
+    if row["type"] in COVERED:
+        found["wrongly_declined"] = row["kind"] not in DECLINES
+    return found
 
 
 def summarize(rows: Sequence[Row], *, mode: str) -> Summary:
     """Each row holds a result's question type, kind, judge verdict and stored scores."""
+    each = [counted(row, mode=mode) for row in rows]
 
-    def expected(row: Row) -> bool:
-        return row["type"] in ANSWER_EXPECTED
+    def measure(name: str) -> Measure:
+        went = [found[name] for found in each if name in found]
+        wrong = name in LOWER_IS_BETTER
+        return Measure(sum(1 for ok in went if ok != wrong), len(went))
 
     return Summary(
-        correct_answers=_count(
-            rows, expected, lambda row: row["judge_verdict"] == "correct" and row["clarified"] is not False
-        ),
-        right_source=_count(rows, expected, lambda row: row["citation_correct"] is True),
-        correct_declines=_count(
-            rows, lambda row: row["type"] in SHOULD_DECLINE, lambda row: row["decline_correct"] is True
-        ),
-        wrongly_declined=_count(rows, lambda row: row["type"] in COVERED, lambda row: row["kind"] in DECLINES),
-        right_place=(
-            None if mode == "full_context" else _count(rows, expected, lambda row: row["retrieval_hit"] is True)
-        ),
+        correct_answers=measure("correct_answers"),
+        right_source=measure("right_source"),
+        correct_declines=measure("correct_declines"),
+        wrongly_declined=measure("wrongly_declined"),
+        right_place=None if mode == "full_context" else measure("right_place"),
         failures=dict(Counter(row["failure_type"] for row in rows if row["failure_type"])),
         swapped=sum(1 for row in rows if row["swapped"]),
     )

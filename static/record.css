@@ -1,0 +1,151 @@
+/*
+ * The evidence record (UI kit 2, rule 4): one answer in five numbered steps. Inlined in the report
+ * and, from Phase 2, linked from the admin's conversation view, so it holds only the record's own
+ * styles. Load tokens.css and citemark.css first. Every color, size and radius comes from a token.
+ *
+ * Compact (every question): each step's short name beside its content, steps ruled apart.
+ * Full (the traced question): the five steps side by side, each explaining itself, three to a
+ * row on a narrow screen, and stacked below 720px with their numbers kept (PRD 8.1).
+ */
+
+.cm-record { display: flex; flex-direction: column; gap: var(--space-3); }
+.cm-record-wrong {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--fail);
+  font-weight: var(--type-body-strong-weight);
+}
+.cm-steps { list-style: none; margin: 0; padding: 0; }
+.cm-step {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  gap: var(--space-6);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--line);
+}
+.cm-step-label {
+  font-family: var(--font-display);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+  font-weight: var(--type-heading-sm-weight);
+  color: var(--text-muted);
+}
+.cm-step.is-wrong .cm-step-label { color: var(--fail); }
+.cm-step-body { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+.cm-step-question { font-weight: var(--type-body-strong-weight); }
+.cm-step-note { color: var(--text-muted); }
+
+/* Step 2: the sections it read, the right one tagged, and a break when it isn't among them */
+.cm-looked { margin: 0; padding-left: var(--space-6); font-size: var(--type-body-sm-size); line-height: var(--type-body-sm-line); }
+.cm-looked li + li { margin-top: var(--space-1); }
+.cm-looked li::marker { font-family: var(--font-mono); color: var(--text-muted); }
+.cm-looked a { overflow-wrap: anywhere; }
+.cm-tag {
+  display: inline-block;
+  margin-left: var(--space-1);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-marker);
+  background: var(--pass-soft);
+  color: var(--pass);
+  font-family: var(--font-display);
+  font-size: var(--type-label-size);
+  line-height: var(--type-label-line);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.cm-break {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-core);
+  background: var(--fail-soft);
+  color: var(--fail);
+  font-weight: var(--type-body-strong-weight);
+}
+.cm-break .cm-glyph, .cm-record-wrong .cm-glyph { margin-top: calc(var(--space-1) * 1.25); }
+
+/* Step 3: each quote under its number, as the AI provider copied it, and the source it showed */
+.cm-quote { margin: 0; }
+.cm-quote blockquote {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-core);
+  background: var(--surface-sunken);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+}
+.cm-quote:target blockquote { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.cm-quote-marker {
+  margin-right: var(--space-2);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-weight: var(--type-data-weight);
+}
+.cm-quote figcaption {
+  margin-top: var(--space-1);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+  color: var(--text-muted);
+}
+
+/* Step 4: the reply as a customer saw it, its line breaks kept */
+.cm-answer { white-space: pre-line; }
+.cm-options { margin: 0; padding-left: var(--space-6); }
+.cm-chosen, .cm-gap { color: var(--text-muted); }
+
+/* Step 5: the result, then what a person wrote in advance */
+.cm-sub {
+  font-family: var(--font-display);
+  font-size: var(--type-label-size);
+  line-height: var(--type-label-line);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.cm-sub:not(:first-child) { margin-top: var(--space-2); }
+.cm-facts, .cm-expected { margin: 0; padding-left: var(--space-6); font-size: var(--type-body-sm-size); line-height: var(--type-body-sm-line); }
+.cm-facts li + li, .cm-expected li + li { margin-top: var(--space-1); }
+.cm-expected blockquote { margin: var(--space-1) 0 0; color: var(--text-muted); }
+
+/* Full: the five steps side by side, ruled apart, each with its number, name and explanation */
+.cm-record-full .cm-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.cm-record-full .cm-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  border-top: 0;
+  border-left: 1px solid var(--line);
+}
+.cm-record-full .cm-step:first-child { padding-left: 0; border-left: 0; }
+.cm-record-full .cm-step-label {
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line-strong);
+  font-family: var(--font-sans);
+  font-weight: var(--type-body-weight);
+}
+.cm-record-full .cm-step-label strong {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--type-heading-sm-size);
+  line-height: var(--type-heading-sm-line);
+  font-weight: var(--type-heading-sm-weight);
+  color: var(--ink);
+}
+
+@media (max-width: 1023px) {
+  .cm-record-full .cm-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--space-8); }
+  .cm-record-full .cm-step:nth-child(3n + 1) { padding-left: 0; border-left: 0; }
+}
+
+@media (max-width: 719px) {
+  .cm-step { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
+  .cm-record-full .cm-steps { display: flex; flex-direction: column; gap: var(--space-6); }
+  .cm-record-full .cm-step { padding: 0; border-left: 0; }
+}

@@ -399,6 +399,12 @@ def _citations(answered: Answered) -> list[dict[str, Any]]:
     ]
 
 
+def _segments(reply: Reply) -> list[dict[str, Any]] | None:
+    if reply.kind not in JUDGED:
+        return None
+    return [{"text": segment.text, "markers": list(segment.markers)} for segment in reply.segments]
+
+
 def _stored(cost: Decimal) -> Decimal:
     return cost.quantize(STORED_PLACES, rounding=ROUND_CEILING)
 
@@ -539,6 +545,8 @@ def _result(run_id: uuid.UUID, mode: str, question: TestQuestion, asked: Asked) 
         test_question_id=question.id,
         answer=_shown(final),
         kind=final.kind,
+        segments=_segments(final),
+        gap_text=final.gap if final.kind == "partial" else None,
         swapped=first.swapped or final.swapped,
         citations=citations,
         clarify_options=options,

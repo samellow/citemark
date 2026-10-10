@@ -19,6 +19,9 @@
 {% for layer, title in [("foundation", "Foundations"), ("primitive", "Shared primitives"), ("report", "Report"), ("demo", "Demo page"), ("widget", "Widget"), ("admin", "Admin page")] %}
 <section aria-labelledby="layer-{{ layer }}">
 <h2 class="cm-type-heading-md" id="layer-{{ layer }}">{{ title }}</h2>
+{% if layer == "report" %}
+<p class="cm-gallery-lede">A whole sample report, with made-up Acme Chat content: {% for page in samples %}<a href="{{ root }}{{ page.path }}">{{ page.theme }}</a>{{ " · " if not loop.last }}{% endfor %}. Its parts aren't gallery pages yet.</p>
+{% endif %}
 <table class="cm-gallery-table">
 <thead><tr><th scope="col">Component</th><th scope="col">Phase</th><th scope="col">Rendered by</th><th scope="col">States</th></tr></thead>
 <tbody>

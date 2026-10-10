@@ -28,6 +28,8 @@ sources_app = typer.Typer(
 app.add_typer(sources_app, name="sources")
 design_app = typer.Typer(help="The design tokens: checked for contrast, then written as CSS.", no_args_is_help=True)
 app.add_typer(design_app, name="design")
+report_app = typer.Typer(help="Accuracy reports: one file each, built from decision runs.", no_args_is_help=True)
+app.add_typer(report_app, name="report")
 
 
 FileArg = Annotated[Path, typer.Argument(help="The test-set YAML file.", exists=True, dir_okay=False)]
@@ -627,6 +629,53 @@ def decision_summary(
         raise typer.Exit(1)
 
 
+@test_app.command("threshold")
+def threshold(
+    file: FileArg,
+    targets: Annotated[
+        str,
+        typer.Option(
+            help="Each measure's target in whole percents, such as correct_answers=90,right_source=90,"
+            "correct_declines=95,wrongly_declined=5,right_place=95. wrongly_declined is the most it may reach."
+        ),
+    ],
+    agreed_by: Annotated[str, typer.Option(help="Who agreed it with you: the client's contact, or you on the demo.")],
+    on: Annotated[str, typer.Option(help="The day it was agreed, such as 2026-10-20.")],
+) -> None:
+    """Set the pass mark a report judges this test set's runs by, with who agreed it and when. Calls no API."""
+    from citemark.db.session import make_sessionmaker
+    from citemark.evals import passmark
+    from citemark.evals.runner import load_test_set
+    from citemark.report import numbers
+
+    try:
+        wanted, day = passmark.parse(targets), dt.date.fromisoformat(on)
+    except passmark.PassMarkError as exc:
+        _fail(f"--targets: {exc}")
+    except ValueError:
+        _fail(f"--on takes a date such as 2026-10-20, not {on}.")
+
+    async def work(engine):
+        async with make_sessionmaker(engine)() as session, session.begin():
+            test_set = await load_test_set(session, file)
+            before = (test_set.threshold_set_by, test_set.threshold_set_at) if test_set.threshold else None
+            await passmark.set_pass_mark(session, test_set, wanted, agreed_by=agreed_by, on=day, today=dt.date.today())
+            return test_set.name, test_set.version, before
+
+    try:
+        name, version, before = _with_db(work)
+    except passmark.PassMarkError as exc:
+        _fail(str(exc))
+    listed = ", ".join(
+        f"{measure} {'at most' if measure == 'wrongly_declined' else 'at least'} {target}%"
+        for measure, target in wanted.items()
+    )
+    agreed = f"agreed by {agreed_by.strip()} on {numbers.date(day)}"
+    typer.echo(f"The pass mark of {name} version {version}, {agreed}: {listed}.")
+    if before is not None:
+        typer.echo(f"It replaces the one agreed by {before[0]} on {numbers.date(before[1].date())}.")
+
+
 CHOICES = {"c": "correct", "correct": "correct", "i": "incorrect", "incorrect": "incorrect"}
 CHOICES |= {"s": "skip", "skip": "skip", "q": "quit", "quit": "quit"}
 
@@ -829,6 +878,70 @@ def gallery(
         _fail(str(exc))
     components = len({page.component for page in pages})
     typer.echo(f"Built {len(pages)} pages for {components} components in {out}. Open {out / 'index.html'}.")
+
+
+@report_app.command("build")
+def report_build(
+    file: Annotated[
+        Path,
+        typer.Argument(
+            help="The report's YAML file: its kind, client, runs and your fix-plan estimates.",
+            exists=True,
+            dir_okay=False,
+        ),
+    ],
+    out: Annotated[Path, typer.Option(help="The HTML file to write. A report already there is replaced.")],
+) -> None:
+    """Build a report from decision runs, as one HTML file that opens offline and prints. Calls no API."""
+    from citemark.db.session import make_engine, make_sessionmaker
+    from citemark.report import build, data, inputs
+    from citemark.settings import get_settings
+
+    if out.is_dir():
+        _fail(f"{out} is a folder. Name the report's file, such as {out / 'report.html'}.")
+    try:
+        given = inputs.load(file)
+    except inputs.InputsError as exc:
+        _fail(str(exc))
+    settings = get_settings()
+
+    async def work(engine):
+        abuse = make_engine(settings.abuse_database_url) if given.abuse and settings.abuse_database_url else None
+        try:
+            async with make_sessionmaker(engine)() as session, session.begin():
+                abuse_session = make_sessionmaker(abuse)() if abuse is not None else None
+                try:
+                    found = await data.gather(
+                        session,
+                        given,
+                        builder_name=settings.builder_name,
+                        today=dt.date.today(),
+                        abuse_session=abuse_session,
+                    )
+                finally:
+                    if abuse_session is not None:
+                        await abuse_session.close()
+                html = build.render(found)
+                row = await build.save(session, found, out)  # recorded first, so a failed write records nothing
+                build.write(html, out)
+                return found, row.id
+        finally:
+            if abuse is not None:
+                await abuse.dispose()
+
+    try:
+        found, report_id = _with_db(work)
+    except data.ReportError as exc:
+        _fail(str(exc))
+    failed, total = len(found.failed), len(found.failed) + len(found.passed)
+    typer.echo(
+        f"Wrote {out}, {out.stat().st_size // 1024} KB: {found.verdict.state.replace('_', ' ')}, with {failed} of "
+        f"{total} questions failed in at least one run. Report {report_id}."
+    )
+    typer.echo(
+        "Before you send it (QA plan 7.4): the client's name everywhere, no other client's questions or data, a good "
+        "traced question, offline and in print preview, and the numbers against the run IDs in its method."
+    )
 
 
 @sources_app.command("add")

@@ -8,6 +8,8 @@ Phase 2's keyboard, snapshot and markup-contract tests will run on them too.
 - **Each state in both themes,** as two pages, unless the state is itself a theme.
 - **Self-contained:** the pages and a copy of `static/` go in one folder, which opens from disk
   and can be published as it is.
+- **A whole sample report** in each theme, from `report.sample`'s made-up Acme Chat content and
+  labeled as such, so the report's layout is checked as a page, not only part by part.
 """
 
 from __future__ import annotations
@@ -25,6 +27,8 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_valida
 
 from citemark import strings
 from citemark.design import manifest, tokens
+from citemark.report import build as reports
+from citemark.report import sample
 from citemark.report.render import glyph, refuse
 
 KIT = Path(__file__).resolve().parents[3]
@@ -34,6 +38,7 @@ TEMPLATES = Path(__file__).parent / "templates"
 MARKER = ".citemark-gallery"  # marks a folder this builds, so a rebuild never empties another
 THEMES = ("light", "dark")
 RENDERED_BY = {"J": "Jinja", "R": "React", "P": "Preact", "L": "the loader", "CSS": "CSS", "All": "every renderer"}
+SAMPLE = "Sample report: made-up Acme Chat content, to show the layout. No test run is behind these numbers."
 
 
 class GalleryError(Exception):
@@ -164,16 +169,23 @@ def build(out: Path, *, fixtures: Path = FIXTURES, manifest_path: Path = manifes
                 (out / component.slug).mkdir(exist_ok=True)
                 (out / path).write_text(html, encoding="utf-8")
                 pages.append(Page(path, component.name, state, theme))
+    samples = []
+    (out / "report").mkdir()
+    for theme in THEMES:
+        path = f"report/sample--{theme}.html"
+        (out / path).write_text(reports.render(sample.report(), theme=theme, banner=SAMPLE), encoding="utf-8")
+        samples.append(Page(path, "Report", "sample", theme))
     paged = {page.component for page in pages}
     index = env.get_template("index.html").render(
         components=list(components.values()),
         pages=pages,
         paged=paged,
+        samples=samples,
         rendered_by=RENDERED_BY,
         root="",
     )
     (out / "index.html").write_text(index, encoding="utf-8")
     index_page = {"path": "index.html", "component": "", "state": "", "theme": "light"}
-    listing = [asdict(page) for page in pages] + [index_page]
+    listing = [asdict(page) for page in pages + samples] + [index_page]
     (out / "pages.json").write_text(json.dumps(listing, indent=2) + "\n", encoding="utf-8")
     return pages

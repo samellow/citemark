@@ -107,7 +107,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [audit, build, demo]
-    strings: [report:title, report:header.prepared_by, report:header.for, report:header.questions, report:header.date, report:header.model]
+    strings: [report:title, report:header.prepared_by, report:header.for, report:header.demo, report:header.questions, report:header.date, report:header.model]
     spec: PRD 8.1; content spec 5.1
     prototype: null
   - name: VerdictLine
@@ -115,7 +115,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [pass, not_pass, baseline]
-    strings: [report:verdict.pass, report:verdict.not_pass, report:verdict.baseline]
+    strings: [report:verdict.pass, report:verdict.not_pass, report:verdict.pass_demo, report:verdict.not_pass_demo, report:verdict.baseline]
     spec: PRD 8.1 (Q7); content spec 5.1
     prototype: VerdictLine (stale)
   - name: MeasureStrip
@@ -123,7 +123,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [met, missed, warn, not_measured, lower_is_better, time_and_cost, count_links, decision_range]
-    strings: [report:measure.range, report:measure.range_same, report:state.warn_help]
+    strings: [report:not_measured, report:count.score, report:count.rate, report:target.at_least, report:target.at_most, report:measure.range, report:measure.range_same, report:measure.correct_answers.name, report:measure.correct_answers.definition, report:measure.right_source.name, report:measure.right_source.definition, report:measure.correct_declines.name, report:measure.correct_declines.definition, report:measure.wrongly_declined.name, report:measure.wrongly_declined.definition, report:measure.right_place.name, report:measure.right_place.definition, report:measure.honest_tickets.name, report:measure.honest_tickets.definition, report:measure.time_to_first_word.name, report:measure.time_to_first_word.definition, report:measure.cost.name, report:measure.cost.definition, report:state.pass, report:state.fail, report:state.warn, report:state.warn_help]
     spec: PRD 8.1; content spec 5.2 (Q4); QA plan Q1
     prototype: MeasureRow (stale)
   - name: EvidenceRecord
@@ -131,7 +131,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [full, compact, answered, declined, clarified, partial, retrieval_miss, went_wrong, without_result]
-    strings: [report:trace.heading, report:trace.intro, report:trace.step1, report:trace.step2, report:trace.step3, report:trace.step4, report:trace.step5, report:trace.gap_step2, report:trace.decline_step3, report:trace.went_wrong, report:evidence.expected_answer, report:evidence.bot_answer, report:evidence.expected_source, report:evidence.shown_source, report:evidence.marker_a11y]
+    strings: [report:trace.heading, report:trace.intro, report:trace.step1, report:trace.step2, report:trace.step3, report:trace.step4, report:trace.step5, report:trace.gap_step2, report:trace.decline_step3, report:trace.no_quote, report:trace.went_wrong, report:evidence.expected_answer, report:evidence.bot_answer, report:evidence.expected_source, report:evidence.shown_source, report:evidence.marker_a11y, report:evidence.chosen, widget:clarify.question, widget:partial.gap]
     spec: PRD 8.1; content spec 5.3, 5.5; UI kit 2 (rule 2)
     prototype: null
   - name: QuestionEntry
@@ -139,7 +139,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [passed_folded, failed_open, anchor]
-    strings: [report:questions.folded_passes]
+    strings: [report:questions.heading, report:questions.folded_passes, report:questions.failed_runs]
     spec: PRD 8.1; content spec 5.5
     prototype: null
   - name: QuestionFilter
@@ -147,7 +147,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [all, failed, by_measure, without_javascript]
-    strings: [report:questions.filter]
+    strings: [report:questions.filter.label, report:questions.filter.all, report:questions.filter.failed]
     spec: PRD 8.1; content spec 5.5
     prototype: null
   - name: FixPlanGroup
@@ -155,7 +155,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [failure_groups, owners, nothing_to_fix, heading_not_pass, heading_pass, heading_baseline]
-    strings: [report:fix.heading.not_pass, report:fix.heading.pass, report:fix.heading.baseline, report:fix.none, report:fix.owner.builder, report:fix.owner.client, report:fix.owner.either]
+    strings: [report:fix.heading.not_pass, report:fix.heading.pass, report:fix.heading.baseline, report:fix.none, report:fix.count, report:fix.owner.builder, report:fix.owner.client, report:fix.owner.either, report:fix.group.answered_should_decline.title, report:fix.group.answered_should_decline.what, report:fix.group.declined_answerable.title, report:fix.group.declined_answerable.what, report:fix.group.retrieval_miss.title, report:fix.group.retrieval_miss.what, report:fix.group.wrong_citation.title, report:fix.group.wrong_citation.what, report:fix.group.wrong_answer.title, report:fix.group.wrong_answer.what, report:fix.group.doc_gap.title, report:fix.group.doc_gap.what, report:demo.client]
     spec: PRD 8.1; content spec 5.4; design system 7 (Q5)
     prototype: FixPlanGroup (stale)
   - name: ComparisonTable
@@ -163,7 +163,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [runs_2_to_5, full_context_na]
-    strings: [report:compare.heading, report:compare.mode.retrieval, report:compare.mode.full_context, report:compare.not_measured]
+    strings: [report:compare.heading, report:compare.mode.retrieval, report:compare.mode.retrieval_no_rerank, report:compare.mode.full_context, report:compare.not_measured]
     spec: PRD 8.1; content spec 5.5
     prototype: null
   - name: MethodBlock
@@ -171,7 +171,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [demo_authorship, client_authorship]
-    strings: [report:method.heading, report:method.questions, report:method.grading, report:method.quotes, report:method.abuse, report:method.runs, report:method.cost, report:method.authorship.demo, report:method.authorship.client]
+    strings: [report:method.heading, report:method.questions, report:method.authorship.demo, report:method.authorship.client, report:method.grading, report:method.grading_recheck, report:method.grading_queue, report:method.quotes, report:method.abuse, report:method.abuse_not_measured, report:method.runs, report:method.cost, report:method.speed, report:method.setup, report:list.and]
     spec: PRD 8.1; content spec 5.5
     prototype: null
   - name: SignedBlock
@@ -179,7 +179,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [pass_mark_agreed, none_agreed]
-    strings: [report:signed.agreed, report:signed.none, report:signed.prepared]
+    strings: [report:signed.agreed, report:signed.set, report:signed.none, report:signed.prepared]
     spec: PRD 8.1; content spec 5.5
     prototype: null
   - name: PrintLayer
@@ -187,7 +187,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [print]
-    strings: [report:print.footer]
+    strings: [report:print.footer, report:print.footer_demo]
     spec: PRD 8.1; content spec 5.5; design system 7 (Q6)
     prototype: null
 

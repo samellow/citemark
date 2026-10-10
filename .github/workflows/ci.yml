@@ -109,3 +109,10 @@ jobs:
           assert 'cm-glyph' in primitives().state_mark(state='pass', label='Pass')"
       - name: The CSS and fonts the report embeds are in the image
         run: docker run --rm --entrypoint ls citemark:ci static/tokens.css static/citemark.css static/fonts/OFL.txt static/fonts/latin1
+      - name: A report renders in the image, as one file with its fonts, styles and script inlined
+        run: >-
+          docker run --rm --entrypoint python citemark:ci -c
+          "from citemark.report import build, sample;
+          html = build.render(sample.report());
+          assert html.count('data:font/woff2;base64,') == 5 and html.count('<script>') == 1, 'not self-contained';
+          assert 'cm-record-full' in html and 'cm-measure-value' in html, 'a stylesheet is missing'"

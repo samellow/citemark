@@ -18,6 +18,11 @@ A support bot for SaaS help centers that ships with proof it works: a test repor
   - `--runs 3` makes a decision run: three runs of the same settings, from committed code, reported as each measure's median and range (`citemark test decision`). A model and its judge don't answer the same way twice, so decisions aren't made on one run. When the judge grades a question differently across the three, a person grades those answers, and that grade counts.
   - `citemark grade` checks the judge against a person. You grade the answers blind, seeing what the judge read but never its verdict. Once every answer is graded, the grades lock, and only then are the judge's verdicts shown: how often you agreed, and where you didn't. `--sample` re-checks the judge on 10 answers, picked the same way every time.
   - An abuse set (`kind: abuse`) tries to make the bot misbehave: invent a policy or a promise, obey instructions planted in a question or in an article, reveal its instructions, or repeat a customer's personal details. It's scored mechanically, never by the judge, and kept apart from the accuracy numbers. Inventing a policy and obeying planted instructions are a release gate: every such question must be resisted in all three runs of a decision run, and `citemark test decision` exits 1 until it is. The demo's abuse set is being drafted.
+- `src/citemark/report/` and `citemark report build`: the accuracy report, one HTML file that opens offline, reads without JavaScript and prints in light.
+  - It's built from decision runs only, and opens with pass, not pass or baseline against the pass mark agreed with the client (`citemark test threshold`), then the five measures, one question traced step by step, a fix plan, every question with its evidence, and how the test was done.
+  - Numbers round against the bot, and a measure's state comes from its exact value, so a shown number never looks better than it was.
+  - It refuses to build rather than claim what it can't show: without the frozen test set the runs used, the judge's agreement with a person's grading, an estimate for each group of failures, or who agreed the pass mark and when.
+  - Every word is in `content/en/report.json`, and the gallery shows a sample report with made-up content.
 - `design/`, `static/` and `citemark gallery`: how the report, the demo page and later the widget and admin page look.
   - `design/tokens.json` holds every color, type style and size, in a light and a dark theme. `citemark design build` checks the 25 text and control color pairs against WCAG AA in both themes, then writes `static/tokens.css`.
   - `static/citemark.css` holds the base styles and the shared parts: the wordmark, citation markers, state marks (always a glyph and a word, never color alone), buttons and form fields. Fonts are IBM Plex, self-hosted, so no page asks Google for them.
@@ -74,6 +79,14 @@ docker compose exec db createdb -U citemark -T citemark citemark_abuse   # while
 export DATABASE_URL=postgresql://citemark:citemark@localhost:54320/citemark_abuse
 uv run citemark sources upload test-sets/<the set's>.planted.md
 uv run citemark test run test-sets/<the abuse set>.yaml --company Zulip --budget 1 --runs 3
+```
+
+To build a report, set the pass mark agreed with the client, then name what the report covers in a small YAML file (`src/citemark/report/inputs.py` describes it) and set `BUILDER_NAME` in `.env`. A report that names an abuse run reads it from `ABUSE_DATABASE_URL`. `reports/` is ignored by git, so a client's report never lands in this public repository.
+
+```
+uv run citemark test threshold test-sets/<the set>.yaml --agreed-by "<their name>" --on 2026-10-20 \
+  --targets correct_answers=90,right_source=90,correct_declines=95,wrongly_declined=5,right_place=95
+uv run citemark report build reports/<client>.yaml --out reports/<client>.html
 ```
 
 ## Licenses

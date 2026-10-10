@@ -71,3 +71,75 @@ def test_every_locked_string_a_file_holds_is_word_for_word():
                     changed.append(f"{file}:{key}")
     assert changed == []
     assert len(checked) >= 7  # widget.json holds 7 of the 20 so far: they can't go unchecked
+
+
+# --- Plurals (content spec 2.3): "1 question" and "2 questions", never "question(s)" ---
+
+
+@pytest.mark.parametrize("path", sorted(CONTENT.glob("*.json")), ids=lambda p: p.name)
+def test_every_string_reads_as_a_message(path):
+    for key, text in json.loads(path.read_text(encoding="utf-8")).items():
+        try:
+            strings.parse(text)
+        except strings.StringError as exc:
+            pytest.fail(f"{path.name}: {key}: {exc}")
+
+
+@pytest.mark.parametrize(
+    ("count", "said"),
+    [
+        (0, "0 questions passed. Show them."),
+        (1, "1 question passed. Show them."),
+        (2, "2 questions passed. Show them."),
+    ],
+)
+def test_a_plural_takes_one_or_other(count, said):
+    assert strings.text("report", "questions.folded_passes", count=count) == said
+
+
+def test_an_exact_case_wins_and_a_big_number_has_separators():
+    text = "flagged {n, plural, =0 {none} one {# question} other {# questions}}"
+    parts = strings.parse(text)
+    assert strings._filled("k", parts, {"n": 0}, None) == "flagged none"
+    assert strings._filled("k", parts, {"n": 1}, None) == "flagged 1 question"
+    assert strings._filled("k", parts, {"n": 1200}, None) == "flagged 1,200 questions"
+
+
+def test_the_demo_authorship_line_says_none_rather_than_zero():
+    found = strings.text("report", "method.authorship.demo", builder_name="B", edited=18, total=50, flagged=0)
+    assert "flagged none." in found and "changed 18 of 50" in found
+    found = strings.text("report", "method.authorship.demo", builder_name="B", edited=18, total=50, flagged=1)
+    assert "flagged 1, which was rewritten before the freeze." in found
+
+
+def test_a_slot_inside_a_plural_case_is_filled():
+    parts = strings.parse("{hours, plural, one {# hour for {who}} other {# hours for {who}}}")
+    assert strings._filled("k", parts, {"hours": 3, "who": "Sam"}, None) == "3 hours for Sam"
+
+
+def test_a_plural_needs_a_whole_number():
+    with pytest.raises(TypeError, match="whole number"):
+        strings.text("report", "fix.count", count="3")
+    with pytest.raises(TypeError, match="whole number"):
+        strings.text("report", "fix.count", count=True)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "{gender, select, female {she} other {they}}",  # select isn't supported
+        "{gender, select, other {they}}",  # not even with only the case a plural has
+        "{n, plural, one {# thing}}",  # no other case
+        "{n, plural, few {# things} other {# things}}",  # not an English category
+        "{n, plural, one {# thing} other {# things}",  # not closed
+        "{ }",  # no slot name
+        "stray } brace",
+    ],
+)
+def test_a_pattern_it_cant_read_is_refused(text):
+    with pytest.raises(strings.StringError):
+        strings.parse(text)
+
+
+def test_an_apostrophe_is_a_letter():
+    assert strings.parse("doesn't {x}") == ("doesn't ", strings.Slot("x"))

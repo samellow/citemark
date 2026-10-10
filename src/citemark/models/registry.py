@@ -26,6 +26,7 @@ class ContextTooLarge(ModelError):
 @dataclass(frozen=True)
 class Model:
     id: str
+    name: str  # the provider's public name, as a report shows it (content spec 10)
     context_window: int  # input and output together, in tokens
     max_output: int
 
@@ -34,10 +35,10 @@ class Model:
 MODELS = {
     model.id: model
     for model in (
-        Model("claude-haiku-4-5", 200_000, 64_000),
-        Model("claude-haiku-5-5", 1_000_000, 128_000),
-        Model("claude-sonnet-5-5", 1_000_000, 128_000),
-        Model("claude-opus-5-5", 1_000_000, 128_000),
+        Model("claude-haiku-4-5", "Claude Haiku 4.5", 200_000, 64_000),
+        Model("claude-haiku-5-5", "Claude Haiku 5.5", 1_000_000, 128_000),
+        Model("claude-sonnet-5-5", "Claude Sonnet 5.5", 1_000_000, 128_000),
+        Model("claude-opus-5-5", "Claude Opus 5.5", 1_000_000, 128_000),
     )
 }
 

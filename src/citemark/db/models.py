@@ -339,12 +339,18 @@ class TestResult(_Row, Base):
         one_of("judge_verdict", VERDICTS),
         one_of("failure_type", FAILURE_TYPES),
         UniqueConstraint("test_run_id", "test_question_id"),
+        CheckConstraint("kind IN ('answer', 'partial') OR segments IS NULL", name="segments"),
+        CheckConstraint("kind = 'partial' OR gap_text IS NULL", name="gap_text"),
     )
 
     test_run_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("test_run.id"))
     test_question_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("test_question.id"))
     answer: Mapped[str | None]
     kind: Mapped[str | None]
+    # The answer in stretches, each with the markers of the sources it rests on, so a report can
+    # show each marker where the visitor saw it (migration 0008). Empty before then.
+    segments: Mapped[list[dict[str, Any]] | None] = mapped_column(NULLABLE_JSON)
+    gap_text: Mapped[str | None]  # completes "The help center doesn't say …" (partial answers)
     swapped: Mapped[bool] = mapped_column(server_default=FALSE)
     citations: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, server_default=EMPTY_LIST)
     # The options offered, when the first reply asked which meaning was meant (ambiguous questions)

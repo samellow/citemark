@@ -1,0 +1,263 @@
+/*
+ * The report (PRD 8.1; design system 7): an inspection certificate, read top to bottom. Inlined in
+ * the report's one file after tokens.css, citemark.css and record.css. Every color, size and radius
+ * comes from a token. Parts are ruled apart, never boxed: a state shows as its own tint, the way
+ * StateMark does, and nothing carries a colored edge.
+ *
+ * On screen it follows the reader's light or dark setting; it always prints in light (tokens.css
+ * applies dark only on screen), with everything unfolded and the fix plan and the question list
+ * each starting a page.
+ */
+
+::selection { background: var(--ink-soft); color: var(--text); }
+.cm-report-page { background: var(--ground); }
+.cm-report {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-16);
+}
+.cm-report h2 { margin-bottom: var(--space-4); }
+.cm-report section > p, .cm-trace-intro { max-width: 70ch; }
+.cm-report-banner {
+  padding: var(--space-2) var(--space-6);
+  background: var(--warn-soft);
+  color: var(--warn);
+  font-weight: var(--type-body-strong-weight);
+  text-align: center;
+}
+
+/* --- CertificateHeader --- */
+
+.cm-cert { display: flex; flex-direction: column; gap: var(--space-3); }
+.cm-cert-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line-strong);
+}
+.cm-cert-date { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.cm-cert-for { font-size: var(--type-heading-sm-size); line-height: var(--type-heading-sm-line); max-width: 60ch; }
+.cm-cert-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-muted);
+}
+
+/* --- The summary: the verdict, then the measures right under it --- */
+
+.cm-summary { display: flex; flex-direction: column; gap: var(--space-6); }
+
+/* VerdictLine: the state's own tint, its glyph, then the sentence */
+.cm-verdict { padding: var(--space-6); border-radius: var(--radius-core); }
+.cm-verdict-pass { background: var(--pass-soft); color: var(--pass); }
+.cm-verdict-not_pass { background: var(--fail-soft); color: var(--fail); }
+.cm-verdict-baseline { background: var(--declined-soft); color: var(--declined); }
+.cm-verdict-text {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  max-width: 60ch;
+  font-size: var(--type-heading-sm-size);
+  line-height: var(--type-heading-sm-line);
+}
+.cm-verdict-text .cm-glyph { width: var(--space-6); height: var(--space-6); margin-top: calc(var(--space-1) / 2); }
+.cm-verdict-text strong {
+  font-family: var(--font-display);
+  font-size: var(--type-heading-lg-size);
+  font-weight: var(--type-heading-lg-weight);
+  letter-spacing: -0.01em;
+}
+
+/* MeasureStrip: one ruled row per measure */
+/* The rows share one set of columns, so counts, targets and states line up down the strip */
+.cm-measures {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content minmax(min-content, max-content) minmax(min-content, 11rem);
+  column-gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line-strong);
+}
+.cm-measure {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  row-gap: var(--space-2);
+  align-items: baseline;
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--line);
+}
+.cm-measure-label { font-weight: var(--type-body-strong-weight); }
+.cm-measure-def, .cm-measure-spread, .cm-measure-target, .cm-measure-help {
+  color: var(--text-muted);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+}
+.cm-measure-value {
+  font-family: var(--type-data-family);
+  font-size: var(--type-heading-sm-size);
+  line-height: var(--type-heading-sm-line);
+  font-weight: var(--type-data-weight);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.cm-measure-spread { font-family: var(--font-mono); font-size: var(--type-data-sm-size); }
+.cm-measure-missing { grid-column: 2 / -1; color: var(--text-muted); }
+.cm-measure-cost .cm-measure-count { grid-column: 2 / -1; }
+.cm-measure-cost .cm-measure-value {
+  font-family: var(--font-sans);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  font-weight: var(--type-body-weight);
+}
+.cm-measure-help { margin-top: var(--space-1); }
+
+/* --- The traced question --- */
+
+.cm-trace-intro { margin-bottom: var(--space-6); }
+
+/* --- FixPlanGroup: ruled rows, the biggest group first --- */
+
+.cm-fix-none { display: flex; align-items: center; gap: var(--space-2); color: var(--pass); font-weight: var(--type-body-strong-weight); }
+.cm-fix-groups { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line-strong); }
+.cm-fix-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--line);
+}
+.cm-fix-group > p { max-width: 70ch; }
+.cm-fix-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2) var(--space-6); }
+.cm-fix-count { font-family: var(--font-mono); font-weight: var(--type-data-weight); font-variant-numeric: tabular-nums; }
+.cm-fix-owner { font-weight: var(--type-body-strong-weight); }
+.cm-fix-questions { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); margin: 0; padding: 0; list-style: none; }
+.cm-fix-questions a, .cm-entry-id { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* --- Every question: failed ones open, passes folded, and a filter when the script runs --- */
+
+.cm-anchor { display: block; }
+.cm-filter { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4); }
+.cm-filter[hidden] { display: none; }
+.cm-filter-label { color: var(--text-muted); }
+.cm-filter .cm-btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--on-ink); }
+.cm-entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6) 0;
+  border-top: 1px solid var(--line-strong);
+  scroll-margin-top: var(--space-6);
+}
+.cm-entry[hidden], .cm-passes[hidden] { display: none; }
+.cm-entry-head { display: flex; flex-direction: column; gap: var(--space-1); }
+.cm-entry-title {
+  display: flex;
+  gap: var(--space-3);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  font-weight: var(--type-body-strong-weight);
+}
+.cm-entry-runs { color: var(--text-muted); font-size: var(--type-body-sm-size); line-height: var(--type-body-sm-line); }
+.cm-passes { border-top: 1px solid var(--line-strong); }
+.cm-passes > summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--size-target);
+  padding: var(--space-3) 0;
+  color: var(--ink);
+  font-weight: var(--type-body-strong-weight);
+  list-style: none;
+  cursor: pointer;
+}
+.cm-passes > summary::-webkit-details-marker { display: none; }
+.cm-passes > summary::before {
+  content: "";
+  flex: none;
+  width: var(--space-2);
+  height: var(--space-2);
+  margin-right: var(--space-3);
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform var(--duration-state);
+}
+.cm-passes[open] > summary::before { transform: rotate(45deg); }
+
+/* --- ComparisonTable: setups as columns on one scale --- */
+
+.cm-compare-scroll { overflow-x: auto; }
+.cm-compare-table { width: 100%; border-collapse: collapse; font-size: var(--type-body-sm-size); line-height: var(--type-body-sm-line); }
+.cm-compare-table th, .cm-compare-table td {
+  padding: var(--space-3) var(--space-4) var(--space-3) 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+.cm-compare-table thead th { min-width: 10rem; border-bottom-color: var(--line-strong); }
+.cm-compare-table tbody th { min-width: 11rem; font-weight: var(--type-body-strong-weight); }
+.cm-compare-table tbody td { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.cm-compare-table tbody tr:last-child td { font-family: var(--font-sans); }
+.cm-compare-model, .cm-compare-mode, .cm-compare-date { display: block; }
+.cm-compare-model { font-weight: var(--type-body-strong-weight); }
+.cm-compare-mode { color: var(--text-muted); font-weight: var(--type-body-weight); }
+.cm-compare-date { color: var(--text-muted); font-family: var(--font-mono); font-size: var(--type-data-sm-size); font-weight: var(--type-body-weight); }
+
+/* --- MethodBlock and SignedBlock --- */
+
+.cm-method { display: flex; flex-direction: column; gap: var(--space-3); }
+.cm-method h2 { margin-bottom: var(--space-1); }
+.cm-method-setups {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-6);
+  color: var(--text-muted);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+  overflow-wrap: anywhere;
+}
+.cm-signed { display: flex; flex-direction: column; gap: var(--space-1); padding-top: var(--space-6); border-top: 1px solid var(--line-strong); }
+.cm-signed-mark { font-weight: var(--type-body-strong-weight); }
+.cm-signed-by { color: var(--text-muted); }
+
+@media (max-width: 719px) {
+  .cm-report { gap: var(--space-8); padding: var(--space-6) var(--space-4) var(--space-12); }
+  .cm-measures { display: block; }
+  .cm-measure { grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--space-4); }
+  .cm-measure-name, .cm-measure-count { grid-column: 1 / -1; }
+  .cm-measure-target { grid-column: 1; }
+  .cm-measure-missing, .cm-measure-cost .cm-measure-count { grid-column: 1 / -1; }
+  .cm-verdict { padding: var(--space-4); }
+}
+
+/* --- PrintLayer: light, everything unfolded, the long parts on new pages --- */
+
+@media print {
+  .cm-report-page { background: var(--surface); }
+  .cm-report { max-width: none; padding: 0; gap: var(--space-8); }
+  .cm-report-banner, .cm-filter { display: none; }
+  .cm-measures { grid-template-columns: minmax(0, 1fr) max-content max-content minmax(min-content, 8rem); column-gap: var(--space-4); }
+  .cm-measure-value { font-size: var(--type-body-size); line-height: var(--type-body-line); }
+  .cm-fix, .cm-questions { break-before: page; }
+  .cm-entry, .cm-measure, .cm-fix-group, .cm-quote, .cm-verdict { break-inside: avoid; }
+  .cm-entry[hidden] { display: flex; }
+  .cm-passes[hidden] { display: block; }
+  /* Unfolded without the script where the browser allows it (Chromium). Elsewhere the script opens
+     the fold before printing; with it off, the summary prints rather than the passes vanishing. */
+  @supports selector(::details-content) {
+    .cm-passes > summary { display: none; }
+    .cm-passes::details-content { content-visibility: visible; display: block; }
+  }
+  .cm-compare-scroll { overflow: visible; }
+  a { color: inherit; text-decoration: none; }
+}
