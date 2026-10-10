@@ -61,7 +61,7 @@ jobs:
           node-version: "22"
           cache: npm
           cache-dependency-path: e2e/package-lock.json
-      - name: axe on every gallery page, in both themes
+      - name: axe on every gallery page in both themes, and the report offline, without JavaScript and in print
         working-directory: e2e
         run: |
           npm ci --ignore-scripts

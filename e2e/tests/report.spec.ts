@@ -4,25 +4,14 @@ import { pathToFileURL } from "node:url";
 import { expect, test } from "@playwright/test";
 
 // The report's one script (PRD 8.1), on the gallery's sample report: a filter over the question
-// list, which the report reads without. The sample's failed questions are Q017 (correct answers
-// and right place) and Q023 (correct answers and wrongly said "not covered"); Q004 is folded.
+// list. How the report reads without it is report-file.spec.ts's. The sample's failed questions
+// are Q017 (correct answers and right place) and Q023 (correct answers and wrongly said "not
+// covered"); Q004 is folded.
 const gallery = resolve(process.env.GALLERY ?? resolve(__dirname, "../../build/gallery"));
 const sample = pathToFileURL(resolve(gallery, "report/sample--light.html")).href;
 
 test.beforeEach(async ({ context }) => {
   await context.route(/^https?:/, (route) => route.abort()); // the report opens offline
-});
-
-test.describe("without JavaScript", () => {
-  test.use({ javaScriptEnabled: false });
-
-  test("the report reads in full and the filter stays hidden", async ({ page }) => {
-    await page.goto(sample);
-    await expect(page.locator("[data-filter]")).toBeHidden();
-    await expect(page.locator("#Q017")).toBeVisible();
-    await expect(page.locator("#Q023")).toBeVisible();
-    await expect(page.locator(".cm-passes")).not.toHaveAttribute("open");
-  });
 });
 
 test("the filter shows all, the failed ones, or those that failed one measure", async ({ page }) => {

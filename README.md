@@ -27,7 +27,7 @@ A support bot for SaaS help centers that ships with proof it works: a test repor
   - `design/tokens.json` holds every color, type style and size, in a light and a dark theme. `citemark design build` checks the 25 text and control color pairs against WCAG AA in both themes, then writes `static/tokens.css`.
   - `static/citemark.css` holds the base styles and the shared parts: the wordmark, citation markers, state marks (always a glyph and a word, never color alone), buttons and form fields. Fonts are IBM Plex, self-hosted, so no page asks Google for them.
   - `design/components.yaml` lists all 67 components of the four surfaces, with their states and the strings they show.
-  - `citemark gallery` builds one page per component state, in both themes, and CI runs axe on every page (`e2e/`).
+  - `citemark gallery` builds one page per component state, in both themes, and CI runs axe on every page (`e2e/`). It also opens the sample report with the network blocked and JavaScript off, and checks that it prints in light, whole, and within A4's width.
 - `fixtures/zulip/`: the text of Zulip's help center, saved on 2026-10-06, used for the demo. The raw HTML is attached to the `zulip-v1-frozen` release.
 - `scripts/snapshot.py`: how that copy was made. `scripts/verify_snapshot.py` checks what the extraction kept.
 - `scripts/api_check.py`: checks what the bot assumes about the Claude and Voyage APIs, on each model, before anything is built on it. The results from 2026-10-08 are next to it.

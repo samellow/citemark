@@ -8,8 +8,10 @@ Phase 2's keyboard, snapshot and markup-contract tests will run on them too.
 - **Each state in both themes,** as two pages, unless the state is itself a theme.
 - **Self-contained:** the pages and a copy of `static/` go in one folder, which opens from disk
   and can be published as it is.
-- **A whole sample report** in each theme, from `report.sample`'s made-up Acme Chat content and
-  labeled as such, so the report's layout is checked as a page, not only part by part.
+- **A whole sample report,** from `report.sample`'s made-up Acme Chat content and labeled as such,
+  so the report's layout is checked as a page, not only part by part. It's written three times:
+  as `report build` writes a real one, following the reader's light or dark setting, which the
+  offline and print checks open, and forced into each theme.
 """
 
 from __future__ import annotations
@@ -171,10 +173,10 @@ def build(out: Path, *, fixtures: Path = FIXTURES, manifest_path: Path = manifes
                 pages.append(Page(path, component.name, state, theme))
     samples = []
     (out / "report").mkdir()
-    for theme in THEMES:
-        path = f"report/sample--{theme}.html"
+    for theme in (None, *THEMES):  # None: no theme forced, as a report is sent
+        path = f"report/sample--{theme}.html" if theme else "report/sample.html"
         (out / path).write_text(reports.render(sample.report(), theme=theme, banner=SAMPLE), encoding="utf-8")
-        samples.append(Page(path, "Report", "sample", theme))
+        samples.append(Page(path, "Report", "sample", theme or ""))
     paged = {page.component for page in pages}
     index = env.get_template("index.html").render(
         components=list(components.values()),

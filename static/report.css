@@ -258,6 +258,9 @@
     .cm-passes > summary { display: none; }
     .cm-passes::details-content { content-visibility: visible; display: block; }
   }
+  /* Paper doesn't scroll: six setups side by side fit A4's width, the narrower of A4 and Letter */
   .cm-compare-scroll { overflow: visible; }
+  .cm-compare-table { font-size: var(--type-data-sm-size); line-height: var(--type-data-sm-line); }
+  .cm-compare-table thead th, .cm-compare-table tbody th, .cm-compare-table td { min-width: 0; padding: var(--space-2) var(--space-2) var(--space-2) 0; }
   a { color: inherit; text-decoration: none; }
 }

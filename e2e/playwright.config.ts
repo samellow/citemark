@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// The pages are files on disk, built by `citemark gallery` (and later the report build), so no
+// The pages are files on disk, built by `citemark gallery`, the sample report among them, so no
 // server runs. Every check uses Chromium, the browser CI pins.
 export default defineConfig({
   testDir: "tests",
