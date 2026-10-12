@@ -1156,9 +1156,11 @@ def serve(
     ),
     port: Annotated[int, typer.Option(envvar="PORT", help="The port. Hosts such as Render set PORT.")] = 8000,
     worker: Annotated[bool, typer.Option(help="Run the job worker in the same process (PRD Q1).")] = True,
+    migrate: Annotated[bool, typer.Option(help="Bring the database to the newest schema first (PRD 5.13).")] = True,
 ) -> None:
     """Serve the web app: the demo page and its ask box once DEMO_COMPANY is set. Its answers call
-    Claude and Voyage, within the ask box's limits."""
+    Claude and Voyage, within the ask box's limits. The database is migrated first."""
+    import structlog
     import uvicorn
 
     from citemark import log
@@ -1171,6 +1173,10 @@ def serve(
     except SetupError as exc:
         _fail(str(exc))
     log.configure()
+    if migrate:
+        from citemark.db import migrate as migrations
+
+        structlog.get_logger().info("database_migrated", revision=migrations.upgrade())
     # The proxy's headers are read by the ask box's limiter alone, and no request is logged with
     # its address (PRD 5.11)
     uvicorn.run(

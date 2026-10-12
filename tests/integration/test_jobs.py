@@ -18,8 +18,9 @@ from stepped_job import STEPS, counts, stepped
 
 from citemark.db.models import Conversation, Job, Setting
 from citemark.db.session import make_engine, make_sessionmaker
+from citemark.ingest import sources
 from citemark.jobs.purge import PurgeError, delete_expired, purge, retention_days
-from citemark.jobs.queue import MAX_ATTEMPTS, cancel, enqueue, ensure_daily
+from citemark.jobs.queue import MAX_ATTEMPTS, cancel, claim, enqueue, ensure_daily, finish
 from citemark.jobs.worker import Worker
 
 pytestmark = pytest.mark.anyio
@@ -175,6 +176,47 @@ async def test_a_job_whose_worker_was_killed_finishes_exactly_once(engine, job_t
     assert (row.attempts, row.progress_done) == (2, STEPS)
     async with make_sessionmaker(engine)() as session:
         assert await counts(session, job_type) == {**{f"step {n}": 1 for n in range(STEPS)}, "finished": 1}
+
+
+@pytest.fixture
+def indexing(job_type, monkeypatch):
+    """`citemark sources index`, running test jobs. Returns the jobs its own worker ran."""
+    ran_here = []
+
+    async def handler(context):
+        ran_here.append(context.id)
+
+    monkeypatch.setattr(sources, "handlers", lambda: {job_type: handler})
+    monkeypatch.setattr(sources, "POLL_SECONDS", 0.05)
+    return ran_here
+
+
+async def test_the_index_command_waits_for_the_worker_that_took_its_job(engine, job_type, indexing):
+    """On a host the app's own worker can take the job first. The command waits for it to end,
+    so it doesn't say Done while the index is still being built (T18)."""
+    [job_id] = await queued(engine, job_type)
+    async with engine.connect() as app_worker:
+        assert (await claim(app_worker, [job_type])).id == job_id
+        shown = asyncio.create_task(sources.show_jobs(engine, [job_id], lambda line: None))
+        await asyncio.sleep(0.5)
+        assert not shown.done()
+        await finish(app_worker, job_id, "failed", "IngestError: The start page answered 503.")
+        assert await asyncio.wait_for(shown, 10) == ["The start page answered 503."]
+    assert indexing == []
+
+
+async def test_the_index_command_takes_over_a_job_whose_worker_stopped(engine, job_type, indexing):
+    [job_id] = await queued(engine, job_type)
+    app_worker = await engine.connect()
+    try:
+        await claim(app_worker, [job_type])
+        shown = asyncio.create_task(sources.show_jobs(engine, [job_id], lambda line: None))
+        await asyncio.sleep(0.2)
+    finally:
+        await app_worker.invalidate()  # Postgres drops the stopped worker's lock
+        await app_worker.close()
+    assert await asyncio.wait_for(shown, 10) == []
+    assert indexing == [job_id] and (await job(engine, job_id)).status == "done"
 
 
 async def test_a_daily_job_is_queued_once_a_day(engine, job_type):

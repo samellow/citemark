@@ -25,6 +25,7 @@ from citemark.jobs.queue import enqueue
 from citemark.jobs.worker import Worker, handlers
 
 CRAWLED = ("sitemap", "start_page", "url")
+ACTIVE = ("queued", "running")  # a job's statuses before it ends
 VERBS = {"articles": "Fetched", "passages": "Embedded"}
 POLL_SECONDS = 1.0
 
@@ -114,8 +115,8 @@ def describe(done: int, total: int | None, label: str) -> str:
 
 
 async def index_and_show(engine: AsyncEngine, source_id: uuid.UUID | None, echo: Callable[[str], None]) -> list[str]:
-    """Queue an `ingest` job for the source (or every crawled source), run the worker here until
-    nothing is waiting, and show each job's progress as it changes. Returns the jobs' errors."""
+    """Queue an `ingest` job for the source (or every crawled source), then run and show them
+    (`show_jobs`). Returns the jobs' errors."""
     sessions = make_sessionmaker(engine)
     async with sessions.begin() as session:
         if source_id is None:
@@ -128,8 +129,30 @@ async def index_and_show(engine: AsyncEngine, source_id: uuid.UUID | None, echo:
         if not ids:
             raise IngestError("There are no sources to index yet. Add one with: citemark sources add")
         jobs = [await enqueue(session, "ingest", {"source_id": str(id)}) for id in ids]
+    return await show_jobs(engine, jobs, echo)
 
-    worker = asyncio.create_task(Worker(engine, handlers()).run_until_idle())
+
+async def _waiting(sessions: async_sessionmaker[AsyncSession], jobs: Sequence[uuid.UUID]) -> bool:
+    async with sessions() as session:
+        found = await session.scalar(select(func.count()).where(Job.id.in_(jobs), Job.status.in_(ACTIVE)))
+    return bool(found)
+
+
+async def show_jobs(engine: AsyncEngine, jobs: Sequence[uuid.UUID], echo: Callable[[str], None]) -> list[str]:
+    """Run the jobs here, and show each one's progress as it changes until they've all ended.
+    On a host the app's own worker may take a job first (`citemark serve`), so this waits for
+    it, and takes the job over if that worker stops. Returns the jobs' errors."""
+    sessions = make_sessionmaker(engine)
+
+    async def run() -> None:
+        here = Worker(engine, handlers())
+        while True:
+            await here.run_until_idle()
+            if not await _waiting(sessions, jobs):
+                return
+            await asyncio.sleep(POLL_SECONDS)
+
+    worker = asyncio.create_task(run())
     shown: dict[uuid.UUID, str] = {}
     while True:
         finished = worker.done()

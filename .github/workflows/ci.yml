@@ -95,6 +95,18 @@ jobs:
 
   image:
     runs-on: ubuntu-24.04
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: citemark
+          POSTGRES_PASSWORD: citemark
+          POSTGRES_DB: citemark
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U citemark -d citemark"
+          --health-interval 2s --health-timeout 3s --health-retries 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: docker build --tag citemark:ci .
@@ -125,3 +137,38 @@ jobs:
           get = lambda path: asyncio.run(httpx2.AsyncClient(transport=httpx2.ASGITransport(app=app), base_url='http://image').get(path));
           codes = [get(path).status_code for path in ('/static/demo.css', '/static/demo.js', '/healthz')];
           assert codes == [200, 200, 200], codes"
+      - name: As on Render, the image's own command migrates an empty database, then serves the page on PORT
+        run: |
+          docker run --detach --name app --network host --env PORT=8123 \
+            --env DATABASE_URL=postgresql://citemark:citemark@localhost:5432/citemark \
+            --env DEMO_COMPANY=Zulip --env BUILDER_NAME=CI --env CLIENT_IP_HEADER=CF-Connecting-IP \
+            --env ANTHROPIC_API_KEY=unused --env VOYAGE_API_KEY=unused \
+            citemark:ci
+          for second in $(seq 60); do curl --silent --fail http://localhost:8123/healthz && break; sleep 1; done
+          curl --silent --fail http://localhost:8123/ | grep --quiet cm-topbar-label
+          docker logs app 2>&1 | grep --quiet database_migrated
+          if docker logs app 2>&1 | grep '"level": "error"'; then exit 1; fi
+      - name: The app's log when a step fails
+        if: failure()
+        run: docker logs app || true
+
+  publish:
+    # Each commit on main, once every job above passed, as ghcr.io/<owner>/citemark:sha-<commit>.
+    # A deploy names that tag (render.yaml), and a rollback names the one before it. :main is the newest.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [test, gallery, security, image]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build the image and push it to GitHub's container registry
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          echo "$GH_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          docker build --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            --tag "$image:sha-${GITHUB_SHA::7}" --tag "$image:main" .
+          docker push --all-tags "$image"

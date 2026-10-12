@@ -97,7 +97,7 @@ uv run citemark report build reports/<client>.yaml --out reports/<client>.html
 To serve the demo page, set `DEMO_COMPANY`, `BUILDER_NAME`, `DEMO_AUDIT_URL` and both API keys in `.env`. Its answers call Claude and Voyage, within the limits above.
 
 ```
-uv run citemark serve              # http://127.0.0.1:8000; a host passes --host 0.0.0.0 and sets PORT
+uv run citemark serve              # migrates the database first, then http://127.0.0.1:8000
 uv run citemark demo spend-cap     # the cap and today's spend; add an amount, such as 2.00, to change it
 ```
 
