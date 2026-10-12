@@ -101,6 +101,16 @@ uv run citemark serve              # migrates the database first, then http://12
 uv run citemark demo spend-cap     # the cap and today's spend; add an amount, such as 2.00, to change it
 ```
 
+The public demo runs on Render from `render.yaml`: the published image and Postgres 16 with pgvector, about $13.30 a month at Render's prices on 2026-10-11. Each commit on `main` that passes CI is published as `ghcr.io/samellow/citemark:sha-<commit>`, and `render.yaml` names the one that's deployed.
+
+1. In Render, create a Blueprint from this repository and fill in what it asks for: `BUILDER_NAME` and both API keys. `DEMO_AUDIT_URL` and `DEMO_AUDIT_PRICE` can stay empty until the listing is live. The app migrates its database as it starts.
+2. Build the index from the web service's Shell. Embedding it costs an estimated cent.
+   ```
+   citemark sources add start-page https://zulip.com/help/ --selector .sl-markdown-content
+   citemark sources index
+   ```
+3. To deploy a newer commit, change the tag in `render.yaml` and merge it; Render deploys it. To roll back, put the previous tag back. Migrations only run forward, so to roll back past one, first undo it from the newer image's Shell with `alembic downgrade <revision>`.
+
 ## Licenses
 
 The code is MIT (see `LICENSE`). The demo uses Zulip's open-source help center under the Apache License 2.0; see `NOTICE`. This is an unofficial demo, not affiliated with Zulip.

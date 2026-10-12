@@ -1,0 +1,50 @@
+# The public demo page on Render: the app from the kit's published image, and Postgres 16 with
+# pgvector. About $13.30 a month at Render's prices on 2026-10-11: Starter $7, Basic-256mb $6,
+# and a 1 GB disk $0.30.
+#
+# A deploy changes the image's tag below and merges it to main. Render syncs this file and deploys
+# that image, and the app migrates its database as it starts. A rollback puts the previous tag
+# back. A moving tag such as :main would be pulled again at its newest on a rollback, so this
+# always names one commit's image.
+services:
+  - type: web
+    name: citemark-demo
+    runtime: image
+    image:
+      url: ghcr.io/samellow/citemark:sha-e453591
+    plan: 0.5c-512mb # Starter: 0.5 CPU, 512 MB
+    region: oregon
+    numInstances: 1 # the hour's question limit is kept in memory, so exactly one
+    healthCheckPath: /healthz
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: citemark-demo-db
+          property: connectionString
+      - key: CLIENT_IP_HEADER # set by Render's Cloudflare, which refuses one a visitor forges
+        value: CF-Connecting-IP
+      - key: DEMO_COMPANY
+        value: Zulip
+      - key: DEMO_MODEL
+        value: claude-haiku-5-5
+      # Asked for when the Blueprint is created, and never kept in this file
+      - key: BUILDER_NAME
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: VOYAGE_API_KEY
+        sync: false
+      - key: DEMO_AUDIT_URL # left empty until the audit listing is live
+        sync: false
+      - key: DEMO_AUDIT_PRICE
+        sync: false
+
+databases:
+  - name: citemark-demo-db
+    plan: 0.1c-256mb # Basic-256mb
+    diskSizeGB: 1 # Basic's default is 15 GB; the help center's index is an estimated few tens of MB
+    postgresMajorVersion: "16" # the version CI tests on
+    region: oregon
+    databaseName: citemark
+    user: citemark
+    ipAllowList: [] # nothing outside Render connects: only the app, over Render's private network
