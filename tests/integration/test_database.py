@@ -4,8 +4,10 @@ Needs a running database: `docker compose up -d db`, then `uv run alembic upgrad
 """
 
 import asyncio
+import socket
 import uuid
 
+import pytest
 from sqlalchemy import make_url, text
 
 from citemark.db import migrate
@@ -48,3 +50,21 @@ def test_serve_migrates_an_empty_database_to_the_newest_revision(monkeypatch):
         monkeypatch.undo()
         get_settings.cache_clear()
         asyncio.run(_scalar(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
+
+
+def test_a_database_that_isnt_listening_yet_is_tried_again(monkeypatch):
+    """The driver's real error, as on Render when the app started before the database made with
+    it: nothing listens on the port. It's waited for, then raised as it came."""
+    with socket.socket() as probe:
+        probe.bind(("127.0.0.1", 0))
+        port = probe.getsockname()[1]  # free, and closed again once the probe is
+    slept: list[float] = []
+    try:
+        monkeypatch.setenv("DATABASE_URL", f"postgresql://citemark@127.0.0.1:{port}/citemark")
+        get_settings.cache_clear()
+        with pytest.raises(ConnectionRefusedError):
+            migrate.upgrade(wait=3, sleep=slept.append, clock=lambda: sum(slept))
+    finally:
+        monkeypatch.undo()
+        get_settings.cache_clear()
+    assert slept == [1.0, 2.0]
