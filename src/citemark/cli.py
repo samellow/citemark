@@ -579,6 +579,62 @@ def resume_tests(
     _run_tests(None, found, company=None, model=None, mode=None, budget=None, yes=True, force=force)
 
 
+@test_app.command("live")
+def test_live(
+    model: Annotated[str, typer.Option(help="The answer model.")] = "claude-haiku-5-5",
+) -> None:
+    """Ask five known questions through the real APIs, to catch an API or model change (QA plan
+    3.2). It fills an empty database with seven Zulip articles first. Fails if a call errors, no
+    answer arrives with its sources, or a known decline is answered. Calls Claude and Voyage: an
+    estimated half a cent with Haiku."""
+    import logging
+    from decimal import Decimal
+
+    import anthropic
+    import httpx2
+
+    from citemark import log
+    from citemark.costs import price
+    from citemark.db.session import make_sessionmaker
+    from citemark.embed.voyage import VoyageEmbedder, VoyageReranker
+    from citemark.evals import live
+    from citemark.models.claude import ClaudeAnswerer
+    from citemark.retrieve import load_config
+
+    voyage, claude = _voyage_key(), _anthropic_key()
+    log.configure(logging.WARNING)  # a logged traceback never shows its locals, which hold the keys
+
+    async def run(engine):
+        sessions = make_sessionmaker(engine)
+        async with httpx2.AsyncClient() as api, anthropic.AsyncAnthropic(api_key=claude) as client:
+            embedder = VoyageEmbedder(voyage, api)
+            loaded = await live.load(sessions, embedder)
+            async with sessions() as session:
+                config = await load_config(session)
+                reranker = VoyageReranker(voyage, api, model=config.reranker) if config.rerank else None
+                bot = ClaudeAnswerer(client, model, company=live.COMPANY)
+                asked = await live.ask(
+                    session, model=bot, rewriter=client, embedder=embedder, reranker=reranker, config=config
+                )
+                today = dt.datetime.now(dt.UTC).date()
+                embedding = await price(session, embedder.model, on=today, input_tokens=loaded.embed_tokens)
+        return loaded, asked, embedding
+
+    try:
+        loaded, asked, embedding = _with_db(run)
+    except live.LiveRunError as exc:
+        _fail(str(exc))
+    typer.echo(f"Loaded seven articles as {loaded.passages:,} passages ({loaded.embed_tokens:,} tokens embedded).")
+    for each in asked:
+        typer.echo(each.line())
+    total = embedding + sum((each.cost_usd for each in asked), Decimal(0))
+    typer.echo(f"Cost about ${total:.4f} at list prices.")
+    found = live.failures(asked)
+    if found:
+        _fail("Failed:\n" + "\n".join(found))
+    typer.echo("Passed: no call failed, answers arrived with their sources, and the known declines were declined.")
+
+
 @test_app.command("rescore")
 def rescore(run_id: Annotated[str, typer.Argument(help="The run to score again.")]) -> None:
     """Recompute a run's scores from its stored results. Nothing is asked again; the judge's verdicts stand."""
