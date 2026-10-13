@@ -42,6 +42,8 @@ def test_one_answer_declined_is_shown_beside_what_was_expected_but_doesnt_fail()
     assert replies[0].line() == f"[decline_not_covered] (expected: answer) {TYPING.question}"
     assert replies[1].line() == f"[answer, 1 source] {BIGGER.question}"
     assert asked(*AS_RECORDED)[0].line() == f"[answer, 2 sources] {TYPING.question}"
+    twice = Asked(TYPING, "partial", 1, Decimal("0.001"), calls=2)
+    assert twice.line() == f"[partial, 1 source, 2 model calls] (expected: answer) {TYPING.question}"
 
 
 def test_an_error_fails_with_what_went_wrong():

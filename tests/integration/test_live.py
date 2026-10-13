@@ -70,7 +70,7 @@ async def test_it_loads_the_seven_articles_and_asks_the_five_questions(sessions,
     assert (loaded.added, loaded.failed, loaded.passages > 7) == (7, 0, True)
     asked = await ask(session, Scripted(SCRIPT))
     assert [each.kind for each in asked] == [known.expected for known in live.QUESTIONS]
-    assert [each.sources for each in asked] == [1, 1, 0, 0, 0]
+    assert [each.sources for each in asked] == [1, 1, 0, 0, 0] and {each.calls for each in asked} == {1}
     assert all(each.cost_usd > 0 for each in asked) and live.failures(asked) == []
     assert asked[0].line() == f"[answer, 1 source] {TYPING}"
     typing, _, emails, spoiler, _ = asked

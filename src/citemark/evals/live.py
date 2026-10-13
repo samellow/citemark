@@ -74,9 +74,12 @@ class Asked:
     cost_usd: Decimal
     problems: tuple[str, ...] = ()
     said: tuple[str, ...] = ()  # the reply as a visitor reads it, so a change from a recording can be read
+    calls: int = 1  # model calls: a second follows a gap reported before anything was cited
 
     def line(self) -> str:
         counted = f"{self.kind}, {self.sources} source{'' if self.sources == 1 else 's'}" if self.sources else self.kind
+        if self.calls > 1:
+            counted += f", {self.calls} model calls"
         differs = "" if self.kind == self.known.expected else f" (expected: {self.known.expected})"
         return f"[{counted}]{differs} {self.known.question}"
 
@@ -140,7 +143,8 @@ async def ask(
             asked.append(Asked(known, "error", 0, Decimal(0), (f"It stopped with {type(exc).__name__}.",)))
             continue
         reply = result.reply
-        asked.append(Asked(known, reply.kind, len(reply.sources), result.cost_usd, reply.problems, shown(reply)))
+        said, calls = shown(reply), len(reply.calls)
+        asked.append(Asked(known, reply.kind, len(reply.sources), result.cost_usd, reply.problems, said, calls))
     return asked
 
 
