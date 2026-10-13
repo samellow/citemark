@@ -11,7 +11,7 @@ services:
     name: citemark-demo
     runtime: image
     image:
-      url: ghcr.io/samellow/citemark:sha-e453591
+      url: ghcr.io/samellow/citemark:sha-60b3893
     plan: 0.5c-512mb # Starter: 0.5 CPU, 512 MB
     region: oregon
     numInstances: 1 # the hour's question limit is kept in memory, so exactly one
