@@ -16,12 +16,12 @@ from citemark.testing.fakes import FakeEmbedder, FakeReranker
 
 pytestmark = pytest.mark.anyio
 RECORDINGS = Path(__file__).parents[1] / "recordings"
-TYPING, BIGGER, EMAILS, PICTURE, AUSTRALIA = (known.question for known in live.QUESTIONS)
+TYPING, BIGGER, EMAILS, SPOILER, AUSTRALIA = (known.question for known in live.QUESTIONS)
 SCRIPT = {
     TYPING: ("answer", "Disable sending typing notifications"),
     BIGGER: ("answer", ""),  # stand-in vectors can't find font size by meaning, so the first passage
     EMAILS: ("clarify", ["New login emails", "Message notification emails"]),
-    PICTURE: ("decline", "not_covered"),
+    SPOILER: ("decline", "not_covered"),
     AUSTRALIA: ("decline", "off_topic"),
 }
 
@@ -44,12 +44,25 @@ async def ask(session, answerer, embedder=None):
     )
 
 
-def test_the_questions_and_articles_are_the_recorded_tests_own():
+def test_the_articles_and_four_questions_are_the_recorded_tests_own():
     """So a live reply can be set beside its recording, and the frozen test set stays unseen."""
     assert set(live.ARTICLES) == set(SUBSET)
     recorded = [path.read_text(encoding="utf-8") for path in RECORDINGS.glob("v1-messages-*.json")]
     for known in live.QUESTIONS:
-        assert any(known.question in text and '"claude-haiku-5-5"' in text for text in recorded), known.question
+        if not known.absent:
+            assert any(known.question in text and '"claude-haiku-5-5"' in text for text in recorded), known.question
+
+
+def test_no_article_has_a_word_on_what_the_not_covered_question_asks():
+    """The first live run failed on "How do I change my profile picture?": the font-size article
+    says "Click on your profile picture", and the bot answered from it (2026-10-13). Nor does the
+    frozen test set ask about it, so the nightly run never shows how a frozen question went."""
+    [own] = [known for known in live.QUESTIONS if known.absent]
+    assert own.expected == "decline_not_covered" and all(term in own.question.lower() for term in own.absent)
+    articles = "".join((live.TEXT / f"{slug}.md").read_text(encoding="utf-8") for slug in live.ARTICLES).lower()
+    frozen = (live.TEXT.parents[2] / "test-sets" / "zulip-v1.yaml").read_text(encoding="utf-8").lower()
+    for term in own.absent:
+        assert term not in articles and term not in frozen, term
 
 
 async def test_it_loads_the_seven_articles_and_asks_the_five_questions(sessions, session, priced):
@@ -60,11 +73,11 @@ async def test_it_loads_the_seven_articles_and_asks_the_five_questions(sessions,
     assert [each.sources for each in asked] == [1, 1, 0, 0, 0]
     assert all(each.cost_usd > 0 for each in asked) and live.failures(asked) == []
     assert asked[0].line() == f"[answer, 1 source] {TYPING}"
-    typing, _, emails, picture, _ = asked
+    typing, _, emails, spoiler, _ = asked
     assert typing.said[0] == "Turn it off in your settings.[1]"  # what was said, so a change can be read
     assert typing.said[1].startswith("[1] ") and "Disable sending typing notifications" in typing.said[1]
     assert emails.said[-1] == "Options: New login emails / Message notification emails"
-    assert len(picture.said) == 1 and picture.said[0]  # a decline's fixed sentence
+    assert len(spoiler.said) == 1 and spoiler.said[0]  # a decline's fixed sentence
 
 
 async def test_it_loads_only_into_an_empty_database(sessions, session):

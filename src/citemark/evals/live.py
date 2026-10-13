@@ -2,9 +2,12 @@
 commit's CI calls. It catches a change in the APIs or the model that recorded replies would hide
 (QA plan 8). Accuracy is the frozen test set's job, not this one's.
 
-The questions and the seven Zulip articles they're asked over are the recorded tests' own, and
-the frozen test set uses none of them. The articles are embedded live into an empty database,
-which takes a call or two where the whole help center would take half an hour on a low rate limit.
+Four questions and the seven Zulip articles they're asked over are the recorded tests' own, so a
+live reply can be set beside its recording. The fifth is a question none of the seven articles
+has a word on, which a test checks: the recorded tests' own not-covered question names something
+one of the seven articles mentions in passing. The frozen test set uses none of this. The articles
+are embedded live into an empty database, which takes a call or two where the whole help center
+would take half an hour on a low rate limit.
 """
 
 from __future__ import annotations
@@ -50,14 +53,15 @@ class LiveRunError(RuntimeError):
 @dataclass(frozen=True)
 class Known:
     question: str
-    expected: str  # the reply's kind in its recording
+    expected: str  # the reply's kind: as recorded, or a decline for a question the articles don't cover
+    absent: tuple[str, ...] = ()  # what it asks about, in words none of the seven articles holds
 
 
 QUESTIONS = (
     Known("Can I stop people from seeing when I'm typing?", "answer"),
     Known("How do I make the text bigger?", "answer"),
     Known("How do I stop getting emails?", "clarify"),
-    Known("How do I change my profile picture?", "decline_not_covered"),
+    Known("How do I add a spoiler to my message?", "decline_not_covered", absent=("spoiler",)),
     Known("What's the capital of Australia?", "decline_off_topic"),
 )
 
@@ -73,7 +77,7 @@ class Asked:
 
     def line(self) -> str:
         counted = f"{self.kind}, {self.sources} source{'' if self.sources == 1 else 's'}" if self.sources else self.kind
-        differs = "" if self.kind == self.known.expected else f" (recorded: {self.known.expected})"
+        differs = "" if self.kind == self.known.expected else f" (expected: {self.known.expected})"
         return f"[{counted}]{differs} {self.known.question}"
 
 
@@ -142,8 +146,8 @@ async def ask(
 
 def failures(asked: Sequence[Asked]) -> list[str]:
     """What fails the run (QA plan 3.2): a call that errors, no answer arriving with its
-    sources, or a known decline answered. Any other change from a recording is shown, not failed:
-    one question answered differently on one night is the model's variance, not an API change."""
+    sources, or a known decline answered. Any other change from what's expected is shown, not
+    failed: one question answered differently on one night is the model's variance, not an API change."""
     found = []
     for each in asked:
         if each.kind == "error":
