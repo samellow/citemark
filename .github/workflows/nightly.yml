@@ -1,8 +1,9 @@
 name: nightly
 
 # QA plan 3.2 and 7.2: five known questions through the real APIs with Haiku, which no commit's
-# CI calls. It catches an API or model change, not accuracy. The API keys are repository secrets,
-# so it runs only on its schedule or when started from the Actions tab, never on a pull request.
+# CI calls. It catches an API or model change, not accuracy. The API keys are secrets of the
+# GitHub environment `nightly`, which only the job below names, and it runs only on its schedule
+# or when started from the Actions tab, never on a pull request.
 # A failure opens an issue, or adds to the one already open; the next pass closes it.
 
 on:
@@ -17,6 +18,7 @@ jobs:
   live:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    environment: nightly # where the two API keys are kept
     services:
       db:
         image: pgvector/pgvector:pg16
