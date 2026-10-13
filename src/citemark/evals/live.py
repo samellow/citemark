@@ -19,6 +19,7 @@ import anthropic
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from citemark.answer import Reply
 from citemark.answer.pipeline import respond
 from citemark.db.models import Source
 from citemark.embed import Embedder, Reranker
@@ -39,6 +40,7 @@ ARTICLES = (
 )
 ANSWERS = ("answer", "partial")
 DECLINES = ("decline_not_covered", "decline_off_topic")
+QUOTE = 200  # characters of a source's quote shown
 
 
 class LiveRunError(RuntimeError):
@@ -67,11 +69,27 @@ class Asked:
     sources: int
     cost_usd: Decimal
     problems: tuple[str, ...] = ()
+    said: tuple[str, ...] = ()  # the reply as a visitor reads it, so a change from a recording can be read
 
     def line(self) -> str:
-        shown = f"{self.kind}, {self.sources} source{'' if self.sources == 1 else 's'}" if self.sources else self.kind
+        counted = f"{self.kind}, {self.sources} source{'' if self.sources == 1 else 's'}" if self.sources else self.kind
         differs = "" if self.kind == self.known.expected else f" (recorded: {self.known.expected})"
-        return f"[{shown}]{differs} {self.known.question}"
+        return f"[{counted}]{differs} {self.known.question}"
+
+
+def shown(reply: Reply) -> tuple[str, ...]:
+    """A reply as a visitor reads it, a line each: its words with their source markers, a
+    clarifying question's options, a partial answer's gap, then what each source quoted."""
+    words = "".join(part.text + "".join(f"[{marker}]" for marker in part.markers) for part in reply.segments)
+    lines = [line.strip() for line in (words or reply.text).splitlines() if line.strip()]
+    if reply.clarify_options:
+        lines.append("Options: " + " / ".join(reply.clarify_options))
+    if reply.gap_line:
+        lines.append(reply.gap_line)
+    for source in reply.sources:
+        quote = " ".join(source.cited_text.split())
+        lines.append(f'[{source.marker}] {source.title}: "{quote[:QUOTE]}{"…" if len(quote) > QUOTE else ""}"')
+    return tuple(lines)
 
 
 async def load(sessions: async_sessionmaker[AsyncSession], embedder: Embedder) -> IndexResult:
@@ -118,7 +136,7 @@ async def ask(
             asked.append(Asked(known, "error", 0, Decimal(0), (f"It stopped with {type(exc).__name__}.",)))
             continue
         reply = result.reply
-        asked.append(Asked(known, reply.kind, len(reply.sources), result.cost_usd, reply.problems))
+        asked.append(Asked(known, reply.kind, len(reply.sources), result.cost_usd, reply.problems, shown(reply)))
     return asked
 
 

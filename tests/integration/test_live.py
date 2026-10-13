@@ -60,6 +60,11 @@ async def test_it_loads_the_seven_articles_and_asks_the_five_questions(sessions,
     assert [each.sources for each in asked] == [1, 1, 0, 0, 0]
     assert all(each.cost_usd > 0 for each in asked) and live.failures(asked) == []
     assert asked[0].line() == f"[answer, 1 source] {TYPING}"
+    typing, _, emails, picture, _ = asked
+    assert typing.said[0] == "Turn it off in your settings.[1]"  # what was said, so a change can be read
+    assert typing.said[1].startswith("[1] ") and "Disable sending typing notifications" in typing.said[1]
+    assert emails.said[-1] == "Options: New login emails / Message notification emails"
+    assert len(picture.said) == 1 and picture.said[0]  # a decline's fixed sentence
 
 
 async def test_it_loads_only_into_an_empty_database(sessions, session):

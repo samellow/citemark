@@ -44,7 +44,11 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
-        run: uv run citemark test live 2>&1 | tee live.txt
+        # GitHub runs a step with `bash -e`, where a pipe reports its last command: without
+        # pipefail, a run that failed its checks showed green, as tee had succeeded.
+        run: |
+          set -o pipefail
+          uv run citemark test live 2>&1 | tee live.txt
       - name: The answers on the run's summary page
         if: always()
         run: |

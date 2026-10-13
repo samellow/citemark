@@ -627,6 +627,8 @@ def test_live(
     typer.echo(f"Loaded seven articles as {loaded.passages:,} passages ({loaded.embed_tokens:,} tokens embedded).")
     for each in asked:
         typer.echo(each.line())
+        for line in each.said:
+            typer.echo(f"    {line}")
     total = embedding + sum((each.cost_usd for each in asked), Decimal(0))
     typer.echo(f"Cost about ${total:.4f} at list prices.")
     found = live.failures(asked)
