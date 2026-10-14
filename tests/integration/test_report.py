@@ -227,6 +227,8 @@ async def test_without_a_pass_mark_a_report_is_a_baseline(session, sessions, tmp
     await grade(session, runs[0].id)
     report = await built(session, asked(path, runs))
     assert report.verdict == Verdict("baseline", t("verdict.baseline"))
+    # An audit's first report (T17): the client's questions, so the client's authorship line
+    assert t("method.authorship.client", client="Acme Chat", builder_name=BUILDER) in report.method.paragraphs
     assert report.pass_mark == t("signed.none") and report.fix_plan.heading == t("fix.heading.baseline")
     assert report.fix_plan.none == t("fix.none") and report.failed == ()
     assert all(row.target is None and row.state is None for row in report.measures)

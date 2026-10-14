@@ -21,3 +21,6 @@ e2e/playwright-report/
 
 # Client reports: never in the public kit (the published demo report lives in demo/published/)
 reports/
+
+# Client audits: each one's files, deleted by citemark audit purge (PRD 5.11)
+audits/

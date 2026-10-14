@@ -24,12 +24,14 @@ PAUSES = (1.0, 2.0, 4.0, 8.0)  # between tries; the last one repeats
 NOT_READY = (OSError, asyncpg.CannotConnectNowError, asyncpg.ConnectionDoesNotExistError)
 
 
-def config() -> Config:
+def config(url: str | None = None) -> Config:
     """Alembic's settings without alembic.ini, whose logging would print plain lines among the
-    app's JSON ones. The database comes from DATABASE_URL, as it does for `alembic upgrade`."""
+    app's JSON ones. The database comes from DATABASE_URL, as it does for `alembic upgrade`,
+    unless `url` names another, such as an audit's own (`citemark audit new`)."""
     made = Config()
     made.set_main_option("script_location", str(MIGRATIONS))
     made.set_main_option("path_separator", "os")
+    made.attributes["url"] = url  # env.py reads it
     return made
 
 
@@ -50,14 +52,19 @@ def _not_ready(error: BaseException) -> bool:
 
 
 def upgrade(
-    *, wait: float = WAIT, sleep: Callable[[float], None] = time.sleep, clock: Callable[[], float] = time.monotonic
+    *,
+    url: str | None = None,
+    wait: float = WAIT,
+    sleep: Callable[[float], None] = time.sleep,
+    clock: Callable[[], float] = time.monotonic,
 ) -> str:
-    """Migrate to the newest revision, and return it.
+    """Migrate to the newest revision, and return it. `url` names a database other than
+    DATABASE_URL's.
 
     A database that isn't accepting connections yet is tried again for up to `wait` seconds. On a
     host the app can start a few seconds before a database made with it does: the demo's first
     deploy on Render failed that way (2026-10-13). Any other error stops the start at once."""
-    made = config()
+    made = config(url)
     deadline = clock() + wait
     for attempt in itertools.count():
         try:

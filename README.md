@@ -24,6 +24,7 @@ A support bot for SaaS help centers that ships with proof it works: a test repor
   - Numbers round against the bot, and a measure's state comes from its exact value, so a shown number never looks better than it was.
   - It refuses to build rather than claim what it can't show: without the frozen test set the runs used, the judge's agreement with a person's grading, an estimate for each group of failures, or who agreed the pass mark and when.
   - Every word is in `content/en/report.json`, and the gallery shows a sample report with made-up content.
+- `src/citemark/audit.py` and `citemark audit new | purge`: audit mode. Each client's audit is its own local database and folder. The purge drops both, checks they're gone, and prints the deletion note to send the client.
 - `src/citemark/web/` and `citemark serve`: the public demo page and its ask box, one FastAPI app with the job worker running inside it.
   - The unofficial-demo label sits at the top of every page. Until the decision runs are published (`DEMO_RESULTS`), the page leaves out everything that would say the bot was tested: the counts, the recorded exchange, the suggested questions and the report link.
   - Answers come from the same pipeline as the test runs, each shown as its evidence: where the bot looked, what it quoted, what it answered. The ask box works without JavaScript.
@@ -94,6 +95,18 @@ uv run citemark test threshold test-sets/<the set>.yaml --agreed-by "<their name
   --targets correct_answers=90,right_source=90,correct_declines=95,wrongly_declined=5,right_place=95
 uv run citemark report build reports/<client>.yaml --out reports/<client>.html
 ```
+
+To audit a client's help center, give the audit its own database and folder. `citemark audit new` makes both, on the server `DATABASE_URL` names, and prints the address to export so every command after it reaches the audit's database. The folder is `audits/<name>/`, which git ignores: keep the client's questions, the test set, the report's file and the report in it. Until a pass mark is agreed, the report is a baseline, and its method says the questions are the client's (`client_questions: true`).
+
+```
+uv run citemark audit new "Acme Chat"
+export DATABASE_URL=postgresql://citemark:citemark@localhost:54320/citemark_audit_acme_chat
+uv run citemark sources add sitemap https://help.acme.example/sitemap.xml && uv run citemark sources index
+uv run citemark report build audits/acme_chat/report.yaml --out audits/acme_chat/acme-chat.html
+uv run citemark audit purge "Acme Chat"   # after delivery
+```
+
+The purge counts what the audit's database holds, drops it, deletes the folder, checks both are gone, and only then prints the deletion note to send the client.
 
 To serve the demo page, set `DEMO_COMPANY`, `BUILDER_NAME`, `DEMO_AUDIT_URL` and both API keys in `.env`. Its answers call Claude and Voyage, within the limits above.
 

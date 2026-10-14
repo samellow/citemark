@@ -1,0 +1,3 @@
+{
+  "audit.deletion_note": "On {date}, I deleted every copy of the help-center content and test questions used for your Citemark accuracy audit: the audit database ({doc_count, plural, one {# article} other {# articles}}, {question_count, plural, one {# question} other {# questions}}) and the local files. Nothing was kept. The report you received is the only remaining copy."
+}

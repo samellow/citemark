@@ -118,7 +118,7 @@ jobs:
           docker run --rm --entrypoint python citemark:ci -c
           "from citemark import prompts, strings;
           [prompts.load(name) for name in ('rewrite.v1', 'answer.v1', 'judge.v1')];
-          prompts.load_tools('tools.v1'); strings.load('widget');
+          prompts.load_tools('tools.v1'); strings.load('widget'); strings.load('outbound');
           from citemark.report.render import primitives;
           assert 'cm-glyph' in primitives().state_mark(state='pass', label='Pass')"
       - name: The CSS and fonts the report embeds are in the image

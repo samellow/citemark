@@ -32,6 +32,11 @@ report_app = typer.Typer(help="Accuracy reports: one file each, built from decis
 app.add_typer(report_app, name="report")
 demo_app = typer.Typer(help="The public demo page: its ask box's daily spend cap.", no_args_is_help=True)
 app.add_typer(demo_app, name="demo")
+audit_app = typer.Typer(
+    help="Audit mode: each client's audit in its own local database and folder, deleted after delivery.",
+    no_args_is_help=True,
+)
+app.add_typer(audit_app, name="audit")
 
 
 FileArg = Annotated[Path, typer.Argument(help="The test-set YAML file.", exists=True, dir_okay=False)]
@@ -1277,3 +1282,65 @@ def demo_spend_cap(
 
     cap, spent = _with_db(run)
     typer.echo(f"The ask box's cap is ${cap:.2f} a day. Spent today (UTC): ${spent:.4f}.")
+
+
+ClientArg = Annotated[str, typer.Argument(help='The client\'s name, such as "Acme Chat".')]
+
+
+def _here(path: Path) -> Path:
+    """A path as it's shown: from the current folder when it's under it."""
+    return path.relative_to(Path.cwd()) if path.is_relative_to(Path.cwd()) else path
+
+
+def _counted(count: int, word: str) -> str:
+    return f"{count:,} {word}" if count == 1 else f"{count:,} {word}s"
+
+
+@audit_app.command("new")
+def audit_new(client: ClientArg) -> None:
+    """Make a client's audit: its own database, migrated, and its own folder under audits/."""
+    from citemark import audit
+
+    try:
+        found = audit.audit(client)
+        audit.new(found)
+    except audit.AuditError as exc:
+        _fail(str(exc))
+    folder, url = _here(found.folder), audit.shown_url(found)
+    typer.echo(f"Made the audit {found.name}: the database {found.database}, and the folder {folder}.")
+    hidden = ", with your database's password in place of ***" if ":***@" in url else ""
+    typer.echo(f"Point every command at its database{hidden}:")
+    typer.echo(f"  export DATABASE_URL={url}")
+    typer.echo(f"Keep the client's questions, the test set and the report in {folder}.")
+    typer.echo(f"After delivery, citemark audit purge {found.name} deletes both and prints the note for the client.")
+
+
+@audit_app.command("purge")
+def audit_purge(
+    client: ClientArg,
+    yes: Annotated[bool, typer.Option("--yes", help="Purge without asking.")] = False,
+) -> None:
+    """Delete a client's audit: drop its database and its folder, check both are gone, then print
+    the deletion note to send the client (content spec 8.3)."""
+    from citemark import audit
+
+    try:
+        found = audit.audit(client)
+        held = audit.contents(found)
+        parts = []
+        if held.database:
+            counts = f"{_counted(held.articles, 'article')}, {_counted(held.questions, 'question')}"
+            parts.append(f"the database {found.database} ({counts})")
+        if held.folder:
+            parts.append(f"the folder {_here(found.folder)}")
+        what = " and ".join(parts)
+        if not yes and not typer.confirm(f"Delete {what}? This can't be undone."):
+            raise typer.Exit(0)
+        audit.purge(found, held)
+    except audit.AuditError as exc:
+        _fail(str(exc))
+    if not held.database:  # the note's counts come from the database
+        typer.echo(f"Deleted {what}. Its database was gone already, so there's nothing to count for the note.")
+        return
+    typer.echo(f"Deleted {what}. The note for the client:\n")
+    typer.echo(audit.note(held, dt.date.today()))

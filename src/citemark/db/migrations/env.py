@@ -15,10 +15,12 @@ if context.config.config_file_name:
     fileConfig(context.config.config_file_name)
 
 target_metadata = Base.metadata
+# Another database than DATABASE_URL's, when `citemark.db.migrate` names one, such as an audit's
+URL: str | None = context.config.attributes.get("url")
 
 
 def run_offline() -> None:
-    context.configure(url=get_settings().database_url, target_metadata=target_metadata, literal_binds=True)
+    context.configure(url=URL or get_settings().database_url, target_metadata=target_metadata, literal_binds=True)
     with context.begin_transaction():
         context.run_migrations()
 
@@ -30,7 +32,7 @@ def _migrate(connection: Connection) -> None:
 
 
 async def run_online() -> None:
-    engine = make_engine(poolclass=NullPool)
+    engine = make_engine(URL, poolclass=NullPool)
     async with engine.connect() as connection:
         await connection.run_sync(_migrate)
     await engine.dispose()
