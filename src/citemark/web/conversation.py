@@ -145,7 +145,7 @@ async def turns(session: AsyncSession, conversation_id: uuid.UUID) -> tuple[view
     shown = []
     for number, (asked, reply) in enumerate(exchanges, start=1):
         if reply.kind in ("error", "stopped"):
-            shown.append(view.Turn(asked.content, None, strings.text("demo", "demo.error")))
+            shown.append(view.Turn(asked.content, None, strings.text("demo", "turn.failed")))
             continue
         prefix = f"t{number}"
         quotes = tuple(
@@ -159,7 +159,10 @@ async def turns(session: AsyncSession, conversation_id: uuid.UUID) -> tuple[view
             )
             for citation, heading_path, anchor_url, url in cited[reply.id]
         )
-        shown.append(view.Turn(asked.content, _record(prefix, asked, reply, quotes, tuple(looked[reply.id]))))
+        kind = "decline" if (reply.kind or "").startswith("decline") else reply.kind
+        shown.append(
+            view.Turn(asked.content, _record(prefix, asked, reply, quotes, tuple(looked[reply.id])), kind=kind)
+        )
     return tuple(shown)
 
 

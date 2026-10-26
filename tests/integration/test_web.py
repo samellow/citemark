@@ -104,8 +104,8 @@ async def test_before_a_run_the_page_shows_the_label_the_ask_box_and_the_offer_a
     assert "<title>A support bot that shows its source · Citemark demo</title>" in html
     for claim in (
         "I tested it on",
-        "cm-hero-verdict",
-        "cm-recorded",
+        "cm-results-verdict",
+        "cm-panel",
         "cm-suggestions",
         "/reports/",
         "/go/audit",
@@ -124,8 +124,8 @@ async def test_with_results_published_the_first_screen_shows_the_counts_the_exch
     async with served(sessions, given=settings(demo_results=str(tmp_path / "results.json"))) as client:
         html = (await client.get("/?v=accuracy")).text
     assert "I tested it on 50 questions before launch. Try it on" in html
-    assert "50 test questions · Not pass" in html and "35 of 40 (87%)" in html
-    assert "cm-recorded" in html and 'name="suggestion"' in html
+    assert "How it did on 50 test questions" in html and "35 of 40 (87%)" in html and "target 90%" in html
+    assert "cm-panel" in html and 'name="suggestion"' in html
     assert 'href="/reports/sample?v=accuracy"' in html and 'href="/go/audit?v=accuracy"' in html
 
 
@@ -150,9 +150,9 @@ async def test_a_question_without_javascript_is_answered_on_the_page_it_returns_
         assert re.fullmatch(r"/\?c=[0-9a-f-]{36}#turn-1", location)
         html = (await client.get(location)).text
     assert escaped(ANSWERED) in html
-    assert "Turn it off in your settings." in html and 'class="cm-quote"' in html
+    assert "Turn it off in your settings." in html and '<li class="cm-source" id="t1-q1">' in html
     assert 'href="#t1-q1"' in html  # the answer's marker links to its quote
-    assert "4 · What it answered" in html and "5 · The result" not in html  # live answers aren't graded
+    assert "Answered · 1 source" in html and "The result" not in html  # live answers aren't graded
 
 
 @pytest.mark.anyio
@@ -295,7 +295,7 @@ async def test_views_taps_clicks_and_report_opens_are_counted_per_day_and_pitch(
         await client.get("/", headers={"user-agent": "Mozilla/5.0 (compatible; Upwork-LinkPreview/1.0; bot)"})
         await client.get("/", headers={"user-agent": "python-httpx/0.28"})
         click = await client.get("/go/audit?v=build")
-        await asked(client, "", fragment=True, suggestion=sample.results().suggestions[0], v="build")
+        await asked(client, "", fragment=True, suggestion=sample.results().suggestions[0].question, v="build")
         await asked(client, "", fragment=True, suggestion="A question that isn't one of them?")
         opened = await client.get("/reports/sample?v=accuracy")
     assert await counted(session, "page_view") == {"accuracy": 2, "": 1}

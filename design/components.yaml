@@ -205,7 +205,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [with_results, run_not_done]
-    strings: [demo:hero.headline, demo:hero.subhead, demo:hero.verdict, demo:hero.measure.correct_answers, demo:hero.measure.right_source, demo:hero.measure.correct_declines, demo:hero.measure.wrongly_declined, demo:hero.measure.right_place, demo:hero.cta, demo:hero.cta_note, demo:hero.cta_secondary]
+    strings: [demo:hero.headline, demo:hero.subhead, demo:hero.verdict, demo:hero.measure.correct_answers, demo:hero.measure.right_source, demo:hero.measure.correct_declines, demo:hero.measure.wrongly_declined, demo:hero.measure.right_place, demo:hero.cta, demo:hero.cta_note, demo:hero.cta_secondary, demo:panel.source, demo:panel.decline, demo:results.heading, demo:results.note]
     spec: PRD 8.2; content spec 6.2
     prototype: null
   - name: WidgetSlot
@@ -213,7 +213,7 @@ components:
     renderers: [J]
     phase: "1-2"
     states: [ask_box_and_recorded_exchange, inline_widget]
-    strings: [widget:inline.recorded_label, widget:inline.suggestions_label]
+    strings: [widget:inline.recorded_label, widget:inline.suggestions_label, demo:ask.heading, demo:ask.lede, demo:suggest.answer, demo:suggest.partial, demo:suggest.decline, demo:suggest.clarify, demo:suggest.small_talk]
     spec: PRD 8.2; content spec 3.7, 6.3
     prototype: null
   - name: AskBox
@@ -221,7 +221,7 @@ components:
     renderers: [J]
     phase: "1"
     states: [empty, waiting, answer, decline, error, rate_limited]
-    strings: [widget:composer.label, widget:composer.placeholder, widget:composer.send, widget:answer.searching, demo:demo.error, demo:demo.rate_limit, demo:demo.spend_cap, demo:demo.spend_cap_no_run]
+    strings: [widget:composer.label, widget:composer.placeholder, widget:composer.send, widget:answer.searching, demo:demo.error, demo:demo.rate_limit, demo:demo.spend_cap, demo:demo.spend_cap_no_run, demo:turn.answered, demo:turn.partial, demo:turn.declined, demo:turn.looked, demo:turn.trace, demo:turn.trace_line, demo:turn.quoted, demo:turn.retry, demo:turn.failed]
     spec: PRD 8.2 (D1); content spec 3.2, 6.6
     prototype: null
   - name: StorySection

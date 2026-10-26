@@ -6,7 +6,7 @@ words and numbers already written, so the page shows them exactly as the report 
 
 - the verdict and the five measure counts, for the first screen
 - the two recorded turns, copied from the run with their sources (content spec 6.3)
-- the three suggested questions, each one that passed
+- the three suggested questions, each one that passed, with what the bot did with it
 
 `from_report` writes it from a built report, and refuses a turn or a suggestion whose question
 didn't pass, since each must pass before it's shown.
@@ -24,7 +24,7 @@ from citemark import strings
 from citemark.evals.scoring import MEASURES
 from citemark.report.render import bold_part
 from citemark.report.view import Report
-from citemark.web.view import HeroMeasure, Turn
+from citemark.web.view import HeroMeasure, Suggestion, Turn, record_kind
 
 RECORDED = 2
 SUGGESTED = 3
@@ -42,7 +42,7 @@ class Published:
     verdict_word: str  # "Pass" or "Not pass", as the report's verdict starts
     measures: tuple[HeroMeasure, ...]
     recorded: tuple[Turn, ...]
-    suggestions: tuple[str, ...]
+    suggestions: tuple[Suggestion, ...]
 
     def __post_init__(self) -> None:
         if [measure.key for measure in self.measures] != list(MEASURES):
@@ -51,6 +51,8 @@ class Published:
             raise PublishedError(f"The results need {RECORDED} recorded turns and {SUGGESTED} suggested questions.")
         if any(turn.record is None for turn in self.recorded):
             raise PublishedError("A recorded turn needs its evidence record.")
+        if sorted("decline" if turn.kind == "decline" else "answer" for turn in self.recorded) != ["answer", "decline"]:
+            raise PublishedError("The recorded turns need one answer with its sources and one decline.")
 
 
 ADAPTER = TypeAdapter(Published)
@@ -97,6 +99,7 @@ def from_report(
                 row.count,
                 row.state,
                 report.labels[f"state.{row.state}"],
+                row.target,
             )
         )
     return Published(
@@ -105,6 +108,6 @@ def from_report(
         verdict_state=report.verdict.state,
         verdict_word=bold_part(report.verdict.sentence).rstrip("."),
         measures=tuple(measures),
-        recorded=tuple(Turn(record.question, record) for record in map(passed, recorded)),
-        suggestions=tuple(passed(question_id).question for question_id in suggestions),
+        recorded=tuple(Turn(record.question, record, kind=record_kind(record)) for record in map(passed, recorded)),
+        suggestions=tuple(Suggestion(record.question, record_kind(record)) for record in map(passed, suggestions)),
     )

@@ -4,6 +4,8 @@
   the headline, the ask box. What would claim a test is left out: the subhead, the verdict, the
   counts, the recorded exchange, the suggested questions, the report link, and the offer and its
   button, which sell "this report". The title and description have their own words for it.
+- **The headline's two promises** are each shown by a recorded turn: the answer with its sources
+  under the first half, the decline under the second.
 - **The audit button** appears only once the run is published and the listing's address is set,
   and goes through the counting redirect, carrying the pitch variant.
 - **Every link keeps `?v=`,** so a click is counted under the pitch that brought the visitor.
@@ -11,12 +13,25 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from urllib.parse import urlencode
 
 from citemark import strings
 from citemark.report.render import environment
 from citemark.web.published import Published
-from citemark.web.view import AskBox, DemoPage, Hero, Link, Offer, Slot, Turn
+from citemark.web.view import (
+    AskBox,
+    DemoPage,
+    Hero,
+    Link,
+    Offer,
+    Panel,
+    Results,
+    Slot,
+    Suggestion,
+    Turn,
+    record_kind,
+)
 
 LANG = "en"
 AUDIT_PRICE = "$300"  # the slot dictionary's default (content spec 10)
@@ -35,6 +50,12 @@ RECORD_LABELS = (  # the evidence record's fixed labels, from the report's strin
     "state.pass",
     "state.fail",
 )
+TURN_LABELS = ("turn.looked", "turn.trace", "turn.quoted", "turn.retry")  # the demo's own, for every turn
+STATUS = {
+    "answer": "turn.answered",
+    "partial": "turn.partial",
+    "decline": "turn.declined",
+}  # a clarifying turn asks for itself
 
 
 def t(key: str, **slots: str | int) -> str:
@@ -45,6 +66,36 @@ def _with_variant(path: str, variant: str) -> str:
     return f"{path}?{urlencode({'v': variant})}" if variant else path
 
 
+def halves(headline: str) -> tuple[str, str]:
+    """The claim split after its first comma, where "shows its source" meets "says it doesn't know"."""
+    first, comma, second = headline.partition(", ")
+    return (first + comma.strip(), second) if comma else (headline, "")
+
+
+def shown(turn: Turn) -> Turn:
+    """A turn with the words drawn around it: what it did, and what it read."""
+    if turn.record is None:
+        return turn
+    kind = turn.kind or record_kind(turn.record)
+    status = STATUS.get(kind)
+    looked = len(turn.record.looked)
+    return replace(
+        turn,
+        kind=kind,
+        status=t(status, sources=len(turn.record.quotes)) if status else None,
+        trace_line=t("turn.trace_line", passages=looked) if looked else None,
+    )
+
+
+def panels(recorded: tuple[Turn, ...]) -> tuple[Panel, ...]:
+    """The recorded answer under "shows its source", then the recorded decline."""
+    turns = [shown(turn) for turn in recorded]
+    answer = next((turn for turn in turns if turn.kind in ("answer", "partial")), None)
+    decline = next((turn for turn in turns if turn.kind == "decline"), None)
+    found = [Panel(t("panel.source"), "pass", answer)] if answer else []
+    return tuple(found + ([Panel(t("panel.decline"), "declined", decline)] if decline else []))
+
+
 def ask_box(
     *,
     company: str,
@@ -53,6 +104,8 @@ def ask_box(
     conversation: str | None = None,
     variant: str = "",
     draft: str | None = None,
+    closed: bool = False,
+    wait: int | None = None,
 ) -> AskBox:
     return AskBox(
         label=strings.text("widget", "composer.label"),
@@ -60,11 +113,13 @@ def ask_box(
         send=strings.text("widget", "composer.send"),
         searching=strings.text("widget", "answer.searching"),
         failed=t("demo.error"),
-        turns=turns,
+        turns=tuple(shown(turn) for turn in turns),
         notice=notice,
         conversation=conversation,
         variant=variant,
         draft=draft,
+        closed=closed,
+        wait=wait,
     )
 
 
@@ -78,6 +133,7 @@ def spend_capped(published: Published | None) -> str:
 
 def page(
     *,
+    company: str,
     builder_name: str,
     audit_url: str | None,
     audit_price: str | None,
@@ -90,6 +146,7 @@ def page(
     price = audit_price or AUDIT_PRICE
     hero = Hero(
         headline=t("hero.headline"),
+        headline_halves=halves(t("hero.headline")),
         subhead=t("hero.subhead", total=published.total, article_count=article_count) if published else None,
         verdict=t("hero.verdict", total=published.total, verdict_word=published.verdict_word) if published else None,
         verdict_state=("pass" if published.verdict_state == "pass" else "fail") if published else None,
@@ -102,9 +159,15 @@ def page(
     )
     slot = Slot(
         recorded_label=strings.text("widget", "inline.recorded_label"),
-        recorded=published.recorded if published else (),
+        panels=panels(published.recorded) if published else (),
+        heading=t("ask.heading", company=company),
+        lede=t("ask.lede"),
         suggestions_label=strings.text("widget", "inline.suggestions_label"),
-        suggestions=published.suggestions if published else (),
+        suggestions=tuple(
+            Suggestion(found.question, found.kind, t(f"suggest.{found.kind}")) for found in published.suggestions
+        )
+        if published
+        else (),
         ask=ask,
     )
     return DemoPage(
@@ -115,6 +178,9 @@ def page(
         prepared_by=t("top.prepared_by", builder_name=builder_name),
         hero=hero,
         slot=slot,
+        results=Results(t("results.heading", total=published.total), published.verdict_word, t("results.note"))
+        if published
+        else None,
         offer=Offer(
             heading=t("offer.heading"),
             body=t("offer.body", audit_price=price),
@@ -130,7 +196,7 @@ def page(
 
 
 def record_labels() -> dict[str, str]:
-    return {key: strings.text("report", key) for key in RECORD_LABELS}
+    return {key: strings.text("report", key) for key in RECORD_LABELS} | {key: t(key) for key in TURN_LABELS}
 
 
 def render(demo: DemoPage, *, static: str = "/static/", theme: str | None = None, banner: str | None = None) -> str:
