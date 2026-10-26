@@ -249,6 +249,7 @@ def create_app(
 
     async def whole_page(found: Demo, session: AsyncSession, box: AskBox, status: int = 200) -> HTMLResponse:
         built = page.page(
+            company=found.settings.demo_company or "",
             builder_name=found.settings.builder_name or "",
             audit_url=found.settings.demo_audit_url,
             audit_price=found.settings.demo_audit_price,
@@ -304,13 +305,18 @@ def create_app(
             return PlainTextResponse("A question is 1 to 1,000 characters.", status_code=422)
         address = client_address(request.headers, _peer(request), found.settings.client_ip_header)
         async with found.sessions() as session:
-            notice, status = None, 200
+            notice, status, wait = None, 200, None
             if await over_spend_cap(session, found.today()):
                 notice, status = page.spend_capped(found.published), 503
-            elif (minutes := found.limiter.ask(address)) is not None:
-                notice, status = page.rate_limited(minutes), 429
+            elif (wait := found.limiter.ask(address)) is not None:
+                notice, status = page.rate_limited(wait), 429
             else:
-                tapped = suggestion and not option and found.published and suggestion in found.published.suggestions
+                tapped = (
+                    suggestion
+                    and not option
+                    and found.published
+                    and suggestion in {s.question for s in found.published.suggestions}
+                )
                 if person and tapped:
                     await counts.count(session, "suggestion_tap", pitch, day=found.today())
                 await session.commit()  # no connection is held while waiting for a turn
@@ -336,6 +342,8 @@ def create_app(
                 conversation=str(asked_in) if turns else None,
                 variant=pitch,
                 draft=None if status == 200 or suggestion or option else question,
+                closed=status == 503,
+                wait=wait,
             )
             if fragment:
                 return HTMLResponse(page.render_ask(box), status_code=status)

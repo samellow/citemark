@@ -7,6 +7,9 @@
  * one; then the newest turn, or the notice that refused it, takes the focus so it's read next. A
  * suggested question or a clarifying option sends the same form with its own value. Nothing is
  * stored in the browser.
+ *
+ * A citation marker opens its quote in place, under the answer, instead of jumping to it; without
+ * the script the marker is a link, and the quote it lands on opens itself.
  */
 (function () {
   "use strict";
@@ -17,6 +20,41 @@
       button.disabled = busy;
     });
   }
+
+  // The hour's limit rests the box for the minutes it names, then the box opens again by itself
+  var reopening;
+  function reopenAfterWait() {
+    clearTimeout(reopening);
+    var form = document.getElementById("ask-form");
+    var minutes = form ? Number(form.getAttribute("data-wait")) : 0;
+    if (minutes > 0) {
+      reopening = setTimeout(function () {
+        var status = document.querySelector("[data-status]");
+        if (status) status.textContent = "";
+        rest(false);
+      }, minutes * 60000);
+    }
+  }
+  reopenAfterWait();
+
+  document.addEventListener("click", function (event) {
+    var marker = event.target.closest(".cm-reply .cm-cite");
+    if (!marker) return;
+    var source = document.getElementById(marker.getAttribute("href").slice(1));
+    if (!source) return;
+    event.preventDefault();
+    var reply = marker.closest(".cm-reply");
+    var opening = !source.classList.contains("is-open");
+    reply.querySelectorAll(".cm-source.is-open").forEach(function (open) {
+      open.classList.remove("is-open");
+    });
+    reply.querySelectorAll(".cm-cite").forEach(function (other) {
+      var on = opening && other.getAttribute("href") === marker.getAttribute("href");
+      other.classList.toggle("is-active", on);
+      other.setAttribute("aria-expanded", String(on));
+    });
+    if (opening) source.classList.add("is-open");
+  });
 
   document.addEventListener("submit", function (event) {
     var form = event.target;
@@ -46,13 +84,17 @@
         var fresh = new DOMParser().parseFromString(html, "text/html").querySelector("[data-ask-box]");
         if (!fresh) throw new Error("no ask box");
         box.replaceWith(fresh);
-        rest(false);
+        // The day's cap closes the box: the server sends Send disabled, and the suggestions rest with it
+        var send = fresh.querySelector("#ask-form > .cm-btn-primary");
+        rest(Boolean(send && send.disabled));
+        reopenAfterWait();
         var notice = fresh.querySelector("[data-status]");
         var turns = fresh.querySelectorAll(".cm-asked > .cm-turn");
         if (notice.textContent) {
           notice.setAttribute("tabindex", "-1");
           notice.focus();
         } else if (turns.length) {
+          turns[turns.length - 1].classList.add("is-new");
           turns[turns.length - 1].focus();
         }
       })

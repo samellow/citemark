@@ -2,8 +2,8 @@
   The demo page's parts (UI kit 5.4; PRD 8.2), as Jinja renders them. No text lives here: every
   word is decided in `web.page`. A part that needs the test run is left out until it's published.
 -#}
-{% from "primitives.html" import button, field, state_mark, wordmark %}
-{% from "record.html" import record %}
+{% from "primitives.html" import button, cite, field, state_mark, wordmark %}
+{% from "record.html" import linked %}
 
 {#- DemoTopBar: the name, who built it, and the unofficial-demo label, on every first screen. -#}
 {% macro top_bar(p) -%}
@@ -15,39 +15,87 @@
 </header>
 {%- endmacro %}
 
-{#- Hero, first half: the headline, and the subhead once the bot has been tested. -#}
-{% macro hero_intro(h) -%}
-<div class="cm-hero-intro">
-<h1 class="cm-hero-headline">{{ h.headline }}</h1>
+{#- Hero: the subhead once tested, then the claim split in two, each half over the recorded turn
+    that shows it. Before a run there are no panels and the claim stands alone. -#}
+{% macro hero(h, s, L) -%}
+<div class="cm-hero{{ ' has-panels' if s.panels }}">
 {% if h.subhead %}<p class="cm-hero-subhead">{{ h.subhead }}</p>{% endif %}
+<div class="cm-promises">
+<h1 class="cm-hero-headline"><span class="cm-hero-half">{{ h.headline_halves[0] }}</span> <span class="cm-hero-half cm-hero-half-second">{{ h.headline_halves[1] }}</span></h1>
+{% for panel in s.panels %}
+<section class="cm-panel" aria-labelledby="promise-{{ loop.index }}">
+<div class="cm-panel-head">
+<p class="cm-panel-promise cm-panel-promise-{{ panel.state }}" id="promise-{{ loop.index }}">{{ glyph(panel.state) }}<span>{{ panel.heading }}</span></p>
+<p class="cm-panel-recorded">{{ s.recorded_label }}</p>
 </div>
-{%- endmacro %}
-
-{#- Hero, second half: what the test found, then the one thing to do. -#}
-{% macro hero_proof(h) -%}
-{% if h.verdict or h.cta or h.report %}
-<div class="cm-hero-proof">
-{% if h.verdict %}
-<p class="cm-hero-verdict">{{ state_mark(h.verdict_state, h.verdict) }}</p>
-<ul class="cm-hero-measures">
-{% for m in h.measures %}
-<li class="cm-hero-measure"><span class="cm-hero-measure-name">{{ m.name }}</span><span class="cm-hero-measure-count">{{ m.count }}</span>{{ state_mark(m.state, m.state_label) }}</li>
+<div class="cm-turn">{{ turn_view(panel.turn, L, open_first=true, status=false) }}</div>
+</section>
 {% endfor %}
-</ul>
-{% endif %}
-{% if h.cta %}
-<p class="cm-hero-cta"><a class="cm-btn cm-btn-primary" href="{{ h.cta.href }}">{{ h.cta.text }}</a></p>
-<p class="cm-hero-cta-note">{{ h.cta_note }}</p>
-{% endif %}
-{% if h.report %}<p class="cm-hero-report"><a href="{{ h.report.href }}">{{ h.report.text }}</a></p>{% endif %}
 </div>
-{% endif %}
+</div>
 {%- endmacro %}
 
-{#- One question and what the bot did: its evidence record without the result, or the error. -#}
-{% macro turn_view(turn, L, choose=none) -%}
+{#- One reply, answer first: what it said with its markers, then its sources, each quote opened by
+    its marker, then what it read, folded. A decline shows where it looked, since that's its proof. -#}
+{% macro reply(turn, L, choose, open_first, status, closed) -%}
+{% set r = turn.record %}
+{% set state = {"answer": "pass", "partial": "warn", "decline": "declined"}.get(turn.kind) %}
+{% set quoted = r.quotes | map(attribute="title") | list %}
+<div class="cm-reply">
+{% if status and turn.status %}<p class="cm-reply-status{{ ' cm-reply-status-' ~ state if state }}">{% if state %}{{ glyph(state) }}{% endif %}<span>{{ turn.status }}</span></p>{% endif %}
+{% if r.clarify_question %}
+<p class="cm-reply-text">{{ r.clarify_question }}</p>
+<ul class="cm-options">
+{% for option in r.options %}<li>{% if choose %}{{ button(option, "quiet", "submit", disabled=closed, name="option", value=option, form=choose) }}{% else %}<span class="cm-option">{{ option }}</span>{% endif %}</li>{% endfor %}
+</ul>
+{% if r.chosen %}<p class="cm-chosen">{{ r.chosen }}</p>{% endif %}
+{% endif %}
+{% if r.answer %}<p class="cm-reply-text">{% for part in r.answer %}{{ part.text }}{% for quote in part.markers %}{{ cite(quote.marker, quote.label, "#" ~ quote.id, active=open_first and quote.id == r.quotes[0].id) }}{% endfor %}{% endfor %}</p>{% endif %}
+{% if r.gap_line %}<p class="cm-reply-gap">{{ glyph("warn") }}<span>{{ r.gap_line }}</span></p>{% endif %}
+{% if r.quotes %}
+<ol class="cm-sources">
+{% for quote in r.quotes %}
+<li class="cm-source{{ ' is-open' if open_first and loop.first }}" id="{{ quote.id }}">
+<span class="cm-source-n" aria-hidden="true">{{ quote.marker }}</span>
+<div class="cm-source-body">
+<p class="cm-source-title"><span class="cm-visually-hidden">{{ quote.label }}: </span>{{ linked(quote.title, quote.url) }}</p>
+<blockquote class="cm-source-quote"><span class="cm-source-passage">{{ quote.text }}</span></blockquote>
+{% if quote.url %}<p class="cm-source-url">{{ quote.url | replace("https://", "") }}</p>{% endif %}
+</div>
+</li>
+{% endfor %}
+</ol>
+{% endif %}
+{% if turn.kind == "decline" and r.looked %}
+<div class="cm-looked-where">
+<p class="cm-reply-label">{{ L["turn.looked"] }}</p>
+<ul class="cm-looked-list">
+{% for passage in r.looked %}<li>{{ linked(passage.title, passage.url) }}</li>{% endfor %}
+</ul>
+</div>
+{% elif r.looked %}
+<details class="cm-trace">
+<summary>{{ L["turn.trace"] }}</summary>
+<div class="cm-trace-body">
+{% if turn.trace_line %}<p class="cm-trace-line">{{ turn.trace_line }}</p>{% endif %}
+<ol class="cm-trace-list">
+{% for passage in r.looked %}<li>{{ linked(passage.title, passage.url) }}{% if passage.title in quoted %} <span class="cm-quoted">{{ L["turn.quoted"] }}</span>{% endif %}</li>{% endfor %}
+</ol>
+</div>
+</details>
+{% endif %}
+</div>
+{%- endmacro %}
+
+{#- One question and what the bot did, or the error that stopped it. -#}
+{% macro turn_view(turn, L, choose=none, open_first=false, status=true, closed=false) -%}
 <p class="cm-turn-question">{{ turn.question }}</p>
-{% if turn.record %}{{ record(turn.record, L, graded=false, choose=choose) }}{% else %}<p class="cm-turn-error">{{ glyph("fail") }}<span>{{ turn.error }}</span></p>{% endif %}
+{% if turn.record %}{{ reply(turn, L, choose, open_first, status, closed) }}{% else %}
+<div class="cm-turn-failed">
+<p class="cm-turn-error">{{ glyph("fail") }}<span>{{ turn.error }}</span></p>
+{% if choose %}{{ button(L["turn.retry"], "quiet", "submit", disabled=closed, name="suggestion", value=turn.question, form=choose) }}{% endif %}
+</div>
+{% endif %}
 {%- endmacro %}
 
 {#- AskBox (D1): the conversation so far, a status line, and the question box. It works as a plain
@@ -56,52 +104,77 @@
 <div class="cm-ask" data-ask-box>
 {% if a.turns %}
 <ol class="cm-turns cm-asked">
-{% for turn in a.turns %}<li class="cm-turn" id="turn-{{ loop.index }}" tabindex="-1">{{ turn_view(turn, L, choose=form) }}</li>{% endfor %}
+{% for turn in a.turns %}<li class="cm-turn" id="turn-{{ loop.index }}" tabindex="-1">{{ turn_view(turn, L, choose=form, closed=a.resting) }}</li>{% endfor %}
 </ol>
 {% endif %}
-<p class="cm-ask-status" role="status" data-status>{% if a.notice %}{{ a.notice }}{% endif %}</p>
-<form class="cm-ask-form" id="{{ form }}" method="post" action="/ask" data-searching="{{ a.searching }}" data-failed="{{ a.failed }}">
+<p class="cm-ask-status" role="status" data-status>{% if a.notice %}{{ glyph("warn") }}<span>{{ a.notice }}</span>{% endif %}</p>
+<form class="cm-ask-form" id="{{ form }}" method="post" action="/ask" data-searching="{{ a.searching }}" data-failed="{{ a.failed }}"{% if a.wait %} data-wait="{{ a.wait }}"{% endif %}>
 {% if a.conversation %}<input type="hidden" name="conversation" value="{{ a.conversation }}">{% endif %}
 {% if a.variant %}<input type="hidden" name="v" value="{{ a.variant }}">{% endif %}
 {{ field("question", a.label, kind="long_text", required=true, placeholder=a.placeholder, maxlength=max_question, value=a.draft) }}
-{{ button(a.send, "primary", "submit") }}
+{{ button(a.send, "primary", "submit", disabled=a.resting) }}
 </form>
 </div>
 {%- endmacro %}
 
-{#- WidgetSlot, Phase 1: the recorded exchange and the suggestions once published, then the ask box. -#}
+{#- WidgetSlot, Phase 1: the heading, the ask box, then one suggested question of each kind,
+    each saying what the bot will do with it. -#}
 {% macro slot(s, L, form, max_question) -%}
-<div class="cm-slot">
-{% if s.recorded %}
-<p class="cm-slot-label">{{ s.recorded_label }}</p>
-<ol class="cm-turns cm-recorded">
-{% for turn in s.recorded %}<li class="cm-turn">{{ turn_view(turn, L) }}</li>{% endfor %}
-</ol>
-{% endif %}
+<section class="cm-try" aria-labelledby="try-h">
+<div class="cm-try-head">
+<h2 class="cm-section-heading" id="try-h">{{ s.heading }}</h2>
+<p class="cm-try-lede">{{ s.lede }}</p>
+</div>
+{{ ask_box(s.ask, L, form, max_question) }}
 {% if s.suggestions %}
-<p class="cm-slot-label" id="suggestions-label">{{ s.suggestions_label }}</p>
-<ul class="cm-suggestions" aria-labelledby="suggestions-label">
-{% for question in s.suggestions %}<li>{{ button(question, "quiet", "submit", name="suggestion", value=question, form=form) }}</li>{% endfor %}
+{% set marks = {"answer": "pass", "partial": "warn", "decline": "declined"} %}
+<ul class="cm-suggestions" aria-label="{{ s.suggestions_label }}">
+{% for found in s.suggestions %}<li class="cm-suggestion cm-suggestion-{{ found.kind }}"><span class="cm-suggestion-expect">{% if found.kind in marks %}{{ glyph(marks[found.kind]) }}{% endif %}<span>{{ found.label }}</span></span>{{ button(found.question, "quiet", "submit", disabled=s.ask.resting, name="suggestion", value=found.question, form=form) }}</li>{% endfor %}
 </ul>
 {% endif %}
-{{ ask_box(s.ask, L, form, max_question) }}
-</div>
+</section>
 {%- endmacro %}
 
-{#- OfferBlock: the audit, what the client sends and gets, and the same button again. -#}
-{% macro offer(o) -%}
+{#- ResultsStrip: the verdict, the five counts with their states, and the report. -#}
+{% macro results(r, h) -%}
+<section class="cm-results" aria-labelledby="results-h">
+<div class="cm-results-head">
+<h2 class="cm-section-heading" id="results-h">{{ r.heading }}</h2>
+<p class="cm-results-verdict">{{ state_mark(h.verdict_state, r.verdict) }}</p>
+</div>
+<ul class="cm-measures">
+{% for m in h.measures %}
+<li class="cm-measure"><span class="cm-measure-name">{{ m.name }}</span><span class="cm-measure-count">{{ m.count }}</span><span class="cm-measure-judged">{{ state_mark(m.state, m.state_label) }}{% if m.target %}<span class="cm-measure-target">{{ m.target }}</span>{% endif %}</span></li>
+{% endfor %}
+</ul>
+<div class="cm-results-foot">
+<p class="cm-results-note">{{ r.note }}</p>
+{% if h.report %}<p class="cm-results-report"><a href="{{ h.report.href }}">{{ h.report.text }}</a></p>{% endif %}
+</div>
+</section>
+{%- endmacro %}
+
+{#- OfferBlock: the audit, what the client sends and gets, the button, and what happens to their data. -#}
+{% macro offer(o, h) -%}
 <section class="cm-offer" aria-labelledby="offer-h">
-<h2 class="cm-type-heading-md" id="offer-h">{{ o.heading }}</h2>
+<div class="cm-offer-body">
+<h2 class="cm-section-heading" id="offer-h">{{ o.heading }}</h2>
 <p>{{ o.body }}</p>
+</div>
+<div class="cm-offer-act">
+{% if o.cta %}<p><a class="cm-btn cm-btn-primary cm-offer-cta" href="{{ o.cta.href }}">{{ o.cta.text }}</a></p>{% endif %}
+{% if h.cta_note %}<p class="cm-offer-note">{{ h.cta_note }}</p>{% endif %}
 <p class="cm-offer-data">{{ o.data }}</p>
-{% if o.cta %}<p class="cm-offer-cta"><a class="cm-btn cm-btn-primary" href="{{ o.cta.href }}">{{ o.cta.text }}</a></p>{% endif %}
+</div>
 </section>
 {%- endmacro %}
 
 {#- DemoFooter: the label again, and the licenses. -#}
 {% macro footer(p) -%}
 <footer class="cm-demo-footer">
+<div class="cm-demo-footer-inner">
 <p>{{ p.footer_label }}</p>
 <p>{{ p.footer_license }}</p>
+</div>
 </footer>
 {%- endmacro %}

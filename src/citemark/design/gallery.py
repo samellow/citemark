@@ -210,7 +210,7 @@ def _demo_pages(out: Path) -> list[Page]:
     from citemark.web import sample as demo_sample
 
     (out / "demo").mkdir()
-    capped = demo_page.ask_box(company=demo_sample.COMPANY, notice=demo_page.spend_capped(None))
+    capped = demo_page.ask_box(company=demo_sample.COMPANY, notice=demo_page.spend_capped(None), closed=True)
     states = [("demo/sample.html", "with results", None, demo_sample.demo())]
     states += [
         (f"demo/sample--{t}.html", "mid-conversation", t, demo_sample.demo(ask=demo_sample.asked())) for t in THEMES
@@ -225,6 +225,8 @@ def _demo_pages(out: Path) -> list[Page]:
         company=demo_sample.COMPANY, turns=demo_sample.conversation()[1:2], conversation="sample"
     )
     (out / FRAGMENT).write_text(demo_page.render_ask(answered), encoding="utf-8")
-    refused = demo_page.ask_box(company=demo_sample.COMPANY, notice=demo_page.rate_limited(12), draft=REFUSED_DRAFT)
+    refused = demo_page.ask_box(
+        company=demo_sample.COMPANY, notice=demo_page.rate_limited(12), draft=REFUSED_DRAFT, wait=12
+    )
     (out / REFUSED).write_text(demo_page.render_ask(refused), encoding="utf-8")
     return pages

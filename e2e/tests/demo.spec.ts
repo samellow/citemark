@@ -138,7 +138,11 @@ test("a suggested question sends itself, and its buttons work again after", asyn
   await expect(suggestion).toBeEnabled();
 });
 
-test("a refused question stays in the box, and the notice is read next", async ({ page, context }) => {
+test("a refused question stays in the box, the notice is read next, and Send rests for the minutes it names", async ({
+  page,
+  context,
+}) => {
+  await page.clock.install();
   await serve(context, answer(REFUSED, 429));
   await page.goto(`${ORIGIN}/demo/sample.html`);
   await page.getByLabel("Your question").fill("How do I export my messages?");
@@ -147,6 +151,15 @@ test("a refused question stays in the box, and the notice is read next", async (
   await expect(status).toHaveText("The demo allows 10 questions an hour. You can ask again in 12 minutes.");
   await expect(status).toBeFocused();
   await expect(page.getByLabel("Your question")).toHaveValue("How do I export my messages?");
+  const send = page.getByRole("button", { name: "Send", exact: true });
+  await expect(send).toBeDisabled();
+  await expect(page.locator(".cm-suggestions button").first()).toBeDisabled();
+  await page.clock.fastForward("11:59");
+  await expect(send).toBeDisabled();
+  await page.clock.fastForward("00:02");
+  await expect(send).toBeEnabled();
+  await expect(status).toHaveText("");
+  await expect(page.locator(".cm-suggestions button").first()).toBeEnabled();
 });
 
 test("when the server can't be reached, the box says so and can be sent again", async ({ page, context }) => {

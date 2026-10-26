@@ -86,7 +86,7 @@ def test_the_demo_page_is_labeled_made_up_in_every_state_and_its_fragment_isnt_a
     listed = {entry["path"] for entry in json.loads((out / "pages.json").read_text(encoding="utf-8"))}
     for path in sorted(p for p in listed if p.startswith("demo/")):
         text = (out / path).read_text(encoding="utf-8")
-        assert text.index(gallery.SAMPLE_DEMO) < text.index('class="cm-first"'), path
+        assert text.index(gallery.SAMPLE_DEMO) < text.index('class="cm-hero'), path
         assert 'href="../static/demo.css"' in text
     fragment = (out / gallery.FRAGMENT).read_text(encoding="utf-8")
     assert gallery.FRAGMENT not in listed and fragment.startswith('<div class="cm-ask" data-ask-box>')

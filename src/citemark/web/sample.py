@@ -9,23 +9,26 @@ from dataclasses import replace
 from citemark.report import sample
 from citemark.report.view import Record, Stretch
 from citemark.web import page, published
-from citemark.web.view import AskBox, DemoPage, Turn
+from citemark.web.view import AskBox, DemoPage, Suggestion, Turn
 
 BUILDER = "Casey Morgan"  # the sample report's made-up builder
 AUDIT = "https://www.upwork.com/"  # made up: the button's target is set per deployment
 COMPANY = "Acme Chat"
-EXTRA_SUGGESTIONS = ("How do I pin a channel to the top?", "Can I schedule a message?")  # made up
+EXTRA_SUGGESTIONS = (  # made up: what the bot did with each is said, not tested
+    Suggestion("How do I pin a channel to the top?", "answer"),
+    Suggestion("Can I record a voice message?", "decline"),
+)
 
 
 def results() -> published.Published:
-    """The sample report's passing questions: an answer and a correct decline recorded, and its
-    clarifying question among the suggestions."""
+    """The sample report's passing questions: an answer and a correct decline recorded, and one
+    suggestion of each kind, its clarifying question among them."""
     found = published.from_report(
         sample.report(), report_id="sample", recorded=("Q004", "Q041"), suggestions=("Q030", "Q004", "Q041")
     )
     # Its counts are of 50 questions (40 the help center answers, 10 it doesn't), though the sample
     # report lists only five of them
-    return replace(found, total=50, suggestions=(found.suggestions[0], *EXTRA_SUGGESTIONS))
+    return replace(found, total=50, suggestions=(*EXTRA_SUGGESTIONS, found.suggestions[0]))
 
 
 def _live(record: Record, prefix: str) -> Record:
@@ -53,12 +56,13 @@ def conversation() -> tuple[Turn, ...]:
     return (
         Turn(clarify.question, asking),
         Turn(answer.question, _live(answer, "t2")),
-        Turn(EXTRA_SUGGESTIONS[1], None, page.t("demo.error")),
+        Turn(EXTRA_SUGGESTIONS[1].question, None, page.t("turn.failed")),
     )
 
 
 def demo(*, run: bool = True, ask: AskBox | None = None) -> DemoPage:
     return page.page(
+        company=COMPANY,
         builder_name=BUILDER,
         audit_url=AUDIT,
         audit_price=None,
@@ -69,7 +73,10 @@ def demo(*, run: bool = True, ask: AskBox | None = None) -> DemoPage:
 
 
 def asked() -> AskBox:
-    """The ask box mid-conversation, refused by the hour's limit."""
-    return page.ask_box(
-        company=COMPANY, turns=conversation(), notice=page.rate_limited(12), conversation="sample", variant="accuracy"
-    )
+    """The ask box mid-conversation."""
+    return page.ask_box(company=COMPANY, turns=conversation(), conversation="sample", variant="accuracy")
+
+
+def refused() -> AskBox:
+    """The same, refused by the hour's limit: everything that sends rests for its minutes."""
+    return replace(asked(), notice=page.rate_limited(12), wait=12)

@@ -44,12 +44,50 @@ def test_before_a_run_nothing_claims_a_test():
     built = sample.demo(run=False)
     hero, slot = built.hero, built.slot
     assert (hero.subhead, hero.verdict, hero.verdict_state, hero.measures, hero.report) == (None, None, None, (), None)
-    assert (slot.recorded, slot.suggestions, hero.cta, hero.cta_note, built.offer) == ((), (), None, None, None)
+    assert (slot.panels, slot.suggestions, hero.cta, hero.cta_note, built.results, built.offer) == (
+        (),
+        (),
+        None,
+        None,
+        None,
+        None,
+    )
     assert built.title == "A support bot that shows its source · Citemark demo"
     assert "test" not in built.title + built.description
     assert hero.headline == page.t("hero.headline")
     html = page.render(built)
     assert "/go/audit" not in html and "$300" not in html and "test report" not in html
+    assert "has-panels" not in html and "cm-results" not in html
+
+
+def test_the_headline_is_split_where_its_two_promises_meet():
+    assert sample.demo().hero.headline_halves == ("A support bot that shows its source,", "or says it doesn't know.")
+    assert page.halves("No comma here.") == ("No comma here.", "")
+
+
+def test_each_promise_is_shown_by_its_recorded_turn_answer_first():
+    """The answer with its sources under "shows its source", whichever order the run recorded them in."""
+    found = sample.results()
+    for recorded in (found.recorded, found.recorded[::-1]):
+        panels = page.panels(recorded)
+        assert [(p.heading, p.state, p.turn.kind) for p in panels] == [
+            ("Shows its source", "pass", "answer"),
+            ("Says it doesn't know", "declined", "decline"),
+        ]
+    html = demo()
+    assert html.count('class="cm-panel"') == 2
+    assert 'class="cm-source is-open"' in html  # the recorded answer's first quote is open
+    assert html.index('class="cm-reply-text"') < html.index('class="cm-sources"') < html.index("Where it looked")
+
+
+def test_each_suggestion_says_what_the_bot_will_do_with_it():
+    found = [(s.kind, s.label) for s in sample.demo().slot.suggestions]
+    assert found == [
+        ("answer", "It answers this"),
+        ("decline", "The help center doesn't cover this"),
+        ("clarify", "It asks which one you mean"),
+    ]
+    assert 'name="suggestion" value="How do I stop the emails?" form="ask-form" formnovalidate' in demo()
 
 
 def test_with_a_run_the_first_screen_says_what_it_found():
@@ -71,6 +109,7 @@ def test_with_a_run_the_first_screen_says_what_it_found():
 
 def test_without_the_listing_there_is_no_button_but_the_price_is_still_said():
     built = page.page(
+        company="Zulip",
         builder_name="Casey Morgan",
         audit_url=None,
         audit_price="$400",
@@ -98,7 +137,7 @@ def test_the_notices_say_how_long_to_wait_and_what_is_still_on_the_page():
 
 
 def test_the_page_is_one_document_whose_ids_are_unique_and_whose_links_all_land():
-    html = page.render(sample.demo(ask=sample.asked()))
+    html = page.render(sample.demo(ask=sample.refused()))
     parsed = Parsed(html)
     assert len(parsed.ids) == len(set(parsed.ids))
     for href in parsed.links:
@@ -110,17 +149,42 @@ def test_the_page_is_one_document_whose_ids_are_unique_and_whose_links_all_land(
 
 def test_the_label_comes_first_and_the_page_runs_no_inline_code():
     html = demo()
+    assert html.startswith("<!doctype html><html")
     assert html.index("cm-topbar-label") < html.index("<main")
     assert re.findall(r"\sstyle=|<script>|\son[a-z]+=", html) == []
     assert '<script src="/static/demo.js" defer></script>' in html
 
 
-def test_a_live_answer_shows_steps_2_to_4_and_its_options_ask_again():
+def test_a_live_answer_leads_with_its_reply_and_its_options_ask_again():
+    """What it said comes first, then its sources, then what it read, folded. Never a result."""
     html = page.render_ask(sample.asked())
-    assert html.count('<li class="cm-step') == 3 * 2  # the clarifying turn and the answer; the error has none
-    assert "5 · The result" not in html and "Went wrong" not in html
+    assert "cm-step" not in html and "The result" not in html and "Went wrong" not in html
+    assert html.count('class="cm-reply-status') == 1  # the answer; a clarifying turn asks for itself
+    assert "Which one do you mean?" in html and "Answered · 1 source" in html
+    assert html.count('<details class="cm-trace">') == 2 and "The 5 passages it read, closest first:" in html
+    assert html.index('class="cm-reply-text"', html.index("turn-2")) < html.index('class="cm-sources"')
     assert 'name="option" value="Weekly digest" form="ask-form" formnovalidate' in html
+    assert ">Ask again</button>" in html  # the failed turn's question, sent again from the same form
+    assert 'name="suggestion" value="Can I record a voice message?" form="ask-form"' in html
     assert html.startswith('<div class="cm-ask" data-ask-box>') and "<html" not in html
+
+
+def test_a_limit_rests_the_box_and_everything_that_sends_it():
+    """The day's cap until tomorrow; the hour's limit for its minutes, which demo.js counts down."""
+    capped = page.ask_box(company="Acme Chat", turns=sample.conversation(), notice=page.spend_capped(None), closed=True)
+    for box, wait in ((capped, None), (sample.refused(), 12)):
+        html = page.render(sample.demo(ask=box))
+        sends = re.findall(r"<button[^>]*>", html)
+        assert sends and all(" disabled" in button for button in sends)
+        assert ('data-wait="12"' in html) == (wait == 12)
+    assert " disabled" not in page.render(sample.demo(ask=sample.asked()))
+
+
+def test_the_counts_carry_their_targets_and_the_verdict_isnt_repeated():
+    html = demo()
+    assert html.count('class="cm-measure-target"') == 5 and "target at most 5%" in html
+    results = html[html.index('class="cm-results"') :]
+    assert "test questions · Not pass" not in results and "<span>Not pass</span>" in results
 
 
 def test_a_question_is_shown_as_text():
@@ -176,6 +240,13 @@ def test_the_published_results_round_trip_and_refuse_what_the_demo_cant_show(tmp
     missing = replace(report, measures=tuple(m for m in report.measures if m.key != "right_place"))
     with pytest.raises(published.PublishedError, match="no count for right_place"):
         published.from_report(missing, report_id="x", **both)
+    assert [s.kind for s in published.from_report(report, report_id="x", **both).suggestions] == [
+        "clarify",
+        "answer",
+        "decline",
+    ]
+    with pytest.raises(published.PublishedError, match="one answer with its sources and one decline"):
+        published.from_report(report, report_id="x", **{**both, "recorded": ("Q004", "Q030")})
     data = json.loads(path.read_text(encoding="utf-8"))
     data["suggestions"] = data["suggestions"][:2]
     path.write_text(json.dumps(data), encoding="utf-8")

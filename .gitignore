@@ -24,3 +24,10 @@ reports/
 
 # Client audits: each one's files, deleted by citemark audit purge (PRD 5.11)
 audits/
+
+# The product brief: sales positioning and pricing, kept out of the public kit
+PRODUCT.md
+
+# Design review screenshots and decision-page logs (the surface briefs in .impeccable/surfaces/ are kept)
+.impeccable/review/
+.impeccable/questions/
