@@ -218,7 +218,7 @@ def _demo_pages(out: Path) -> list[Page]:
     states += [(f"demo/no-run--{t}.html", "run not done", t, demo_sample.demo(run=False, ask=capped)) for t in THEMES]
     pages = []
     for path, state, theme, built in states:
-        html = demo_page.render(built, static="../static/", theme=theme, banner=SAMPLE_DEMO)
+        html = demo_page.render(built, static="../static/", version="", theme=theme, banner=SAMPLE_DEMO)
         (out / path).write_text(html, encoding="utf-8")
         pages.append(Page(path, "Demo page", state, theme or ""))
     answered = demo_page.ask_box(
