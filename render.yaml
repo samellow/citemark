@@ -2,10 +2,12 @@
 # pgvector. About $13.30 a month at Render's prices on 2026-10-11: Starter $7, Basic-256mb $6,
 # and a 1 GB disk $0.30.
 #
-# A deploy changes the image's tag below and merges it to main. Render syncs this file and deploys
-# that image, and the app migrates its database as it starts. A rollback puts the previous tag
-# back. A moving tag such as :main would be pulled again at its newest on a rollback, so this
-# always names one commit's image.
+# The demo follows main. Once every check on a commit passes, CI publishes its image and commits
+# its tag below ("deploy: the demo runs sha-…"). Render syncs this file and deploys that image,
+# and the app migrates its database as it starts. A rollback puts an older tag back by hand; CI
+# leaves a push that names an image here alone, and the next commit on main deploys again. A
+# moving tag such as :main would be pulled again at its newest on a rollback, so this always
+# names one commit's image.
 services:
   - type: web
     name: citemark-demo
