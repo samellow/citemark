@@ -13,7 +13,10 @@
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import replace
+from functools import cache
+from pathlib import Path
 from urllib.parse import urlencode
 
 from citemark import strings
@@ -33,6 +36,8 @@ from citemark.web.view import (
     record_kind,
 )
 
+STATIC = Path(__file__).resolve().parents[3] / "static"
+ASSETS = ("tokens.css", "citemark.css", "demo.css", "demo.js")  # what the page links, in that order
 LANG = "en"
 AUDIT_PRICE = "$300"  # the slot dictionary's default (content spec 10)
 FORM = "ask-form"  # the ask box's form, which the suggestions and options submit
@@ -199,12 +204,40 @@ def record_labels() -> dict[str, str]:
     return {key: strings.text("report", key) for key in RECORD_LABELS} | {key: t(key) for key in TURN_LABELS}
 
 
-def render(demo: DemoPage, *, static: str = "/static/", theme: str | None = None, banner: str | None = None) -> str:
-    """The whole page. `theme` forces light or dark, as the gallery shows it; served, it follows the visitor's."""
+@cache
+def assets_version(directory: Path = STATIC) -> str:
+    """A fingerprint of the files the page links. It goes in their addresses, so a browser that
+    kept an older copy fetches the new one after a deploy instead of styling the new page with it.
+    The files don't change while the app runs, so it's worked out once."""
+    digest = hashlib.sha256()
+    for name in ASSETS:
+        digest.update((directory / name).read_bytes())
+    return digest.hexdigest()[:12]
+
+
+def render(
+    demo: DemoPage,
+    *,
+    static: str = "/static/",
+    version: str | None = None,
+    theme: str | None = None,
+    banner: str | None = None,
+) -> str:
+    """The whole page. `theme` forces light or dark, as the gallery shows it; served, it follows the visitor's.
+    `version` is the files' fingerprint, by default today's; the gallery, opened from disk, passes ""."""
+    version = assets_version() if version is None else version
     return (
         environment()
         .get_template("demo.html")
-        .render(page=demo, static=static, theme=theme, banner=banner, form=FORM, max_question=MAX_QUESTION)
+        .render(
+            page=demo,
+            static=static,
+            version=version,
+            theme=theme,
+            banner=banner,
+            form=FORM,
+            max_question=MAX_QUESTION,
+        )
     )
 
 

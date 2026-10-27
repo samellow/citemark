@@ -152,7 +152,25 @@ def test_the_label_comes_first_and_the_page_runs_no_inline_code():
     assert html.startswith("<!doctype html><html")
     assert html.index("cm-topbar-label") < html.index("<main")
     assert re.findall(r"\sstyle=|<script>|\son[a-z]+=", html) == []
-    assert '<script src="/static/demo.js" defer></script>' in html
+    assert f'<script src="/static/demo.js?h={page.assets_version()}" defer></script>' in html
+
+
+def test_the_files_the_page_links_carry_a_fingerprint_that_changes_with_them(tmp_path):
+    """A browser that kept the last deploy's stylesheet fetches the new one, since its address changed."""
+    html = demo()
+    version = page.assets_version()
+    assert re.fullmatch(r"[0-9a-f]{12}", version)
+    for name in page.ASSETS:
+        assert f'"/static/{name}?h={version}"' in html, name
+    before, after = tmp_path / "before", tmp_path / "after"
+    for folder in (before, after):
+        folder.mkdir()
+        for name in page.ASSETS:
+            (folder / name).write_bytes((page.STATIC / name).read_bytes())
+    assert page.assets_version(before) == version
+    (after / "demo.css").write_text(".cm-demo {}\n", encoding="utf-8")
+    assert page.assets_version(after) != version
+    assert "?h=" not in page.render(sample.demo(), static="../static/", version="")
 
 
 def test_a_live_answer_leads_with_its_reply_and_its_options_ask_again():
