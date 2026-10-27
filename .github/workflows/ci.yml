@@ -156,7 +156,7 @@ jobs:
 
   publish:
     # Each commit on main, once every job above passed, as ghcr.io/<owner>/citemark:sha-<commit>.
-    # A deploy names that tag (render.yaml), and a rollback names the one before it. :main is the newest.
+    # The deploy job names that tag in render.yaml, and a rollback names an older one. :main is the newest.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [test, gallery, security, image]
     runs-on: ubuntu-24.04
@@ -174,3 +174,51 @@ jobs:
           docker build --label "org.opencontainers.image.revision=$GITHUB_SHA" \
             --tag "$image:sha-${GITHUB_SHA::7}" --tag "$image:main" .
           docker push --all-tags "$image"
+
+  deploy:
+    # The demo follows main: once a commit's image is published, render.yaml names it and Render
+    # deploys it. A push that names an image in render.yaml itself is a deploy or rollback by hand,
+    # and is left as it is. The push below is the GitHub token's, so it starts no workflow of its own.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: publish
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: deploy-demo # one at a time, and a newer commit's waiting deploy replaces an older one's
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.11.16"
+      - name: Name this commit's image in render.yaml and push it to main
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          tag="sha-${GITHUB_SHA::7}"
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          live=$(grep -oE 'citemark:sha-[0-9a-f]{7}' render.yaml | cut -d- -f2)
+          [ -n "$live" ] || { echo "render.yaml names no image by its sha- tag." >&2; exit 1; }
+          pushed=$(git diff "$BEFORE" "$GITHUB_SHA" -- render.yaml 2>/dev/null || git diff "$GITHUB_SHA^" "$GITHUB_SHA" -- render.yaml)
+          if grep -qE '^[-+].*citemark:sha-' <<<"$pushed"; then
+            echo "This push names an image in render.yaml by hand, so the demo stays on sha-$live."
+            exit 0
+          fi
+          if git merge-base --is-ancestor "$GITHUB_SHA" "$live" 2>/dev/null; then
+            echo "The demo already runs sha-$live, this commit or a newer one."
+            exit 0
+          fi
+          # Render pulls without logging in, so the image must be public
+          docker manifest inspect "$image:$tag" > /dev/null
+          sed -i "s|citemark:sha-$live|citemark:$tag|" render.yaml
+          uvx check-jsonschema@0.38.2 --schemafile https://render.com/schema/render.yaml.json render.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --quiet --all --message "deploy: the demo runs $tag" \
+            --message "Made by CI once every check on ${GITHUB_SHA::7} passed. To roll back, put sha-$live back."
+          git push origin HEAD:main || { git pull --rebase --quiet origin main && git push origin HEAD:main; }
+          echo "render.yaml now names $tag; Render deploys it."

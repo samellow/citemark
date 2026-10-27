@@ -115,7 +115,7 @@ uv run citemark serve              # migrates the database first, then http://12
 uv run citemark demo spend-cap     # the cap and today's spend; add an amount, such as 2.00, to change it
 ```
 
-The public demo runs on Render from `render.yaml`: the published image and Postgres 16 with pgvector, about $13.30 a month at Render's prices on 2026-10-11. Each commit on `main` that passes CI is published as `ghcr.io/samellow/citemark:sha-<commit>`, and `render.yaml` names the one that's deployed.
+The public demo runs on Render from `render.yaml`: the published image and Postgres 16 with pgvector, about $13.30 a month at Render's prices on 2026-10-11. Each commit on `main` that passes CI is published as `ghcr.io/samellow/citemark:sha-<commit>`, and `render.yaml` names the one that's deployed. CI updates that name itself, so the demo follows `main`.
 
 1. In Render, create a Blueprint from this repository and fill in what it asks for: `BUILDER_NAME` and both API keys. `DEMO_AUDIT_URL` and `DEMO_AUDIT_PRICE` can stay empty until the listing is live. The app migrates its database as it starts.
 2. Build the index from the web service's Shell. Embedding it costs an estimated cent.
@@ -123,7 +123,8 @@ The public demo runs on Render from `render.yaml`: the published image and Postg
    citemark sources add start-page https://zulip.com/help/ --selector .sl-markdown-content
    citemark sources index
    ```
-3. To deploy a newer commit, change the tag in `render.yaml` and merge it; Render deploys it. To roll back, put the previous tag back. Migrations only run forward, so to roll back past one, first undo it from the newer image's Shell with `alembic downgrade <revision>`.
+3. Deploys happen on their own: once every check on a commit to `main` passes, CI publishes its image and commits `deploy: the demo runs sha-<commit>` to `render.yaml`, and Render deploys it. If the new image fails Render's health check, the old one keeps serving. Pull `main` after merging, since CI adds that commit.
+4. To roll back, put an older tag in `render.yaml` and push it to `main`. CI leaves a push that names an image there alone, and the next commit on `main` deploys again. Migrations only run forward, so to roll back past one, first undo it from the newer image's Shell with `alembic downgrade <revision>`.
 
 ## Licenses
 
